@@ -64,7 +64,7 @@ public final class OcclusionReviewHarness {
         player.setGameMode(GameType.SPECTATOR);player.teleportTo(level,10.5,103,3.5,90,0);
         prepared=true;
     }
-    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void before(RenderLevelStageEvent e)throws Exception{
+    @SubscribeEvent(priority=EventPriority.NORMAL) public static void before(RenderLevelStageEvent e)throws Exception{
         if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES||!prepared||wait<100||captured)return;
         boolean hasLens=GravitationalLensing.hasSources();
         if(!hasLens)throw new AssertionError("Spindle lens source not registered");

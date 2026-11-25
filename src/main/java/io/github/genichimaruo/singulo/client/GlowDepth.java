@@ -360,8 +360,6 @@ final class GlowDepth extends RenderType {
                 main.bindWrite(false);
                 solidDepthFresh = true;
             }
-            // 透ける物を描く前に、奥の景色へ重力レンズを掛ける（手前のガラスはこのあと上に描かれる）
-            GravitationalLensing.beforeTranslucent(event);
         }
     }
 

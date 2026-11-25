@@ -350,6 +350,7 @@ public final class GravitationalLensing {
      * そのとき掛ける。
      */
     static void beforeTranslucent(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
         if (SOURCES.isEmpty() || shader == null || !enabled() || shaderPackInUse()) {
             return;
         }
