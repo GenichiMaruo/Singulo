@@ -437,7 +437,15 @@ DESC = {
     '四芒星ホワイトガラスパネル': ('四芒星の模様が入った、透けるホワイトパネル。', 'A see-through white panel with a four-pointed star.'),
     '黒色強化ガラス': ('黒色強化パネルと同じくらい硬く、爆発に強い透けるパネル。鉄以上のツルハシで掘る。',
                 'See-through, as hard and blast-resistant as the Black Reinforced Panel. Needs an iron pickaxe or better.'),
+    '四芒星コラプサー強化ガラス': ('四芒星の模様が入ったコラプサー強化ガラス。ウィザーにも爆発にも壊されない。',
+        'Collapsar Reinforced Glass with a four-pointed star. Proof against the Wither and explosions.'),
     '四芒星黒色強化ガラス': ('四芒星の模様が入った黒色強化ガラス。', 'Black Reinforced Glass with a four-pointed star.'),
+    'コラプサー強化パネル': ('黒色強化パネルにコラプサーを編み込んだ、紫がかった黒のパネル。爆発ではまず壊れず、ウィザーとエンダードラゴンにも壊されない。ダイヤ以上のツルハシで、時間をかけて掘る。',
+        'A purplish black panel woven with collapsar. Explosions barely affect it, and neither the Wither nor the Ender Dragon can break it. Mine it slowly with a diamond pickaxe or better.'),
+    '発光コラプサー強化パネル': ('明るく光るコラプサー強化パネル（明るさ15）。爆発ではまず壊れず、ウィザーとエンダードラゴンにも壊されない。ダイヤ以上のツルハシで掘る。',
+        'A Collapsar Reinforced Panel that glows brightly (light 15). Explosions barely affect it, and neither the Wither nor the Ender Dragon can break it. Mine it with a diamond pickaxe or better.'),
+    'コラプサー強化ガラス': ('黒色強化ガラスにコラプサーを編み込んだ、紫がかった黒の透けるガラス。爆発ではまず壊れず、ウィザーとエンダードラゴンにも壊されない。ダイヤ以上のツルハシで掘る。',
+        'A purplish black see-through glass woven with collapsar. Explosions barely affect it, and neither the Wither nor the Ender Dragon can break it. Mine it with a diamond pickaxe or better.'),
     '黒色強化パネル': ('黒曜石なみに爆発に強い黒いパネル。鉄以上のツルハシで掘る。',
                 'A black panel as blast-resistant as obsidian. Needs an iron pickaxe or better.'),
     '発光黒色強化パネル': ('明るく光る黒色強化パネル（明るさ15）。黒曜石なみに爆発に強く、鉄以上のツルハシで掘る。',
@@ -1156,3 +1164,8 @@ DESC['携帯型アンドロイド印刷機（Mk2）'] = (
     'Choose the next set on its screen.')
 SUMMARY['携帯型アンドロイド印刷機（Mk2）'] = ('型の違う3体を順に印刷できる、携帯型アンドロイド印刷機の改良型。',
                                          'An improved portable printer that prints three types in turn.')
+
+# 0.23.0 コラプサー強化パネル
+SUMMARY['コラプサー強化パネル'] = ('ウィザーにも爆発にも壊されない、最も硬いパネル。', 'The toughest panel: proof against the Wither and explosions.')
+SUMMARY['発光コラプサー強化パネル'] = ('明るく光る、ウィザーにも爆発にも壊されないパネル。', 'A glowing panel proof against the Wither and explosions.')
+SUMMARY['コラプサー強化ガラス'] = ('ウィザーにも爆発にも壊されない、透けるガラス。', 'See-through glass proof against the Wither and explosions.')

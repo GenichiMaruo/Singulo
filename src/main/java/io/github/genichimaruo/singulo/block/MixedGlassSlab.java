@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -27,10 +29,50 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-/** Two distinct glass slabs sharing a position. The original slab items are used for placement and drops. */
-public final class MixedGlassSlab extends TransparentBlock {
+/**
+ * Two distinct glass slabs sharing a position. The original slab items are used for placement and drops.
+ * <p>
+ * This block ({@code mixed_glass_slab}) holds white panel glass and black reinforced glass. Its state ({@link #BLACK_ON_TOP})
+ * is stored in existing worlds since 0.21.0, so it is kept as it is. Pairs that include collapsar reinforced glass (0.23.0)
+ * use {@link Collapsar} ({@code mixed_collapsar_glass_slab}), which shares all behaviour through {@link #layer}.
+ */
+public class MixedGlassSlab extends TransparentBlock {
     public static final BooleanProperty BLACK_ON_TOP = BooleanProperty.create("black_on_top");
     public static final int BOTTOM_HIT = 1, TOP_HIT = 2;
+
+    /** 重ねられるガラス（コラプサーとの組で、もう一方を表すのに使う）。 */
+    public enum Glass implements StringRepresentable {
+        WHITE("white", "white_glass_panel"),
+        BLACK("black", "black_reinforced_glass"),
+        COLLAPSAR("collapsar", "collapsar_reinforced_glass");
+
+        private final String name;
+        /** 元のガラスの ID（ハーフブロックは <id>_slab）。 */
+        public final String base;
+
+        Glass(String name, String base) {
+            this.name = name;
+            this.base = base;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+
+        @Nullable
+        public static Glass of(Block base) {
+            var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(base);
+            for (Glass g : values()) {
+                if (id.getNamespace().equals(io.github.genichimaruo.singulo.Singulo.MODID) && id.getPath().equals(g.base)) return g;
+            }
+            return null;
+        }
+
+        BlockState slab(boolean top) {
+            return SinguloBlocks.VARIANTS.get(base + "_slab").get().defaultBlockState().setValue(SlabBlock.TYPE, top ? SlabType.TOP : SlabType.BOTTOM);
+        }
+    }
 
     public interface ExplosionHits {
         int singulo$glassHits(BlockPos pos);
@@ -38,7 +80,9 @@ public final class MixedGlassSlab extends TransparentBlock {
 
     public MixedGlassSlab(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(BLACK_ON_TOP, false));
+        if (stateDefinition.getProperties().contains(BLACK_ON_TOP)) {
+            registerDefaultState(stateDefinition.any().setValue(BLACK_ON_TOP, false));
+        }
     }
 
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -46,9 +90,24 @@ public final class MixedGlassSlab extends TransparentBlock {
         builder.add(BLACK_ON_TOP);
     }
 
+    /** このブロックの上（top）か下のハーフブロック。 */
+    protected BlockState layer(BlockState mixed, boolean top) {
+        return (mixed.getValue(BLACK_ON_TOP) == top ? Glass.BLACK : Glass.WHITE).slab(top);
+    }
+
+    /** 重ねたガラス（白黒・コラプサーとの組のどちらでも）の、上（top）か下のハーフブロック。 */
     public static BlockState half(BlockState mixed, boolean top) {
-        String id = mixed.getValue(BLACK_ON_TOP) == top ? "black_reinforced_glass_slab" : "white_glass_panel_slab";
-        return SinguloBlocks.VARIANTS.get(id).get().defaultBlockState().setValue(SlabBlock.TYPE, top ? SlabType.TOP : SlabType.BOTTOM);
+        return ((MixedGlassSlab) mixed.getBlock()).layer(mixed, top);
+    }
+
+    /** 下と上のガラスから、重ねたブロックの状態（白と黒は元からのブロック、コラプサーとの組は {@link Collapsar}）。 */
+    public static BlockState of(Glass lower, Glass upper) {
+        if (lower != Glass.COLLAPSAR && upper != Glass.COLLAPSAR) {
+            return SinguloBlocks.MIXED_GLASS_SLAB.get().defaultBlockState().setValue(BLACK_ON_TOP, upper == Glass.BLACK);
+        }
+        return SinguloBlocks.MIXED_COLLAPSAR_GLASS_SLAB.get().defaultBlockState()
+                .setValue(Collapsar.COLLAPSAR_ON_TOP, upper == Glass.COLLAPSAR)
+                .setValue(Collapsar.OTHER, upper == Glass.COLLAPSAR ? lower : upper);
     }
 
     public static boolean topAt(BlockPos pos, double y) { return y >= pos.getY() + 0.5; }
@@ -71,6 +130,13 @@ public final class MixedGlassSlab extends TransparentBlock {
         BlockState surface = entity instanceof Player player
                 ? selected(state, pos, player.pick(player.blockInteractionRange(), 1, false)) : half(state, true);
         return surface.getSoundType(level, pos, entity);
+    }
+
+
+    /** 掘って落とすのは、道具が上下どちらのハーフブロックも掘れるときだけ（コラプサーの方はダイヤ以上のツルハシ）。 */
+    @Override
+    public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
+        return player.hasCorrectToolForDrops(half(state, false)) && player.hasCorrectToolForDrops(half(state, true));
     }
 
     @Override public float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion) {
@@ -108,5 +174,37 @@ public final class MixedGlassSlab extends TransparentBlock {
             broken.getDrops(loot).forEach(stack -> drops.accept(stack, pos));
         }
         level.setBlockAndUpdate(pos, half(state, hits == BOTTOM_HIT));
+    }
+
+    /**
+     * コラプサー強化ガラスのハーフブロックと、白か黒のガラスのハーフブロックを重ねたもの（0.23.0。{@code mixed_collapsar_glass_slab}）。
+     * ふるまいは白黒の重ねハーフブロックと同じ。コラプサーを含むので、ウィザーとエンダードラゴンには壊されない。
+     */
+    public static final class Collapsar extends MixedGlassSlab {
+        public static final BooleanProperty COLLAPSAR_ON_TOP = BooleanProperty.create("collapsar_on_top");
+        /** コラプサーと重ねた、もう一方のガラス（白か黒）。 */
+        public static final EnumProperty<Glass> OTHER = EnumProperty.create("other", Glass.class, Glass.WHITE, Glass.BLACK);
+
+        public Collapsar(Properties properties) {
+            super(properties);
+            registerDefaultState(stateDefinition.any().setValue(COLLAPSAR_ON_TOP, true).setValue(OTHER, Glass.BLACK));
+        }
+
+        @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+            builder.add(COLLAPSAR_ON_TOP, OTHER);
+        }
+
+        @Override protected BlockState layer(BlockState mixed, boolean top) {
+            return (mixed.getValue(COLLAPSAR_ON_TOP) == top ? Glass.COLLAPSAR : mixed.getValue(OTHER)).slab(top);
+        }
+
+        @Override public boolean canEntityDestroy(BlockState state, BlockGetter level, BlockPos pos, Entity entity) {
+            if (entity instanceof net.minecraft.world.entity.boss.wither.WitherBoss
+                    || entity instanceof net.minecraft.world.entity.projectile.WitherSkull
+                    || entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon) {
+                return false;
+            }
+            return super.canEntityDestroy(state, level, pos, entity);
+        }
     }
 }

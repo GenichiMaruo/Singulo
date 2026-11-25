@@ -1603,6 +1603,8 @@ UI_LANG = {
     'gui.singulo.archivist.phase_2': ('覚えているか。記録はすべて、ここにある。', 'Do you remember? Every record is here.'),
     'gui.singulo.archivist.phase_3': ('光も記録も、いつかはこの暗がりに沈む。', 'Light and records alike sink into this dark in the end.'),
     'block.singulo.mixed_glass_slab': ('白黒ガラスの重ねハーフブロック', 'Stacked White and Black Glass Slabs'),
+    'block.singulo.mixed_panel_slab': ('パネルの重ねハーフブロック', 'Stacked Panel Slabs'),
+    'block.singulo.mixed_collapsar_glass_slab': ('コラプサーガラスの重ねハーフブロック', 'Stacked Collapsar Glass Slabs'),
     'block.singulo.arena_hologram': ('ホログラムの床', 'Hologram Floor'),
     'item.singulo.afterglow_wings.tip_1': ('胴に着ける光の翼。エリトラのように滑空でき、壊れない', 'Wings of light worn on the chest. Glide like an elytra; they never break'),
     'item.singulo.afterglow_wings.tip_2': ('滑空中にスニーク: 羽ばたいて前へ加速する', 'Sneak while gliding: beat the wings to surge forward'),
@@ -3717,16 +3719,25 @@ def tags():
         if tag == 'bypasses_armor':
             values.insert(1, f'{MODID}:jet_beam')
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
-    from building_variants import MIXED_SLAB
+    from building_variants import MIXED_SLAB, MIXED_PANEL_SLAB, MIXED_COLLAPSAR_SLAB
     mixed_slab = f'{MODID}:{MIXED_SLAB}'
-    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab]
+    mixed_panel = f'{MODID}:{MIXED_PANEL_SLAB}'
+    mixed_collapsar = f'{MODID}:{MIXED_COLLAPSAR_SLAB}'
+    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab, mixed_panel, mixed_collapsar]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     diamond_only = ('welded_hatch',)                      # 溶接された蓋はダイヤのツルハシ以上でないと掘れない
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
                {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
                    v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)] + [mixed_slab]})
-    write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
+                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)]
+                + [mixed_slab, mixed_panel, mixed_collapsar]})
+    # コラプサー強化パネル（0.23.0）: ダイヤ以上のツルハシで掘り、ウィザーとエンダードラゴンに壊されない（重ねハーフブロックは Java で見る）
+    collapsar = (['collapsar_reinforced_panel', 'collapsar_reinforced_light_panel', 'collapsar_reinforced_glass', 'collapsar_star_glass']
+                 + sorted(__import__('building_variants').COLLAPSAR_VARIANTS))
+    write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json',
+               {'values': [f'{MODID}:{i}' for i in diamond_only + tuple(collapsar)]})
+    for tag in ('wither_immune', 'dragon_immune'):
+        write_json(t / 'minecraft' / 'tags' / 'block' / f'{tag}.json', {'replace': False, 'values': [f'{MODID}:{i}' for i in collapsar]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter', 'minecraft:block_entity_data'],
                        # 液体のドローン発着ポート: 2つのタンクの中身をアイテムへ写す（置き直すと戻る）
@@ -4271,8 +4282,8 @@ TAB_GROUPS = [
     ('中間素材', None),
     ('白い建材', [
         'white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel',
-        'white_sliding_door', 'black_reinforced_panel', 'black_reinforced_light_panel', 'black_reinforced_glass',
-        'black_star_glass',
+        'white_sliding_door', 'black_reinforced_panel', 'black_reinforced_light_panel', 'collapsar_reinforced_panel',
+        'collapsar_reinforced_light_panel', 'black_reinforced_glass', 'black_star_glass', 'collapsar_reinforced_glass', 'collapsar_star_glass',
         'bismuth_crystal_block', 'glowing_bismuth_crystal',
         'android_barrier_glass', 'android_barrier_glass_patterned', 'android_gate_glass',
         'android_gate_glass_patterned',

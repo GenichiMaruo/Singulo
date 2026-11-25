@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "collapsar_on_top=false,other=white": {
+      "model": "singulo:block/mixed_collapsar_glass_slab_white_white_top"
+    },
+    "collapsar_on_top=true,other=white": {
+      "model": "singulo:block/mixed_collapsar_glass_slab_white_collapsar_top"
+    },
+    "collapsar_on_top=false,other=black": {
+      "model": "singulo:block/mixed_collapsar_glass_slab_black_black_top"
+    },
+    "collapsar_on_top=true,other=black": {
+      "model": "singulo:block/mixed_collapsar_glass_slab_black_collapsar_top"
+    }
+  }
+}

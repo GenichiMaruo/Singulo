@@ -205,6 +205,9 @@ public final class GeneratedContent {
             new BlockVariant("lab_tile_stairs", "lab_tiles", "stairs", 1),
             new BlockVariant("lab_tile_slab", "lab_tiles", "slab", 1),
             new BlockVariant("lab_tile_wall", "lab_tiles", "wall", 1),
+            new BlockVariant("collapsar_reinforced_panel_stairs", "collapsar_reinforced_panel", "stairs", 5),
+            new BlockVariant("collapsar_reinforced_panel_slab", "collapsar_reinforced_panel", "slab", 5),
+            new BlockVariant("collapsar_reinforced_panel_wall", "collapsar_reinforced_panel", "wall", 5),
             new BlockVariant("white_glass_panel_stairs", "white_glass_panel", "stairs", 1),
             new BlockVariant("black_reinforced_glass_stairs", "black_reinforced_glass", "stairs", 1),
             new BlockVariant("android_gate_glass_stairs", "android_gate_glass", "stairs", 2),
@@ -214,7 +217,9 @@ public final class GeneratedContent {
             new BlockVariant("white_glass_panel_slab", "white_glass_panel", "slab", 1),
             new BlockVariant("black_reinforced_glass_slab", "black_reinforced_glass", "slab", 1),
             new BlockVariant("android_gate_glass_slab", "android_gate_glass", "slab", 2),
-            new BlockVariant("android_barrier_glass_slab", "android_barrier_glass", "slab", 2)
+            new BlockVariant("android_barrier_glass_slab", "android_barrier_glass", "slab", 2),
+            new BlockVariant("collapsar_reinforced_glass_stairs", "collapsar_reinforced_glass", "stairs", 5),
+            new BlockVariant("collapsar_reinforced_glass_slab", "collapsar_reinforced_glass", "slab", 5)
     );
 
     /** クリエイティブタブ（と JEI）の並び。用途ごとのまとまり → 段階順。ここにないものは最後。 */
@@ -572,10 +577,19 @@ public final class GeneratedContent {
             "black_reinforced_panel_slab",
             "black_reinforced_panel_wall",
             "black_reinforced_light_panel",
+            "collapsar_reinforced_panel",
+            "collapsar_reinforced_panel_stairs",
+            "collapsar_reinforced_panel_slab",
+            "collapsar_reinforced_panel_wall",
+            "collapsar_reinforced_light_panel",
             "black_reinforced_glass",
             "black_reinforced_glass_stairs",
             "black_reinforced_glass_slab",
             "black_star_glass",
+            "collapsar_reinforced_glass",
+            "collapsar_reinforced_glass_stairs",
+            "collapsar_reinforced_glass_slab",
+            "collapsar_star_glass",
             "bismuth_crystal_block",
             "glowing_bismuth_crystal",
             "android_barrier_glass",
@@ -924,10 +938,14 @@ public final class GeneratedContent {
             Map.entry("white_panel", 1),
             Map.entry("white_light_panel", 1),
             Map.entry("black_reinforced_panel", 1),
+            Map.entry("collapsar_reinforced_panel", 5),
+            Map.entry("collapsar_reinforced_light_panel", 5),
             Map.entry("black_reinforced_light_panel", 1),
             Map.entry("white_glass_panel", 1),
             Map.entry("white_star_glass_panel", 1),
             Map.entry("black_reinforced_glass", 1),
+            Map.entry("collapsar_reinforced_glass", 5),
+            Map.entry("collapsar_star_glass", 5),
             Map.entry("black_star_glass", 1),
             Map.entry("android_barrier_glass", 2),
             Map.entry("android_barrier_glass_patterned", 2),
@@ -987,6 +1005,9 @@ public final class GeneratedContent {
             Map.entry("lab_tile_stairs", 1),
             Map.entry("lab_tile_slab", 1),
             Map.entry("lab_tile_wall", 1),
+            Map.entry("collapsar_reinforced_panel_stairs", 5),
+            Map.entry("collapsar_reinforced_panel_slab", 5),
+            Map.entry("collapsar_reinforced_panel_wall", 5),
             Map.entry("white_glass_panel_stairs", 1),
             Map.entry("black_reinforced_glass_stairs", 1),
             Map.entry("android_gate_glass_stairs", 2),
@@ -996,6 +1017,8 @@ public final class GeneratedContent {
             Map.entry("white_glass_panel_slab", 1),
             Map.entry("black_reinforced_glass_slab", 1),
             Map.entry("android_gate_glass_slab", 2),
-            Map.entry("android_barrier_glass_slab", 2)
+            Map.entry("android_barrier_glass_slab", 2),
+            Map.entry("collapsar_reinforced_glass_stairs", 5),
+            Map.entry("collapsar_reinforced_glass_slab", 5)
     );
 }

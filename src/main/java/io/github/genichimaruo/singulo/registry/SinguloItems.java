@@ -615,10 +615,14 @@ public final class SinguloItems {
         block(SinguloBlocks.GLOWING_BISMUTH_CRYSTAL, 2);
         block(SinguloBlocks.BLACK_REINFORCED_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_LIGHT_PANEL, 1);
+        block(SinguloBlocks.COLLAPSAR_REINFORCED_PANEL, 5);
+        block(SinguloBlocks.COLLAPSAR_REINFORCED_LIGHT_PANEL, 5);
         block(SinguloBlocks.WHITE_GLASS_PANEL, 1);
         block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_GLASS, 1);
         block(SinguloBlocks.BLACK_STAR_GLASS, 1);
+        block(SinguloBlocks.COLLAPSAR_REINFORCED_GLASS, 5);
+        block(SinguloBlocks.COLLAPSAR_STAR_GLASS, 5);
         block(SinguloBlocks.ANDROID_BARRIER_GLASS, 2);
         block(SinguloBlocks.ANDROID_BARRIER_GLASS_PATTERNED, 2);
         block(SinguloBlocks.ANDROID_GATE_GLASS, 2);

@@ -40,6 +40,7 @@ import org.joml.Vector3f;
  * glass_join_textures（見える 1/4 の組ごとの <ガラス>_join_<bits>）。
  * 0.21.0: 階段・ハーフブロックの面も同じ。同じガラスの階段・ハーフブロックが一部を覆う面は、自分の形があって覆われていない 1/4 だけを描く
  * （階段の側面にハーフブロックが当たるときなど）。
+ * 0.23.0: 不透明なハーフブロック・階段（パネルなど）に一部だけ覆われる面も、同じく見える所だけを描く（{@link PanelJoinModel#coverage}）。
  */
 final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     /** Per face: zero uses the original geometry, otherwise 1 + two four-bit visible material masks. */
@@ -54,9 +55,15 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
 
         int clipped(BlockState neighbour, Direction face) {
             BlockState part = GlassJoin.matchingPart(neighbour, glass);
-            if (part == null) return -1;
             int own = own(face);
-            int covered = part.is(glass) ? 15 : quarters(part, face, false);
+            int covered;
+            if (part != null) {
+                covered = part.is(glass) ? 15 : quarters(part, face, false);
+            } else {
+                // 0.23.0: 不透明なハーフブロック・階段（パネルなど）に一部だけ覆われる面も、見える所だけを枠の絵で描く
+                covered = PanelJoinModel.coverage(neighbour, face);
+                if (covered == 0 || covered == 15) return -1;
+            }
             return (own & covered) == 0 ? -1 : own & ~covered;
         }
     }
@@ -73,6 +80,7 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
 
     static void wrap(ModelEvent.ModifyBakingResult event) {
         for (Block glass : new Block[] {SinguloBlocks.WHITE_GLASS_PANEL.get(), SinguloBlocks.BLACK_REINFORCED_GLASS.get(),
+                SinguloBlocks.COLLAPSAR_REINFORCED_GLASS.get(),
                 SinguloBlocks.ANDROID_GATE_GLASS_PATTERNED.get(), SinguloBlocks.ANDROID_BARRIER_GLASS_PATTERNED.get()}) {
             // 元のガラスと、その階段・ハーフブロック（0.21.0。形どうしが接する面も、隠れていない所だけ描く）
             List<Block> blocks = new ArrayList<>(List.of(glass));
@@ -87,7 +95,9 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
                 }
             }
         }
-        for (BlockState state : SinguloBlocks.MIXED_GLASS_SLAB.get().getStateDefinition().getPossibleStates()) {
+        var mixed = new ArrayList<>(SinguloBlocks.MIXED_GLASS_SLAB.get().getStateDefinition().getPossibleStates());
+        mixed.addAll(SinguloBlocks.MIXED_COLLAPSAR_GLASS_SLAB.get().getStateDefinition().getPossibleStates());   // 0.23.0
+        for (BlockState state : mixed) {
             BlockState lower = MixedGlassSlab.half(state, false), upper = MixedGlassSlab.half(state, true);
             Layer bottom = new Layer(((GlassJoin.Shaped) lower.getBlock()).base(), lower);
             Layer top = new Layer(((GlassJoin.Shaped) upper.getBlock()).base(), upper);
@@ -115,7 +125,7 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
      * 向き d の面の 1/4 のうち、shape（階段・ハーフブロック）の 1/8 の箱がある所（bits）。self なら自分の面の側の層、
      * そうでなければ向き d の隣にあるものとして、この面に接する層を見る。
      */
-    private static int quarters(BlockState shape, Direction d, boolean self) {
+    static int quarters(BlockState shape, Direction d, boolean self) {
         int[] masks = FACE_MASKS.computeIfAbsent(shape, s -> {
             int[] result = new int[12];
             for (Direction face : Direction.values()) {
@@ -147,7 +157,7 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     }
 
     /** 面 d に接する4つの 1/8 の箱の、始まりの座標（0 か 8）。 */
-    private static List<int[]> cells(Direction d) {
+    static List<int[]> cells(Direction d) {
         List<int[]> out = new ArrayList<>(4);
         int axis = d.getAxis().ordinal();
         int at = d.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 8 : 0;
@@ -165,7 +175,7 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     }
 
     /** 1/8 の箱の面 d の UV（面の位置どおり。tools/building_variants.py の _face_uv と同じ）。 */
-    private static float[] uv(Direction d, int[] f) {
+    static float[] uv(Direction d, int[] f) {
         int[] t = {f[0] + 8, f[1] + 8, f[2] + 8};
         return switch (d) {
             case DOWN -> new float[] {f[0], 16 - t[2], t[0], 16 - f[2]};
@@ -178,7 +188,7 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     }
 
     /** その 1/8 の箱の面が、UV のどの 1/4 か（bit）。 */
-    private static int quarter(Direction d, int[] cell) {
+    static int quarter(Direction d, int[] cell) {
         float[] r = uv(d, cell);
         return 1 << ((r[0] >= 8 ? 1 : 0) + (r[1] >= 8 ? 2 : 0));
     }
@@ -202,7 +212,7 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     }
 
     /** 見える 1/4 だけの面（その組の枠の絵）。 */
-    private void bake(Direction side, int bits, String name, List<BakedQuad> out) {
+    static void bake(Direction side, int bits, String name, List<BakedQuad> out) {
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
                 .apply(Singulo.id("block/" + name + "_join_" + bits));
         for (int[] cell : cells(side)) {

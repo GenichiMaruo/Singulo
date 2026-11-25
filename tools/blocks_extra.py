@@ -462,6 +462,7 @@ def bismuth_crystal(glow=False):
 
 DECO_ART = {'white_panel': white_panel, 'white_light_panel': white_light_panel,
             'black_reinforced_panel': black_reinforced_panel, 'black_reinforced_light_panel': black_reinforced_light_panel,
+            'collapsar_reinforced_panel': collapsar_reinforced_panel, 'collapsar_reinforced_light_panel': collapsar_reinforced_light_panel,
             'bismuth_crystal_block': bismuth_crystal, 'glowing_bismuth_crystal': lambda: bismuth_crystal(True)}
 
 

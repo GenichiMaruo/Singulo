@@ -2646,3 +2646,42 @@ Mk2を材料にする。蓄電容量を最低40,000,000 FEにする
 
 すべての技のダメージ +100%（2倍）。燃えない。材料の出力増幅器のエンチャントを引き継ぐ
 
+### コラプサー強化パネル
+
+![コラプサー強化パネル](501_collapsar_reinforced_panel.png)
+
+爆発ではまず壊れず、ウィザーとエンダードラゴンにも壊されない。ダイヤ以上のツルハシで掘る
+
+### コラプサー強化パネルの階段
+
+![コラプサー強化パネルの階段](502_collapsar_reinforced_panel_stairs.png)
+
+### コラプサー強化パネルのハーフブロック
+
+![コラプサー強化パネルのハーフブロック](503_collapsar_reinforced_panel_slab.png)
+
+### コラプサー強化パネルの塀
+
+![コラプサー強化パネルの塀](504_collapsar_reinforced_panel_wall.png)
+
+### 発光コラプサー強化パネル
+
+![発光コラプサー強化パネル](505_collapsar_reinforced_light_panel.png)
+
+### コラプサー強化ガラス
+
+![コラプサー強化ガラス](506_collapsar_reinforced_glass.png)
+
+爆発ではまず壊れず、ウィザーとエンダードラゴンにも壊されない透けるガラス。ダイヤ以上のツルハシで掘る
+
+### コラプサー強化ガラスの階段
+
+![コラプサー強化ガラスの階段](507_collapsar_reinforced_glass_stairs.png)
+
+### コラプサー強化ガラスのハーフブロック
+
+![コラプサー強化ガラスのハーフブロック](508_collapsar_reinforced_glass_slab.png)
+
+### 四芒星コラプサー強化ガラス
+
+![四芒星コラプサー強化ガラス](509_collapsar_star_glass.png)

@@ -1,0 +1,133 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "name": "singulo:white_panel_slab",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "singulo:mixed_panel_slab",
+                  "properties": {
+                    "lower": "white"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "singulo:black_reinforced_panel_slab",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "singulo:mixed_panel_slab",
+                  "properties": {
+                    "lower": "black"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "singulo:collapsar_reinforced_panel_slab",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "singulo:mixed_panel_slab",
+                  "properties": {
+                    "lower": "collapsar"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "name": "singulo:white_panel_slab",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "singulo:mixed_panel_slab",
+                  "properties": {
+                    "upper": "white"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "singulo:black_reinforced_panel_slab",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "singulo:mixed_panel_slab",
+                  "properties": {
+                    "upper": "black"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "singulo:collapsar_reinforced_panel_slab",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "singulo:mixed_panel_slab",
+                  "properties": {
+                    "upper": "collapsar"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

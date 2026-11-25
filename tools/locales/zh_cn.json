@@ -11460,8 +11460,8 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 58 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 58 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 59 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 59 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 38 more",
@@ -11480,12 +11480,12 @@
     "translation": "用于：鿭、铋晶体块"
   },
   "uses.singulo.black_reinforced_glass": {
-    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs, Black Reinforced Glass Slab",
-    "translation": "用于：四芒星黑色强化玻璃、黑色强化玻璃楼梯、黑色强化玻璃台阶"
+    "source": "Used in: Starred Black Reinforced Glass, Black Reinforced Glass Stairs, Black Reinforced Glass Slab, Collapsar Reinforced Glass",
+    "translation": "用于：四芒星黑色强化玻璃、黑色强化玻璃楼梯、黑色强化玻璃台阶、坍缩星强化玻璃"
   },
   "uses.singulo.black_reinforced_panel": {
-    "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall, Glowing Black Reinforced Panel",
-    "translation": "用于：高重力面板、黑色强化面板楼梯、黑色强化面板台阶、黑色强化面板墙、发光黑色强化面板"
+    "source": "Used in: High-Gravity Panel, Black Reinforced Panel Stairs, Black Reinforced Panel Slab, Black Reinforced Panel Wall, Glowing Black Reinforced Panel and 1 more",
+    "translation": "用于：高重力面板、黑色强化面板楼梯、黑色强化面板台阶、黑色强化面板墙、发光黑色强化面板 等 1 项"
   },
   "uses.singulo.blank_data_card": {
     "source": "Used in: Data Card (Observation Log), Data Card (Quantum Data Fragment), Data Card (Culture Data), Shield Permit",
@@ -11556,8 +11556,8 @@
     "translation": "用于：冷原子"
   },
   "uses.singulo.cold_atoms": {
-    "source": "Used in: BE Condensate Catalyst, Phase Sync Plate, Gravity Field Stabilizer, Reactor Stabilizer Coil, Quantum Key",
-    "translation": "用于：玻色凝聚态催化剂、相位同步板、重力场稳定器、炉心稳定线圈、量子锁钥匙"
+    "source": "Used in: BE Condensate Catalyst, Phase Sync Plate, Gravity Field Stabilizer, Reactor Stabilizer Coil, Quantum Key and 1 more",
+    "translation": "用于：玻色凝聚态催化剂、相位同步板、重力场稳定器、炉心稳定线圈、量子锁钥匙 等 1 项"
   },
   "uses.singulo.collapsar_billet": {
     "source": "Used in: Collapsar Ingot, Tidal Filament",
@@ -11700,12 +11700,12 @@
     "translation": "用于：简并热炉"
   },
   "uses.singulo.degenerate_matter_shell": {
-    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 4 more",
-    "translation": "用途：反应堆外壳、奇点种子、奇点核心、中微子灵敏度模块 Mk3、封印容器（时间锁） 等 4 项"
+    "source": "Used in: Reactor Shell, Singularity Seed, Singularity Core, Neutrino Sensitivity Module Mk3, Sealed Container (Temporal Lock) and 5 more",
+    "translation": "用途：反应堆外壳、奇点种子、奇点核心、中微子灵敏度模块 Mk3、封印容器（时间锁） 等 5 项"
   },
   "uses.singulo.degenerate_nucleus": {
-    "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core",
-    "translation": "用于：时间晶体育成槽、奇点封装器、奇点种子、引力子操控器、觉醒重力核"
+    "source": "Used in: Time Crystal Incubator, Singularity Encapsulator, Singularity Seed, Graviton Manipulator, Awakened Gravity Core and 1 more",
+    "translation": "用于：时间晶体育成槽、奇点封装器、奇点种子、引力子操控器、觉醒重力核 等 1 项"
   },
   "uses.singulo.degenerate_precursor": {
     "source": "Used in: Degenerate Matter Shell",
@@ -11740,8 +11740,8 @@
     "translation": "用于：冷媒罐、液氦冷媒罐"
   },
   "uses.singulo.entangled_element": {
-    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 30 more",
-    "translation": "用途：强化背包升级、量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器 等 30 项"
+    "source": "Used in: Reinforced Backpack Upgrade, Quantum Computing Module, Optical Lattice Substrate, Neutrino Scanner, Inertial Stabilizer and 34 more",
+    "translation": "用途：强化背包升级、量子计算模块、光学晶格基板、中微子扫描仪、惯性稳定器 等 34 项"
   },
   "uses.singulo.ergosphere_chapter": {
     "source": "Used in: Awakened Ergosphere Core, Terminus Record, Primordial Seed",
@@ -11752,8 +11752,8 @@
     "translation": "用于：封印容器（奇点锁）"
   },
   "uses.singulo.exotic_matter": {
-    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 35 more",
-    "translation": "用途：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 35 项"
+    "source": "Used in: Horizon Bus, Gravity Field Stabilizer, Micro Black Hole Vessel, Black Hole Bomb, H-Collector and 38 more",
+    "translation": "用途：视界总线、重力场稳定器、微型黑洞容器、黑洞炸弹、霍金收集器 等 38 项"
   },
   "uses.singulo.accelerator_focusing_magnet": {
     "source": "Used in: Particle Accelerator",
@@ -11800,8 +11800,8 @@
     "translation": "用于：破碎的废墟玻璃、强化废墟玻璃"
   },
   "uses.singulo.jet_condensate": {
-    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon, Collapsar Billet",
-    "translation": "用于：人造星核、觉醒涡核、创世炉支柱、坍缩星坯料"
+    "source": "Used in: Artificial Star Core, Awakened Ergosphere Core, Genesis Pylon, Collapsar Billet, Output Amplifier Mk3",
+    "translation": "用于：人造星核、觉醒涡核、创世炉支柱、坍缩星坯料、输出增幅器（Mk3）"
   },
   "uses.singulo.jet_forge_collector": {
     "source": "Used in: Accretion Jet Forge",
@@ -11884,24 +11884,24 @@
     "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、简并热炉控制器、自动探测站 等 16 个"
   },
   "uses.singulo.nihonium_ingot": {
-    "source": "Used in: Nihonium Plate",
-    "translation": "用于：鿭板"
+    "source": "Used in: Nihonium Plate, Piercing Module",
+    "translation": "用于：鿭板、贯通模块"
   },
   "uses.singulo.nihonium_plate": {
-    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 13 more",
-    "translation": "用途：视界总线、陀螺驱动装置、霍金收集器、喷流收集器、鿭框架 等 13 项"
+    "source": "Used in: Horizon Bus, Gyro Drive, H-Collector, Jet Collector, Nihonium Frame and 16 more",
+    "translation": "用途：视界总线、陀螺驱动装置、霍金收集器、喷流收集器、鿭框架 等 16 项"
   },
   "uses.singulo.observation_log": {
     "source": "Used in: Data Card (Observation Log)",
     "translation": "用于：数据卡（观测日志）"
   },
   "uses.singulo.optical_lattice_substrate": {
-    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 28 more",
-    "translation": "用于：大型背包升级、简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、相位同步板 等 28 个"
+    "source": "Used in: Large Backpack Upgrade, Degenerate Compactor Controller, C-Cavity Controller, Time Crystal Incubator, Phase Sync Plate and 29 more",
+    "translation": "用于：大型背包升级、简并压缩炉控制器、卡西米尔腔控制器、时间晶体育成槽、相位同步板 等 29 个"
   },
   "uses.singulo.phase_sync_plate": {
-    "source": "Used in: Time Crystal Catalyst",
-    "translation": "用于：时间晶体催化剂"
+    "source": "Used in: Time Crystal Catalyst, Warden Breaker Module",
+    "translation": "用于：时间晶体催化剂、对守护者模块"
   },
   "uses.singulo.precision_actuator": {
     "source": "Used in: Factory Print Unit, Awakened Foundry Core",
@@ -11916,8 +11916,8 @@
     "translation": "用于：无瑕废墟瓷砖、无瑕废墟柱、无瑕废墟导光板、无瑕废墟面板楼梯、无瑕废墟面板台阶 等 1 个"
   },
   "uses.singulo.quantum_computing_module": {
-    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 22 more",
-    "translation": "用于：量子热机、引力波探测器、中微子观测站、简并压缩炉控制器、卡西米尔腔控制器 等 22 个"
+    "source": "Used in: Quantum Heat Engine, Gravitational Wave Detector, Neutrino Observatory, Degenerate Compactor Controller, C-Cavity Controller and 23 more",
+    "translation": "用于：量子热机、引力波探测器、中微子观测站、简并压缩炉控制器、卡西米尔腔控制器 等 23 个"
   },
   "uses.singulo.quantum_data_fragment": {
     "source": "Used in: Data Card (Quantum Data Fragment)",
@@ -12004,12 +12004,12 @@
     "translation": "用于：基本框架、钢板、压缩机、迁移扳手、无瑕废墟柱 等 1 个"
   },
   "uses.singulo.steel_plate": {
-    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 100 more",
-    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 100 个"
+    "source": "Used in: White Panel, Black Reinforced Panel, White Sliding Door, Black Reinforced Glass, Cooling Tower Base and 102 more",
+    "translation": "用于：白色面板、黑色强化面板、白色滑动门、黑色强化玻璃、冷却塔底座 等 102 个"
   },
   "uses.singulo.superconducting_coil": {
-    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 84 more",
-    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 84 项"
+    "source": "Used in: Superconducting Wire, Focusing Magnet, Accelerator Controller, Catalytic Reactor, Cryogenic Turbine and 88 more",
+    "translation": "用途：超导线材、聚焦磁体、加速器控制器、催化反应器、低温涡轮机 等 88 项"
   },
   "uses.singulo.superconducting_wire": {
     "source": "Used in: Superconducting Cable, Accelerator Tube, Entangled Element, BE Condensate Catalyst, Degenerate Furnace Heat Exchange Tube and 4 more",
@@ -12024,8 +12024,8 @@
     "translation": "用于：奇异物质、陀螺驱动装置、奇点核心、晕收集器、盾塔底座 等 13 个"
   },
   "uses.singulo.time_crystal_module": {
-    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 9 more",
-    "translation": "用于：SMES 模块、反应堆外壳、炉心控制器、奇点封装器、盾塔核心 等 9 个"
+    "source": "Used in: SMES Module, Reactor Shell, Core Controller, Singularity Encapsulator, Shield Tower Core and 10 more",
+    "translation": "用于：SMES 模块、反应堆外壳、炉心控制器、奇点封装器、盾塔核心 等 10 个"
   },
   "uses.singulo.time_crystal_seed": {
     "source": "Used in: Time Crystal Catalyst",
@@ -12060,8 +12060,8 @@
     "translation": "用于：简并压缩炉控制器、卡西米尔腔控制器、环形线圈、视界总线、磁约束环 等 4 个"
   },
   "uses.singulo.toroidal_magnetic_coil": {
-    "source": "Used in: SMES Module",
-    "translation": "用于：SMES 模块"
+    "source": "Used in: SMES Module, Heavy Strike Module",
+    "translation": "用于：SMES 模块、重击模块"
   },
   "uses.singulo.unfired_ceramic": {
     "source": "Used in: White Ceramic Composite",
@@ -13572,8 +13572,8 @@
     "translation": "升级两端的口，步行通行。"
   },
   "uses.singulo.collapsar_ingot": {
-    "source": "Used in: Tidal Spindle, Wormhole Seam Upgrade, Collapsar Parallel Cassette, Collapsar Lining, Event Horizon Vault and 1 more",
-    "translation": "用途：潮汐纺丝机、虫洞缝合升级、坍缩星并行加工盒、坍缩星内衬、视界仓库 等 1 项"
+    "source": "Used in: Tidal Spindle, Wormhole Seam Upgrade, Collapsar Parallel Cassette, Collapsar Lining, Event Horizon Vault and 6 more",
+    "translation": "用途：潮汐纺丝机、虫洞缝合升级、坍缩星并行加工盒、坍缩星内衬、视界仓库 等 6 项"
   },
   "uses.singulo.cosmic_frame": {
     "source": "Used in: Suspension Reservoir, Nuclear Pasta Laminate, Suspension Crown, Suspension Strut, Pasta Conductor and 2 more",
@@ -16507,6 +16507,18 @@
     "source": "A weapon module that lets a guard join boss fights.",
     "translation": "让护卫加入首领战的武装模块。"
   },
+  "uses.singulo.android_weapon_module": {
+    "source": "Used in: Output Amplifier Mk2, Heavy Strike Module, Rapid Strike Module, Drain Module, Piercing Module and 2 more",
+    "translation": "用于：输出增幅器（Mk2）、重击模块、连击模块、吸收模块、贯通模块 等 2 项"
+  },
+  "uses.singulo.android_weapon_module_2": {
+    "source": "Used in: Output Amplifier Mk3",
+    "translation": "用于：输出增幅器（Mk3）"
+  },
+  "uses.singulo.helium_cartridge": {
+    "source": "Used in: Frost Module",
+    "translation": "用于：冻结模块"
+  },
   "gui.singulo.android_station.weapon": {
     "source": "Weapon (fitted to the printed android)",
     "translation": "武装（装配到打印出的仿生人）"
@@ -16514,5 +16526,141 @@
   "gui.singulo.portable_printer.weapon": {
     "source": "Weapon (fitted to the printed android)",
     "translation": "武装（装配到打印出的仿生人）"
+  },
+  "block.singulo.mixed_panel_slab": {
+    "source": "Stacked Panel Slabs",
+    "translation": "面板双层台阶"
+  },
+  "block.singulo.collapsar_reinforced_panel": {
+    "source": "Collapsar Reinforced Panel",
+    "translation": "坍缩星强化面板"
+  },
+  "block.singulo.collapsar_reinforced_panel_stairs": {
+    "source": "Collapsar Reinforced Panel Stairs",
+    "translation": "坍缩星强化面板楼梯"
+  },
+  "block.singulo.collapsar_reinforced_panel_slab": {
+    "source": "Collapsar Reinforced Panel Slab",
+    "translation": "坍缩星强化面板台阶"
+  },
+  "block.singulo.collapsar_reinforced_panel_wall": {
+    "source": "Collapsar Reinforced Panel Wall",
+    "translation": "坍缩星强化面板墙"
+  },
+  "howto.singulo.collapsar_reinforced_panel": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "howto.singulo.collapsar_reinforced_panel_stairs": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "howto.singulo.collapsar_reinforced_panel_slab": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "howto.singulo.collapsar_reinforced_panel_wall": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "desc.singulo.collapsar_reinforced_panel": {
+    "source": "A purplish black panel woven with collapsar. Explosions barely affect it, and neither the Wither nor the Ender Dragon can break it. Mine it slowly with a diamond pickaxe or better.",
+    "translation": "编织了坍缩星材料的紫黑色面板。爆炸几乎无法破坏它，凋灵和末影龙也无法破坏。需用钻石或更好的镐耐心开采。"
+  },
+  "summary.singulo.collapsar_reinforced_panel": {
+    "source": "The toughest panel: proof against the Wither and explosions.",
+    "translation": "连凋灵和爆炸都无法破坏的最坚固面板。"
+  },
+  "desc.singulo.collapsar_reinforced_panel_slab": {
+    "source": "A half-height Collapsar Reinforced Panel. Two make a full block.",
+    "translation": "半格高的坍缩星强化面板。两个叠在一起就是一整块。"
+  },
+  "desc.singulo.collapsar_reinforced_panel_stairs": {
+    "source": "Stairs made from Collapsar Reinforced Panel.",
+    "translation": "用坍缩星强化面板制成的楼梯。"
+  },
+  "desc.singulo.collapsar_reinforced_panel_wall": {
+    "source": "A Collapsar Reinforced Panel wall that connects like a fence.",
+    "translation": "坍缩星强化面板制成的墙，会像栅栏一样与相邻方块相连。"
+  },
+  "uses.singulo.collapsar_reinforced_panel": {
+    "source": "Used in: Collapsar Reinforced Panel Stairs, Collapsar Reinforced Panel Slab, Collapsar Reinforced Panel Wall, Glowing Collapsar Reinforced Panel",
+    "translation": "用于：坍缩星强化面板楼梯、坍缩星强化面板台阶、坍缩星强化面板墙、发光坍缩星强化面板"
+  },
+  "block.singulo.collapsar_reinforced_glass": {
+    "source": "Collapsar Reinforced Glass",
+    "translation": "坍缩星强化玻璃"
+  },
+  "block.singulo.collapsar_reinforced_glass_stairs": {
+    "source": "Collapsar Reinforced Glass Stairs",
+    "translation": "坍缩星强化玻璃楼梯"
+  },
+  "block.singulo.collapsar_reinforced_glass_slab": {
+    "source": "Collapsar Reinforced Glass Slab",
+    "translation": "坍缩星强化玻璃台阶"
+  },
+  "block.singulo.collapsar_reinforced_light_panel": {
+    "source": "Glowing Collapsar Reinforced Panel",
+    "translation": "发光坍缩星强化面板"
+  },
+  "howto.singulo.collapsar_reinforced_glass": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "howto.singulo.collapsar_reinforced_glass_stairs": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "howto.singulo.collapsar_reinforced_glass_slab": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "howto.singulo.collapsar_reinforced_light_panel": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "desc.singulo.collapsar_reinforced_glass": {
+    "source": "A purplish black see-through glass woven with collapsar. Explosions barely affect it, and neither the Wither nor the Ender Dragon can break it. Mine it with a diamond pickaxe or better.",
+    "translation": "编织了坍缩星材料的紫黑色透明玻璃。爆炸几乎无法破坏它，凋灵和末影龙也无法破坏。需用钻石或更好的镐开采。"
+  },
+  "desc.singulo.collapsar_reinforced_light_panel": {
+    "source": "A Collapsar Reinforced Panel that glows brightly (light 15). Explosions barely affect it, and neither the Wither nor the Ender Dragon can break it. Mine it with a diamond pickaxe or better.",
+    "translation": "明亮发光的坍缩星强化面板（亮度15）。爆炸几乎无法破坏它，凋灵和末影龙也无法破坏。需用钻石或更好的镐开采。"
+  },
+  "summary.singulo.collapsar_reinforced_glass": {
+    "source": "See-through glass proof against the Wither and explosions.",
+    "translation": "连凋灵和爆炸都无法破坏的透明玻璃。"
+  },
+  "summary.singulo.collapsar_reinforced_light_panel": {
+    "source": "A glowing panel proof against the Wither and explosions.",
+    "translation": "明亮发光、连凋灵和爆炸都无法破坏的面板。"
+  },
+  "desc.singulo.collapsar_reinforced_glass_slab": {
+    "source": "A half-height Collapsar Reinforced Glass. Two make a full block.",
+    "translation": "半格高的坍缩星强化玻璃。两个叠在一起就是一整块。"
+  },
+  "desc.singulo.collapsar_reinforced_glass_stairs": {
+    "source": "Stairs made from Collapsar Reinforced Glass.",
+    "translation": "用坍缩星强化玻璃制成的楼梯。"
+  },
+  "uses.singulo.collapsar_reinforced_glass": {
+    "source": "Used in: Collapsar Reinforced Glass Stairs, Collapsar Reinforced Glass Slab, Starred Collapsar Reinforced Glass",
+    "translation": "用于：坍缩星强化玻璃楼梯、坍缩星强化玻璃台阶、四芒星坍缩星强化玻璃"
+  },
+  "block.singulo.mixed_collapsar_glass_slab": {
+    "source": "Stacked Collapsar Glass Slabs",
+    "translation": "坍缩星玻璃双层台阶"
+  },
+  "block.singulo.collapsar_star_glass": {
+    "source": "Starred Collapsar Reinforced Glass",
+    "translation": "四芒星坍缩星强化玻璃"
+  },
+  "howto.singulo.collapsar_star_glass": {
+    "source": "Made in: Crafting Table (stage 5)",
+    "translation": "制作：工作台（阶段5）"
+  },
+  "desc.singulo.collapsar_star_glass": {
+    "source": "Collapsar Reinforced Glass with a four-pointed star. Proof against the Wither and explosions.",
+    "translation": "带有四芒星图案的坍缩星强化玻璃。凋灵和爆炸都无法破坏。"
   }
 }

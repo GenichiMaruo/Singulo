@@ -63,9 +63,12 @@ public final class GlassJoin {
     @Nullable public static BlockState matchingPart(BlockState state, Block glass) {
         if (state.is(glass) || shapedOf(state, glass)) return state;
         if (!(state.getBlock() instanceof MixedGlassSlab)) return null;
-        boolean black = glass == SinguloBlocks.BLACK_REINFORCED_GLASS.get();
-        if (!black && glass != SinguloBlocks.WHITE_GLASS_PANEL.get()) return null;
-        return MixedGlassSlab.half(state, state.getValue(MixedGlassSlab.BLACK_ON_TOP) == black);
+        // 重ねたハーフブロックのうち、そのガラスの方（違うガラスどうしなので、合うのは多くても1つ）
+        for (boolean top : new boolean[] {false, true}) {
+            BlockState half = MixedGlassSlab.half(state, top);
+            if (shapedOf(half, glass)) return half;
+        }
+        return null;
     }
 
     /** self の direction 側の面が、隣の adjacent の形ですき間なく覆われているか（覆われていれば描かない）。 */
@@ -140,7 +143,7 @@ public final class GlassJoin {
         }
     }
 
-    /** White panel and black reinforced glass share vanilla slab placement rules. */
+    /** White panel, black reinforced and collapsar reinforced glass slabs share vanilla slab placement rules and stack with each other. */
     public static final class PairSlab extends Slab {
         public PairSlab(Supplier<Block> base, Properties properties) { super(base, properties); }
 
@@ -156,9 +159,11 @@ public final class GlassJoin {
         @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
             BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
             if (existing.getBlock() instanceof PairSlab other && other != this && existing.getValue(TYPE) != SlabType.DOUBLE) {
-                Block top = existing.getValue(TYPE) == SlabType.TOP ? other.base() : base();
-                return SinguloBlocks.MIXED_GLASS_SLAB.get().defaultBlockState()
-                        .setValue(MixedGlassSlab.BLACK_ON_TOP, top == SinguloBlocks.BLACK_REINFORCED_GLASS.get());
+                MixedGlassSlab.Glass mine = MixedGlassSlab.Glass.of(base()), theirs = MixedGlassSlab.Glass.of(other.base());
+                if (mine != null && theirs != null && mine != theirs) {
+                    boolean theirsOnTop = existing.getValue(TYPE) == SlabType.TOP;
+                    return MixedGlassSlab.of(theirsOnTop ? mine : theirs, theirsOnTop ? theirs : mine);
+                }
             }
             return super.getStateForPlacement(context);
         }
