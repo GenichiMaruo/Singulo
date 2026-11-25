@@ -1,0 +1,44 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 2,
+  "time": 160,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "tag": "forge:plates/steel"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:superconducting_coil"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:basic_circuit"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:dusts/redstone"
+      },
+      "count": 2
+    }
+  ],
+  "shape": [
+    "     ",
+    " A A ",
+    " BCB ",
+    " D D ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:android_weapon_module",
+    "count": 1
+  }
+}

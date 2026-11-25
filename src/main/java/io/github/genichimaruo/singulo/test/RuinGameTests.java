@@ -288,6 +288,50 @@ public final class RuinGameTests {
         helper.succeed();
     }
 
+    /**
+     * 地上の遺構の周りをならす: 箱の中は床の1段下より上の地面がなくなり（型紙のブロックは残る）、箱の外は離れるほど1段ずつ
+     * 高い斜面になる。上に出た土は草ブロックに戻る。
+     */
+    @GameTest(template = "large")
+    public static void gradedRuinClearsGroundAroundBuilding(GameTestHelper helper) {
+        net.minecraft.world.level.block.Block dirt = net.minecraft.world.level.block.Blocks.DIRT;
+        net.minecraft.world.level.block.Block grass = net.minecraft.world.level.block.Blocks.GRASS_BLOCK;
+        net.minecraft.world.level.block.Block slab = net.minecraft.world.level.block.Blocks.SMOOTH_STONE_SLAB;
+        for (int x = 0; x < 9; x++) {
+            for (int z = 0; z < 9; z++) {
+                for (int y = 1; y < 8; y++) {
+                    helper.setBlock(x, y, z, dirt);
+                }
+                helper.setBlock(x, 8, z, grass);
+            }
+        }
+        int floor = 3;
+        helper.setBlock(4, floor, 4, slab);                       // 型紙のブロック（床の段）
+        helper.setBlock(4, floor + 2, 4, SinguloBlocks.RUIN_PANEL.get());
+        BlockPos lo = helper.absolutePos(new BlockPos(3, floor, 3)), hi = helper.absolutePos(new BlockPos(5, floor + 4, 5));
+        net.minecraft.world.level.levelgen.structure.BoundingBox box = net.minecraft.world.level.levelgen.structure.BoundingBox.fromCorners(lo, hi);
+        BlockPos a0 = helper.absolutePos(new BlockPos(0, 0, 0)), a1 = helper.absolutePos(new BlockPos(8, 10, 8));
+        io.github.genichimaruo.singulo.ruin.GradedStructure.gradeAround(helper.getLevel(), box, lo.getY(), 3,
+                net.minecraft.world.level.levelgen.structure.BoundingBox.fromCorners(a0, a1),
+                net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE);
+        // 箱の中: 床の1段下が地面のいちばん上（草）。型紙のブロックの下は土のまま
+        helper.assertBlockPresent(grass, new BlockPos(3, floor - 1, 3));
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.AIR, new BlockPos(3, floor, 3));
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.AIR, new BlockPos(5, floor + 4, 5));
+        helper.assertBlockPresent(slab, new BlockPos(4, floor, 4));
+        helper.assertBlockPresent(SinguloBlocks.RUIN_PANEL.get(), new BlockPos(4, floor + 2, 4));
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.AIR, new BlockPos(4, floor + 1, 4));
+        helper.assertBlockPresent(dirt, new BlockPos(4, floor - 1, 4));
+        // 箱の外: すぐ外の1列は床の1段下、その先は1マスごとに1段
+        helper.assertBlockPresent(grass, new BlockPos(2, floor - 1, 4));
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.AIR, new BlockPos(2, floor, 4));
+        helper.assertBlockPresent(grass, new BlockPos(1, floor, 4));
+        helper.assertBlockPresent(grass, new BlockPos(0, floor + 1, 4));
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.AIR, new BlockPos(0, floor + 2, 4));
+        helper.assertBlockPresent(grass, new BlockPos(2, floor, 2));        // 斜めに1マス離れた角（約1.4マス）
+        helper.succeed();
+    }
+
     /** /singulo ruin と同じ置き方で、遺構を丸ごと建てられる（保管庫に遺構IDが入る）。 */
     @GameTest(setupTicks = 20, template = EMPTY)
     public static void ruinCommandPlacesRuin(GameTestHelper helper) {

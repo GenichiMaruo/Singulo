@@ -69,8 +69,7 @@ public final class FactoryGameTests {
         be.scan(helper.getLevel());
         // ほかの組のテストが残した仕掛けを数えないように、このテストの場所の中のものだけにする
         AABB bounds = new AABB(helper.absolutePos(BlockPos.ZERO), helper.absolutePos(new BlockPos(64, 24, 64)));
-        be.lines().removeIf(p -> !bounds.contains(Vec3.atCenterOf(p)));
-        be.conveyors().removeIf(p -> !bounds.contains(Vec3.atCenterOf(p)));
+        be.keepPropsWithin(p -> bounds.contains(Vec3.atCenterOf(p)));
         return be;
     }
 

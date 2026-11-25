@@ -99,6 +99,16 @@ VARIANTS = {
         'seed': 59,
         'inner': True,
     },
+    # 放電型「エクレール」: 濃い鋼灰色の髪に、電光の黄色のインナーカラーと、レモン寄りの白黄の光
+    # （腰の機械から両腕の放電籠手へケーブルがつながる。籠手と機械は描画で出す）
+    'spark_android': {
+        'hair': ((78, 82, 94), (58, 62, 72), (40, 43, 52)),
+        'streak': ((240, 226, 72), (198, 182, 40)),
+        'accent': (244, 242, 90),
+        'iris': ((140, 120, 24), (250, 240, 130)),
+        'seed': 61,
+        'inner': True,
+    },
     # ビット型「ノクス」: 紺の髪に菫のひと房
     'bit_android': {
         'hair': ((50, 58, 98), (36, 42, 76), (24, 28, 54)),
@@ -142,6 +152,55 @@ def textures(te, save):
     save(gunner_charge(VARIANTS['gunner_android'], Image), te / 'gunner_android_charge.png')
     for stage in range(len(KATANA_SURGE)):
         save(katana_surge(VARIANTS['katana_android'], stage, Image), te / f'katana_android_surge_{stage}.png')
+    for stage in range(len(KATANA_SURGE)):
+        save(katana_surge(VARIANTS['spark_android'], stage, Image, node=(255, 255, 220)), te / f'spark_android_surge_{stage}.png')
+    save(shield_hex(Image), te / 'android_shield_hex.png')
+    save(shield_collapsar(Image), te / 'android_shield_collapsar.png')
+
+
+def shield_hex(Image):
+    """装甲板 Mk2 のエネルギーシールドの模様（足し合わせで描くので、黒は透ける）: 六角の格子の細い線と、ところどころ明るい節。
+    色は描画でかけるので、白の濃淡で描く。格子の周期を絵の幅・高さに合わせて、上下左右につながる（流れても継ぎ目が出ない）。"""
+    import math
+    w, h = 64, 28
+    cw, ch = 8.0, 7.0                           # 六角の横の間隔と段の間隔（ほぼ正六角形。1段おきに半分ずらす。4段で高さ1つ分）
+    centers = [(i * cw + (cw / 2 if j % 2 else 0), j * ch) for j in range(int(h / ch)) for i in range(int(w / cw))]
+    im = Image.new('RGB', (w, h), (0, 0, 0))
+    px = im.load()
+
+    def wrap(d, size):
+        return (d + size / 2) % size - size / 2
+
+    for y in range(h):
+        for x in range(w):
+            ds = sorted(math.hypot(wrap(x + 0.5 - cx, w), wrap(y + 0.5 - cy, h)) for cx, cy in centers)
+            edge = max(0.0, 1 - (ds[1] - ds[0]) / 1.6)      # 2つの中心からの距離が近い所が、六角の辺
+            v = int(150 * edge)
+            px[x, y] = (v, v, v)
+    for (x, y) in ((4, 3), (20, 10), (36, 17), (52, 24), (12, 24), (44, 3)):
+        px[x, y] = (230, 230, 230)                  # ところどころ明るい節
+    return im
+
+
+def shield_collapsar(Image):
+    """装甲板 Mk3（コラプサー）のエネルギーシールドの模様: 降着円盤のような、斜めに流れる光の筋と、ゆらぐ明るい粒。
+    白の濃淡で描き、色は描画でかける。上下左右につながる。"""
+    import math
+    rng = random.Random(97)
+    w, h = 64, 32
+    im = Image.new('RGB', (w, h), (0, 0, 0))
+    px = im.load()
+    for y in range(h):
+        for x in range(w):
+            t = (x / w * 2 + y / h) * math.tau          # 斜めの筋（つながるよう、周期を絵の幅・高さに合わせる）
+            band = 0.5 + 0.5 * math.sin(t * 3)
+            fine = 0.5 + 0.5 * math.sin(t * 7 + math.sin(y / h * math.tau * 2) * 1.5)
+            v = int(120 * band ** 3 + 50 * fine ** 6)
+            px[x, y] = (v, v, v)
+    for _ in range(18):
+        x, y = rng.randrange(w), rng.randrange(h)
+        px[x, y] = (240, 240, 240)
+    return im
 
 
 # 刀型の紅一閃で、体の継ぎ目に浮き出る光の筋。胸の芯から外へ、3段に分けて浮き出る（段ごとに別の部品。重ならない）
@@ -152,8 +211,8 @@ KATANA_SURGE = (
 )
 
 
-def katana_surge(pal, stage, Image):
-    """刀型の紅一閃の間だけ重ねる、体の光の筋（stage 段目の部品だけ）。
+def katana_surge(pal, stage, Image, node=(255, 214, 220)):
+    """刀型の紅一閃の間だけ重ねる、体の光の筋（stage 段目の部品だけ）。放電型の天雷の溜めでも、同じ形の電光の筋を使う。
 
     部品の縦の面に、回路のような細い筋を1本ずつ: 途中で1ドット横へ折れ、端に明るい節がつく。上下の面には、縁を横切る短い筋。
     """
@@ -161,7 +220,6 @@ def katana_surge(pal, stage, Image):
     im = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
     r, g, b = pal['accent']
     trace = (r, min(255, g + 40), min(255, b + 40))
-    node = (255, 214, 220)
 
     def put(x, y, c):
         im.putpixel((x, y), tuple(c) + (255,))
@@ -735,8 +793,14 @@ def item_textures(ti, save):
     save(decor_strands(Image), ti.parent / 'entity' / 'android_decor_strands.png')
     save(kit_icon(Image), ti / 'android_kit.png')
     save(charger_icon(Image), ti / 'android_charger.png')
+    save(charger_icon(Image, 2), ti / 'android_charger_2.png')
+    save(charger_icon(Image, 3), ti / 'android_charger_3.png')
     save(repair_icon(Image), ti / 'android_repair_kit.png')
     save(plate_icon(Image), ti / 'android_armor_plate.png')
+    save(plate_icon(Image, 2), ti / 'android_armor_plate_2.png')
+    save(plate_icon(Image, 3), ti / 'android_armor_plate_3.png')
+    for iid in WEAPON_MODULES:
+        save(module_icon(Image, iid), ti / f'{iid}.png')
     save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
     save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
@@ -865,7 +929,43 @@ def katana_memory(accent, Image):
     return sheet
 
 
-ANIMATED_MEMORIES = {'gunner': animated_memory, 'katana': katana_memory}
+def spark_memory(accent, Image):
+    """放電型のアニメーションつきの小型クリスタルメモリ（縦に並べた16コマ）。
+
+    結晶の上から下へ、枝分かれした電光が2回続けて走り（2コマずつ）、そのたびに結晶が白黄に瞬く。そのあとは静かで、
+    結晶の縁にときおり小さな火花がはじける。表示灯は電光に合わせて2回点き、あとは暗い。
+    """
+    base = memory_icon(accent, Image)
+    sheet = Image.new('RGBA', (16, 16 * MEMORY_FRAMES), (0, 0, 0, 0))
+    hot = tuple(min(255, c + 60) for c in accent)
+    # 電光の道筋（上から下へジグザグに）と枝
+    bolts = ([(8, 2), (7, 3), (8, 4), (9, 5), (8, 6), (7, 7), (8, 8), (7, 9)],
+             [(7, 2), (8, 3), (7, 4), (6, 5), (7, 6), (8, 7), (9, 8), (9, 9)])
+    branches = ([(9, 5), (10, 6)], [(6, 5), (5, 6)])
+    sparks = ((10, 3, 9), (5, 8, 12), (10, 9, 14))     # (x, y, コマ)
+    for f in range(MEMORY_FRAMES):
+        im = base.copy()
+        px = im.load()
+        flash = 0 if f in (0, 1) else 1 if f in (3, 4) else -1
+        if flash >= 0:
+            strong = f in (0, 3)
+            for y in range(2, 10):                        # 結晶が瞬く
+                for x in range(5, 11):
+                    r, g, b, a = px[x, y]
+                    k = 0.45 if strong else 0.2
+                    px[x, y] = (int(r + (hot[0] - r) * k), int(g + (hot[1] - g) * k), int(b + (hot[2] - b) * k), min(255, a + int(70 * k)))
+            for x, y in bolts[flash] + (branches[flash] if strong else []):
+                px[x, y] = (255, 255, 240, 250) if strong else hot + (230,)
+        for x, y, at in sparks:
+            if f == at:
+                px[x, y] = (255, 255, 230, 240)
+        lamp = 1.0 if f in (0, 1, 3, 4) else 0.35
+        px[11, 11] = tuple(int(c * lamp) for c in accent) + (255,)
+        sheet.paste(im, (0, 16 * f))
+    return sheet
+
+
+ANIMATED_MEMORIES = {'gunner': animated_memory, 'katana': katana_memory, 'spark': spark_memory}
 
 
 def memory_icon(accent, Image):
@@ -957,22 +1057,82 @@ def kit_icon(Image):
     return _kit_finish(Image, outlined(f, **SOFT_EDGE))
 
 
-def charger_icon(Image):
-    """無線充電器: 黒い本体に白い外装の輪、水色に光る送電の輪と稲妻の印。"""
-    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-    px = im.load()
-    import math
-    for y in range(16):
-        for x in range(16):
-            d = math.hypot(x - 7.5, y - 7.5)
-            if d <= 7.0:
-                c = (236, 238, 242) if d > 5.6 else (120, 225, 255) if d > 4.6 else (44, 48, 60)
-                if 5.6 < d <= 7.0 and y > 9:
-                    c = (200, 206, 216)
-                px[x, y] = c + (255,)
-    for (x, y) in ((8, 4), (7, 5), (7, 6), (6, 7), (7, 7), (8, 7), (9, 7), (8, 8), (8, 9), (7, 10)):
-        px[x, y] = (255, 236, 140, 255)
-    return im
+# 無線充電器の段ごとの色: (本体, 外装, 光, 光の芯)。Mk1 は水色、Mk2 は菫、Mk3 は黒いコラプサーの筐体に橙
+CHARGER_TIERS = {
+    1: ((44, 48, 60), (236, 238, 242), (120, 225, 255), (220, 250, 255)),
+    2: ((40, 40, 64), (214, 220, 232), (180, 140, 255), (236, 222, 255)),
+    3: ((26, 22, 30), (70, 62, 74), (255, 154, 74), (255, 232, 190)),
+}
+
+
+def charger_icon(Image, tier=1):
+    """無線充電器（携帯端末の形）: 縦長の白い本体に、黒い画面と残量の目盛り、下に送電の格子、上にアンテナ。
+    段が上がるほど目盛りとアンテナが増える。Mk3 はコラプサーの黒い筐体で、両側面に光の帯が走る。"""
+    import art16
+    body, shell, glow, hot = CHARGER_TIERS[tier]
+    rgba, darken = art16.rgba, art16.darken
+
+    def f(d):
+        d.rectangle([4, 4, 11, 14], fill=rgba(shell))
+        d.rectangle([5, 5, 10, 9], fill=rgba(body))                     # 画面
+        for i in range(tier + 1):                                       # 残量の目盛り（段ごとに増える）
+            d.line([(6, 8 - i), (9, 8 - i)], fill=rgba(glow))
+        d.rectangle([5, 11, 10, 13], fill=rgba(darken(shell, 0.18)))    # 送電の格子
+        for x in (6, 8, 10):
+            d.point((x, 12), fill=rgba(glow))
+        d.line([(9, 3), (9, 1)], fill=rgba(darken(shell, 0.3)))         # アンテナ
+        d.point((9, 0), fill=rgba(glow))
+        if tier >= 2:
+            d.line([(6, 3), (6, 2)], fill=rgba(darken(shell, 0.3)))
+            d.point((6, 1), fill=rgba(glow))
+        if tier == 3:
+            d.rectangle([3, 6, 3, 12], fill=rgba(glow))                 # 側面の光の帯
+            d.rectangle([12, 6, 12, 12], fill=rgba(glow))
+        d.point((7, 6), fill=rgba((255, 236, 140) if tier < 3 else hot))
+    return art16.grain(art16.outlined(f), seed=110 + tier)
+
+
+# 武装モジュールの色と記号（0.23.0）。記号は 5×5 の点（'#' が光る所）
+WEAPON_MODULES = {
+    'android_weapon_module': ((120, 225, 255), 'amp', 1),
+    'android_weapon_module_2': ((180, 140, 255), 'amp', 2),
+    'android_weapon_module_3': ((255, 154, 74), 'amp', 3),
+    'heavy_strike_module': ((255, 90, 90), ('.###.', '.###.', '..#..', '..#..', '..#..'), 0),
+    'rapid_strike_module': ((124, 255, 138), ('#..#.', '.#..#', '..#..', '.#..#', '#..#.'), 0),
+    'drain_module': ((212, 92, 255), ('.#.#.', '#####', '#####', '.###.', '..#..'), 0),
+    'piercing_module': ((255, 210, 74), ('..#..', '.###.', '#.#.#', '..#..', '..#..'), 0),
+    'frost_module': ((159, 232, 255), ('#.#.#', '.###.', '##.##', '.###.', '#.#.#'), 0),
+    'warden_breaker_module': ((255, 255, 255), ('#.#.#', '#####', '#...#', '#####', '.....'), 0),
+}
+
+
+def module_icon(Image, iid):
+    """武装モジュール: 暗い基板の小さな箱に、白い枠と金の端子。真ん中に型の色で光る記号（出力増幅器は段の数だけ山形）。
+    Mk3 の出力増幅器はコラプサーの黒い枠。"""
+    import art16
+    glow, symbol, tier = WEAPON_MODULES[iid]
+    rgba = art16.rgba
+    frame = (70, 62, 74) if tier == 3 else (226, 230, 236)
+    body = (26, 22, 30) if tier == 3 else (40, 44, 56)
+
+    def f(d):
+        d.rectangle([3, 3, 12, 12], fill=rgba(frame))
+        d.rectangle([4, 4, 11, 11], fill=rgba(body))
+        for x in (4, 6, 9, 11):                               # 下の端子
+            d.point((x, 13), fill=rgba((214, 176, 80)))
+        d.line([(4, 3), (11, 3)], fill=rgba(art16.lighten(frame, 0.2)))
+        d.point((12, 4), fill=rgba(glow))                     # 表示灯
+        if symbol == 'amp':
+            for k in range(tier):                             # 段の数だけ山形
+                y = 9 - k * 2
+                d.line([(5, y + 1), (7, y - 1)], fill=rgba(glow))
+                d.line([(8, y - 1), (10, y + 1)], fill=rgba(glow))
+        else:
+            for j, row in enumerate(symbol):
+                for i, ch in enumerate(row):
+                    if ch == '#':
+                        d.point((5 + i, 5 + j), fill=rgba(glow))
+    return art16.grain(art16.outlined(f), seed=200 + len(iid))
 
 
 def repair_icon(Image):
@@ -1007,22 +1167,40 @@ def _kit_finish(Image, im):
     return out
 
 
-def plate_icon(Image):
-    """アンドロイド用装甲板（0.21.0 で描き直した）: これまでと同じ形の白い陶磁の胸当て（上が広く、首の左右に切り欠き、下がすぼまる）。
-    左が明るく右が陰。真ん中に水色の発光ライン（明・陰の2列）。輪郭を含めて14×14に収め、上下左右の真ん中に置く。"""
+# 装甲板の段ごとの色: (外装の明, 外装の陰, 発光ラインの明, 発光ラインの陰)。Mk2 はニホニウムの青い鋼と菫、Mk3 はコラプサーの黒と橙
+PLATE_TIERS = {
+    1: ((238, 240, 244), (210, 214, 224), (120, 225, 255), (90, 190, 230)),
+    2: ((196, 206, 232), (160, 172, 206), (180, 140, 255), (140, 100, 220)),
+    3: ((82, 74, 90), (58, 52, 66), (255, 154, 74), (220, 110, 50)),
+}
+
+
+def plate_icon(Image, tier=1):
+    """アンドロイド用装甲板（0.21.0 で描き直した）: これまでと同じ形の陶磁の胸当て（上が広く、首の左右に切り欠き、下がすぼまる）。
+    左が明るく右が陰。真ん中に発光ライン（明・陰の2列）。輪郭を含めて14×14に収め、上下左右の真ん中に置く。
+    上位版（0.23.0）は色だけを変え、Mk2 は肩に菫の鋲、Mk3 は肩と裾に橙の筋を足す。"""
     from art16 import outlined, rgba, SOFT_EDGE
     rows = [(4, 11), (2, 13), (2, 13), (2, 13), (3, 12), (3, 12), (3, 12), (4, 11), (4, 11), (5, 10), (6, 9), (7, 8)]
-    left, right = (238, 240, 244), (210, 214, 224)
+    left, right, line, line_sh = PLATE_TIERS[tier]
 
     def f(d):
         for i, (x0, x1) in enumerate(rows):
             y = 2 + i
             d.line([(x0, y), (7, y)], fill=rgba(left))
             d.line([(8, y), (x1, y)], fill=rgba(right))
-        d.line([(7, 5), (7, 11)], fill=rgba((120, 225, 255)))
-        d.line([(8, 5), (8, 11)], fill=rgba((90, 190, 230)))
-        d.point((3, 4), fill=(255, 255, 255, 255))
-        d.point((4, 3), fill=(255, 255, 255, 255))
+        d.line([(7, 5), (7, 11)], fill=rgba(line))
+        d.line([(8, 5), (8, 11)], fill=rgba(line_sh))
+        hi = (255, 255, 255, 255) if tier < 3 else rgba((130, 120, 140))
+        d.point((3, 4), fill=hi)
+        d.point((4, 3), fill=hi)
+        if tier >= 2:
+            d.point((3, 3), fill=rgba(line))          # 肩の鋲
+            d.point((12, 3), fill=rgba(line_sh))
+        if tier == 3:
+            d.line([(4, 5), (5, 5)], fill=rgba(line))     # 肩の筋
+            d.line([(10, 5), (11, 5)], fill=rgba(line_sh))
+            d.line([(6, 11), (6, 10)], fill=rgba(line_sh))  # 裾の筋
+            d.line([(9, 11), (9, 10)], fill=rgba(line_sh))
         d.point((6, 2), fill=(0, 0, 0, 0))   # 首の左右の切り欠き（輪郭を付ける前にも抜く）
         d.point((9, 2), fill=(0, 0, 0, 0))
     im = outlined(f, **SOFT_EDGE)

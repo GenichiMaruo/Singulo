@@ -24,7 +24,9 @@ public class AndroidStationMenu extends AbstractContainerMenu {
     public static final int PRINT_UNIT_X = 28, PRINT_UNIT_Y = 46;
     public static final int UPGRADE_X = 8, UPGRADE_Y = 68;
     public static final int PRODUCTION_X = 28, PRODUCTION_Y = 68;
-    public static final int STOCK_X = 18, STOCK_Y = 90;
+    public static final int STOCK_X = 8, STOCK_Y = 90;
+    /** 武装モジュール（補充の右。上の段と同じ左右の並び）。 */
+    public static final int WEAPON_X = 28, WEAPON_Y = 90;
     /** シールド許可証は右レールの2段目（枠の外のタブ。作業指令台・ドローン・ステーションと同じ）。 */
     public static final int PERMIT_X = io.github.genichimaruo.singulo.machine.GuiFrame.railSlotX(WIDTH),
             PERMIT_Y = io.github.genichimaruo.singulo.machine.GuiFrame.railSlotY(io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE);
@@ -115,6 +117,12 @@ public class AndroidStationMenu extends AbstractContainerMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return AndroidStationBlockEntity.isPrintUnit(stack);
+            }
+        });
+        addSlot(new SlotItemHandler(items, AndroidStationBlockEntity.SLOT_WEAPON, WEAPON_X, WEAPON_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return RuinAndroid.isWeaponModule(stack);
             }
         });
         for (int row = 0; row < 3; row++) {

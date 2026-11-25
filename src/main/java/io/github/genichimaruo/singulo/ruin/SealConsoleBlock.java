@@ -50,6 +50,7 @@ public class SealConsoleBlock extends BaseEntityBlock {
                                                                   BlockPos pos, Player player, net.minecraft.world.InteractionHand hand,
                                                                   BlockHitResult hit) {
         var stack = player.getItemInHand(hand);
+        if (stack.is(io.github.genichimaruo.singulo.registry.SinguloItems.FACILITY_RECONSTRUCTOR.get())) return InteractionResult.PASS;
         if (stack.is(SealConsoleBlockEntity.terminusRecord())) {
             if (!level.isClientSide && player instanceof ServerPlayer sp && !sp.isSpectator()
                     && level.getBlockEntity(pos) instanceof SealConsoleBlockEntity console

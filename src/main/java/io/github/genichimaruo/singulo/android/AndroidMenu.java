@@ -27,7 +27,9 @@ public class AndroidMenu extends AbstractContainerMenu {
     public static final int HEIGHT = 216;
     /** 修理・装甲のスロットと解体のボタンを、同じ間隔（22）で並べる。 */
     public static final int REPAIR_X = 96, REPAIR_Y = 98;
-    public static final int PLATE_X = 134, PLATE_Y = 98;
+    public static final int PLATE_X = 118, PLATE_Y = 98;
+    /** 武装モジュールの枠（装甲板の右。修理・装甲と同じ間隔）。 */
+    public static final int WEAPON_X = 140;
     public static final int DISMANTLE_X = 172, DISMANTLE_Y = 100;
     /**
      * 装備と持ち物のページ: 左にアップグレードの列、中ほどにバックパック（6×4）、右に持ち物の列（5）。上の段をそろえる。
@@ -180,6 +182,12 @@ public class AndroidMenu extends AbstractContainerMenu {
                 }
             });
         }
+        addSlot(new PageSlot(items, RuinAndroid.SLOT_WEAPON, WEAPON_X, PLATE_Y, PAGE_STATUS, 1) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return RuinAndroid.isWeaponModule(stack);
+            }
+        });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
@@ -386,6 +394,7 @@ public class AndroidMenu extends AbstractContainerMenu {
         } else if (!(RuinAndroid.isToolUpgrade(stack) && (moveItemStackTo(stack, RuinAndroid.SLOT_MINING, RuinAndroid.SLOT_MINING + 1, false)
                         || moveItemStackTo(stack, RuinAndroid.SLOT_FELLING, RuinAndroid.SLOT_FELLING + 1, false)))
                 && !(RuinAndroid.isTankUpgrade(stack) && moveItemStackTo(stack, RuinAndroid.SLOT_TANK, RuinAndroid.SLOT_TANK + 1, false))
+                && !(RuinAndroid.isWeaponModule(stack) && moveItemStackTo(stack, RuinAndroid.SLOT_WEAPON, RuinAndroid.SLOT_WEAPON + 1, false))
                 && !(stack.getItem() instanceof AndroidAccessoryItem acc
                         && moveItemStackTo(stack, RuinAndroid.SLOT_DECOR + acc.part(), RuinAndroid.SLOT_DECOR + acc.part() + 1, false))
                 && !moveItemStackTo(stack, 0, RuinAndroid.CARRY_START, false)          // 修理キット・装甲板・アップグレードの枠

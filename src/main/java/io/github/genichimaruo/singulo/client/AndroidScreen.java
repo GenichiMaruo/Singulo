@@ -506,6 +506,11 @@ public class AndroidScreen extends FramedScreen<AndroidMenu> {
         if (!plate.hasItem()) {
             area(plate.x, plate.y, 16, 16, List.of(Component.translatable("gui.singulo.android.plate")));
         }
+        Slot weapon = menu.getSlot(RuinAndroid.SLOT_WEAPON);
+        ghostSlot(g, x + weapon.x, y + weapon.y, weapon, item("android_weapon_module"));
+        if (!weapon.hasItem()) {
+            area(weapon.x, weapon.y, 16, 16, List.of(Component.translatable("gui.singulo.android.weapon")));
+        }
         // 解体のボタン（小さく、目立たない。押すと赤くなり、もう一度で解体）
         boolean hover = Panel.inside(mouseX, mouseY, x + DISMANTLE_X, y + DISMANTLE_Y, 12, 12);
         int dd = Panel.button(g, skin, x + DISMANTLE_X, y + DISMANTLE_Y, 12, 12, armed() ? Panel.Press.ON : hover ? Panel.Press.HOVER : Panel.Press.NORMAL);

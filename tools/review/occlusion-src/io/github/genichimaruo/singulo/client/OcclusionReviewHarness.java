@@ -5,7 +5,6 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import java.nio.file.*;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.core.BlockPos;
@@ -67,16 +66,16 @@ public final class OcclusionReviewHarness {
         prepared=true;
     }
     @SubscribeEvent(priority=EventPriority.HIGHEST) public static void before(RenderLevelStageEvent e)throws Exception{
-        if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL||!prepared||wait<100||captured)return;
-        var f=GravitationalLensing.class.getDeclaredField("SOURCES");f.setAccessible(true);int n=((List<?>)f.get(null)).size();
-        if(n<1)throw new AssertionError("Spindle lens source not registered");
+        if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES||!prepared||wait<100||captured)return;
+        boolean hasLens=GravitationalLensing.hasSources();
+        if(!hasLens)throw new AssertionError("Spindle lens source not registered");
         if ((Minecraft.getInstance().levelRenderer.getTranslucentTarget()!=null) != (MODES[stage/3]==net.minecraft.client.GraphicsStatus.FABULOUS)) {
             throw new AssertionError("Requested graphics pipeline not active");
         }
         before=Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget());
     }
     @SubscribeEvent(priority=EventPriority.LOWEST) public static void after(RenderLevelStageEvent e)throws Exception{
-        if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL||before==null)return;
+        if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES||before==null)return;
         var mc=Minecraft.getInstance();var out=Path.of(System.getProperty("singulo.occlusionOutput"));Files.createDirectories(out);
         try(var after=Screenshot.takeScreenshot(mc.getMainRenderTarget())){
             before.writeToFile(out.resolve("occlusion-"+stage+"-before.png"));after.writeToFile(out.resolve("occlusion-"+stage+"-after.png"));

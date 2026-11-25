@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LLL",
+    "LQL",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "singulo:collapsar_reinforced_glass"
+    },
+    "Q": {
+      "tag": "forge:gems/quartz"
+    }
+  },
+  "result": {
+    "count": 8,
+    "item": "singulo:collapsar_star_glass"
+  }
+}

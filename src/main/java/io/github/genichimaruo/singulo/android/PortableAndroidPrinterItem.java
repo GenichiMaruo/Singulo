@@ -72,8 +72,34 @@ public class PortableAndroidPrinterItem extends Item {
         return stack.getItem() instanceof PortableAndroidPrinterItem p ? p.units : 0;
     }
 
+    /** 中身の枠の数: 組ごとの4枠と、そのうしろに組ごとの武装モジュールの枠（0.23.0。古い中身の番号がずれないよう、最後に置く）。 */
     public static int slots(ItemStack stack) {
-        return units(stack) * PER_UNIT;
+        return units(stack) * (PER_UNIT + 1);
+    }
+
+    /** 組 unit の武装モジュールの枠の番号（units は印刷機の組の数）。 */
+    public static int weaponSlot(int units, int unit) {
+        return units * PER_UNIT + unit;
+    }
+
+    /**
+     * 組の数が違う印刷機の中身を写したあと（Mk1 → Mk2）: 写す前の武装モジュールの枠（fromUnits 組のうしろ）は、新しい印刷機では
+     * 組の枠に重なるので、新しい印刷機の武装モジュールの枠へ移す。
+     */
+    public static void moveWeaponsAfterUpgrade(ItemStack stack, int fromUnits) {
+        int units = units(stack);
+        if (fromUnits <= 0 || fromUnits == units) return;
+        List<ItemStack> items = new ArrayList<>(contents(stack));
+        boolean moved = false;
+        for (int u = fromUnits - 1; u >= 0; u--) {
+            int from = weaponSlot(fromUnits, u), to = weaponSlot(units, u);
+            ItemStack module = items.get(from);
+            if (!RuinAndroid.isWeaponModule(module)) continue;     // 武装モジュールの枠になかった物（空）は動かさない
+            items.set(from, ItemStack.EMPTY);
+            items.set(to, module);
+            moved = true;
+        }
+        if (moved) setContents(stack, items);   // 動かす物がなければ、中身のデータに手を付けない（レシピの結果と同じに保つ）
     }
 
     /** 組 unit の中の枠 slot の番号。 */
@@ -242,6 +268,20 @@ public class PortableAndroidPrinterItem extends Item {
             setContents(printer, items);
         }
         return moved;
+    }
+
+    /** 組 unit の武装モジュールを、まだ積んでいないアンドロイドに積む。積んだら true。印刷機の中身は書き戻す。 */
+    static boolean equipWeapon(ItemStack printer, RuinAndroid android, int unit) {
+        List<ItemStack> items = new ArrayList<>(contents(printer));
+        int at = weaponSlot(units(printer), unit);
+        ItemStack module = items.get(at);
+        if (!RuinAndroid.isWeaponModule(module) || !android.inventory().getItem(RuinAndroid.SLOT_WEAPON).isEmpty()) {
+            return false;
+        }
+        android.inventory().setItem(RuinAndroid.SLOT_WEAPON, module.copy());
+        items.set(at, ItemStack.EMPTY);
+        setContents(printer, items);
+        return true;
     }
 
     /** 組 unit の装甲板を、まだ積んでいないアンドロイドに積む（胸当てとして装備される）。積んだら true。印刷機の中身は書き戻す。 */

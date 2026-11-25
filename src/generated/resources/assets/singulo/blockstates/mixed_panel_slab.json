@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "lower=white,upper=white": {
+      "model": "singulo:block/white_panel"
+    },
+    "lower=white,upper=black": {
+      "model": "singulo:block/mixed_panel_slab_white_black"
+    },
+    "lower=white,upper=collapsar": {
+      "model": "singulo:block/mixed_panel_slab_white_collapsar"
+    },
+    "lower=black,upper=white": {
+      "model": "singulo:block/mixed_panel_slab_black_white"
+    },
+    "lower=black,upper=black": {
+      "model": "singulo:block/black_reinforced_panel"
+    },
+    "lower=black,upper=collapsar": {
+      "model": "singulo:block/mixed_panel_slab_black_collapsar"
+    },
+    "lower=collapsar,upper=white": {
+      "model": "singulo:block/mixed_panel_slab_collapsar_white"
+    },
+    "lower=collapsar,upper=black": {
+      "model": "singulo:block/mixed_panel_slab_collapsar_black"
+    },
+    "lower=collapsar,upper=collapsar": {
+      "model": "singulo:block/collapsar_reinforced_panel"
+    }
+  }
+}

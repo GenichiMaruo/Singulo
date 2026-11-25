@@ -18,6 +18,8 @@ PRESETS = {
 
 # (セクション, キー, 既定値, 範囲・型, 何が変わるか)
 SERVER = [
+    ('facilityReconstruction', 'recipeEnabled', 'true', 'true / false', '施設再構築装置をクラフトできるか。既存の装置の使用可否には影響しない'),
+    ('facilityReconstruction', 'multiplayerAccess', '"admins_only"', '"admins_only", "everyone", "disabled"', 'マルチプレイ、LAN公開中の施設再構築装置の使用権限。管理者のみ、全員、全員禁止のいずれか'),
     ('transport', 'pumpStartFe', '100', '1〜2,147,483,647（整数）', '電動液体ポンプが1 tickの最初の1 mBを搬出する電力（FE）'),
     ('transport', 'pumpFeAtHighFlow', '10000000', '1〜2,147,483,647（整数）', '21億 mB/tでのポンプ電力（FE/t）。開始電力から直線補間し、それ以上の流量にも同じ傾きを使う。開始電力以下にすると定額'),
     ('transport', 'pumpFePerMb', '0.0', '0.0〜2,147,483,647', '0で流量に応じた電力。正の値で旧方式の固定単価（FE/mB、最小0.001、0.001刻み）を指定する'),

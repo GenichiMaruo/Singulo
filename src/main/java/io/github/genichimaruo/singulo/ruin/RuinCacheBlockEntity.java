@@ -64,6 +64,9 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
     private long emptiedAt = -1;
     /** プレイヤーが置いた（壊して置き直した）保管庫。中身を入れない・再生しない。 */
     private boolean placedByPlayer;
+    private int reconstructionRevision;
+
+    public int reconstructionRevision() { return reconstructionRevision; }
 
     public RuinCacheBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.RUIN_CACHE.get(), pos, state);
@@ -246,6 +249,7 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
         tag.putBoolean("filled", filledOnce);
         tag.putLong("emptied_at", emptiedAt);
         tag.putBoolean("placed", placedByPlayer);
+        tag.putInt("reconstruction_revision", reconstructionRevision);
     }
 
     @Override
@@ -257,5 +261,6 @@ public class RuinCacheBlockEntity extends net.minecraft.world.level.block.entity
         filledOnce = tag.getBoolean("filled");
         emptiedAt = tag.contains("emptied_at") ? tag.getLong("emptied_at") : -1;
         placedByPlayer = tag.getBoolean("placed");
+        reconstructionRevision = tag.getInt("reconstruction_revision");
     }
 }

@@ -45,6 +45,7 @@ public class GuardianCoreBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         var stack = player.getItemInHand(hand);
+        if (stack.is(io.github.genichimaruo.singulo.registry.SinguloItems.FACILITY_RECONSTRUCTOR.get())) return InteractionResult.PASS;
         if (!GuardianCoreBlockEntity.isAwakeningCore(stack)) {
             return InteractionResult.PASS;
         }

@@ -225,6 +225,10 @@ public class BladeAndroid extends RuinAndroid {
             getLookControl().setLookAt(target, 30, 30);
             nextMove--;
             swingCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextMove--;
+                swingCooldown--;
+            }
             boolean seen = hasLineOfSight(target);
             if (dist > 3.2 || !seen) {
                 if (stateTicks % 8 == 0 || getNavigation().isDone()) {

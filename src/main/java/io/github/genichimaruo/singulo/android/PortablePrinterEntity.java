@@ -146,6 +146,7 @@ public class PortablePrinterEntity extends Entity {
         a.setCharge(a.maxCharge());
         PortableAndroidPrinterItem.refill(printer, a, unit);
         PortableAndroidPrinterItem.equipPlate(printer, a, unit);
+        PortableAndroidPrinterItem.equipWeapon(printer, a, unit);
         a.startPrinting();
         a.makeGuard(owner, blockPosition(), RuinAndroid.MODE_FOLLOW, 30);
         a.loseStation();

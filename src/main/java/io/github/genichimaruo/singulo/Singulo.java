@@ -86,6 +86,8 @@ public final class Singulo {
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.lab.PressureHullBlock::onBreak);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.ArenaShield::onExplosion);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.RuinAndroid::onChangeTarget);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.AndroidWeaponModules::onIncoming);
+        MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.AndroidWeaponModules::onDamaged);
         io.github.genichimaruo.singulo.machine.ShieldPermits.register();
         MinecraftForge.EVENT_BUS.addListener(MetricDriveItem::onPlayerTick);
         MinecraftForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.item.GravityBootsItem::onFall);

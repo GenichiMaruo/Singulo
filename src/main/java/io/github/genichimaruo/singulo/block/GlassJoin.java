@@ -59,13 +59,31 @@ public final class GlassJoin {
         return s.getBlock() instanceof Shaped shaped && shaped.base() == base;
     }
 
-    /** Shape occupied by the requested glass material at this position. */
+    /**
+     * 0.23.0: 境目を描かないガラスの仲間か。この作品のガラス（白・黒・コラプサー・四芒星・遺構・研究所のガラス）と、その階段・
+     * ハーフブロック・重ねハーフブロックは、種類が違っても同じガラスのように扱い、接する面を描かない。アンドロイド用のガラスは入らない
+     * （つながって見える模様と、アンドロイドの通り抜けがあるので）。
+     */
+    public static boolean inFamily(BlockState state) {
+        Block b = state.getBlock();
+        return b instanceof Glass || b instanceof MixedGlassSlab || b instanceof MixedPanelGlassSlab
+                || b instanceof Shaped shaped && shaped.base() instanceof Glass;
+    }
+
+    /**
+     * Shape occupied by the requested glass material at this position. Glass of the shared family ({@link #inFamily})
+     * counts as the same material, so the whole neighbouring shape is returned.
+     */
     @Nullable public static BlockState matchingPart(BlockState state, Block glass) {
         if (state.is(glass) || shapedOf(state, glass)) return state;
+        if (glass instanceof Glass && inFamily(state)) return state;
         if (!(state.getBlock() instanceof MixedGlassSlab)) return null;
-        boolean black = glass == SinguloBlocks.BLACK_REINFORCED_GLASS.get();
-        if (!black && glass != SinguloBlocks.WHITE_GLASS_PANEL.get()) return null;
-        return MixedGlassSlab.half(state, state.getValue(MixedGlassSlab.BLACK_ON_TOP) == black);
+        // 重ねたハーフブロックのうち、そのガラスの方（違うガラスどうしなので、合うのは多くても1つ）
+        for (boolean top : new boolean[] {false, true}) {
+            BlockState half = MixedGlassSlab.half(state, top);
+            if (shapedOf(half, glass)) return half;
+        }
+        return null;
     }
 
     /** self の direction 側の面が、隣の adjacent の形ですき間なく覆われているか（覆われていれば描かない）。 */
@@ -74,8 +92,11 @@ public final class GlassJoin {
                 adjacent.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO), direction);
     }
 
-    /** 透けるガラス（ホワイトガラスパネル・黒色強化ガラス）。同じガラスの階段・ハーフブロックの、埋まった面との間も描かない。 */
-    public static class Glass extends net.minecraft.world.level.block.GlassBlock {
+    /**
+     * 透けるガラス（ホワイトガラスパネル・黒色強化ガラスなど）。同じガラスの階段・ハーフブロックの、埋まった面との間も描かない。
+     * 0.23.0: 種類の違うガラスの仲間（{@link #inFamily}）との間も描かない。
+     */
+    public static class Glass extends GlassBlock {
         public Glass(Properties properties) {
             super(properties);
         }
@@ -140,25 +161,30 @@ public final class GlassJoin {
         }
     }
 
-    /** White panel and black reinforced glass share vanilla slab placement rules. */
-    public static final class PairSlab extends Slab {
+    /** White panel, black reinforced and collapsar reinforced glass slabs share vanilla slab placement rules and stack with each other. */
+    public static final class PairSlab extends Slab implements MixedPanelGlassSlab.Stackable {
         public PairSlab(Supplier<Block> base, Properties properties) { super(base, properties); }
 
-        private boolean fits(BlockState existing, BlockPlaceContext context) {
+        @Override public boolean fits(BlockState existing, BlockPlaceContext context) {
             return super.canBeReplaced(existing, context);
         }
 
         @Override public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
             // Vanilla checks the held item against "this", and the hit against the existing slab's shape.
-            return Block.byItem(context.getItemInHand().getItem()) instanceof PairSlab held && held.fits(state, context);
+            // 0.23.0: panel slabs stack onto glass slabs too ({@link MixedPanelGlassSlab}).
+            return Block.byItem(context.getItemInHand().getItem()) instanceof MixedPanelGlassSlab.Stackable held && held.fits(state, context);
         }
 
         @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
             BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
+            BlockState withPanel = MixedPanelGlassSlab.stack(existing, this);
+            if (withPanel != null) return withPanel;
             if (existing.getBlock() instanceof PairSlab other && other != this && existing.getValue(TYPE) != SlabType.DOUBLE) {
-                Block top = existing.getValue(TYPE) == SlabType.TOP ? other.base() : base();
-                return SinguloBlocks.MIXED_GLASS_SLAB.get().defaultBlockState()
-                        .setValue(MixedGlassSlab.BLACK_ON_TOP, top == SinguloBlocks.BLACK_REINFORCED_GLASS.get());
+                MixedGlassSlab.Glass mine = MixedGlassSlab.Glass.of(base()), theirs = MixedGlassSlab.Glass.of(other.base());
+                if (mine != null && theirs != null && mine != theirs) {
+                    boolean theirsOnTop = existing.getValue(TYPE) == SlabType.TOP;
+                    return MixedGlassSlab.of(theirsOnTop ? mine : theirs, theirsOnTop ? theirs : mine);
+                }
             }
             return super.getStateForPlacement(context);
         }
