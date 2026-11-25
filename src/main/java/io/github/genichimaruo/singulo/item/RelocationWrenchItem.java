@@ -154,6 +154,7 @@ public final class RelocationWrenchItem extends SinguloItem {
         java.util.List<net.minecraft.core.BlockPos> run = player.isSecondaryUseActive()
                 ? connectedRun(level, start, cable) : java.util.List.of(start);
         int removed = 0;
+        net.minecraft.core.BlockPos locked = null;
         for (var pos : run) {
             if (!level.isLoaded(pos) || !level.getBlockState(pos).is(cable)
                     || !level.mayInteract(player, pos) || !player.mayUseItemAt(pos, context.getClickedFace(), wrench)
@@ -165,10 +166,16 @@ public final class RelocationWrenchItem extends SinguloItem {
                 removed++;
                 continue;
             }
+            // 掘るのに道具の要るブロックを入れたカバーは、ケーブルごとも外さない（その道具で先にブロックを外す）
+            if (io.github.genichimaruo.singulo.cable.ConduitCover.locked(level, pos, player)) {
+                if (locked == null) locked = pos;
+                continue;
+            }
             // ブロック入りのカバー（枠とはめ込んだブロック）は、ケーブルと一緒に持ち物へ（創造モードでも返す。ケーブルと違って作った物なので）
             io.github.genichimaruo.singulo.cable.ConduitCover.strip(level, pos).forEach(s -> give(player, s));
             if (level.removeBlock(pos, false)) removed++;
         }
+        if (locked != null) io.github.genichimaruo.singulo.cable.ConduitCover.tellLocked(level, locked, player);
         if (removed == 0) return InteractionResult.FAIL;
         level.playSound(null, start, state.getSoundType(level, start, player).getBreakSound(),
                 net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -199,6 +206,11 @@ public final class RelocationWrenchItem extends SinguloItem {
         if (!player.mayBuild() || !level.mayInteract(player, pos)
                 || !player.mayUseItemAt(pos, context.getClickedFace(), wrench)) return InteractionResult.FAIL;
         if (level.isClientSide) return InteractionResult.SUCCESS;
+        // 掘るのに道具の要るブロックは、それを掘れる道具で壊さないと外せない（レンチはその道具ではない）
+        if (io.github.genichimaruo.singulo.cable.ConduitCover.locked(level, pos, player)) {
+            io.github.genichimaruo.singulo.cable.ConduitCover.tellLocked(level, pos, player);
+            return InteractionResult.FAIL;
+        }
         ItemStack back = io.github.genichimaruo.singulo.cable.ConduitCover.takeOne(level, pos);
         if (back.isEmpty()) return InteractionResult.FAIL;
         level.playSound(null, pos, net.minecraft.sounds.SoundEvents.CHAIN_BREAK, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.1F);

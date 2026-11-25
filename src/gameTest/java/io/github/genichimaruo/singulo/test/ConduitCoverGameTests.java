@@ -45,6 +45,125 @@ public final class ConduitCoverGameTests {
     }
 
     /**
+     * 0.23.0: 掘るのに道具の要るブロック（黒曜石）を入れたカバーは、それを掘れる道具でないと外れない。素手でも移設レンチでも外れず、
+     * ダイヤモンドのツルハシなら外れる。道具の要らないブロック（木材）は、これまでどおり素手で外れる。
+     */
+    @GameTest(template = "empty", timeoutTicks = 20)
+    public static void toolBoundInlayNeedsTheRightTool(GameTestHelper h) {
+        h.setBlock(AT, SinguloBlocks.COPPER_WIRE.get());
+        var level = h.getLevel();
+        BlockPos pos = h.absolutePos(AT);
+        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        use(h, player, new ItemStack(SinguloItems.COVER_FRAME.get()), Direction.UP);
+        use(h, player, new ItemStack(Items.OBSIDIAN), Direction.UP);
+        h.assertTrue(cover(h) == ConduitCover.State.BLOCK, "Obsidian was not set in");
+        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        h.assertTrue(ConduitCover.breakCover(h.getBlockState(AT), level, pos, player) && cover(h) == ConduitCover.State.BLOCK,
+                "Obsidian came out by hand");
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SinguloItems.RELOCATION_WRENCH.get()));
+        h.assertTrue(ConduitCover.locked(level, pos, player), "Obsidian could come out with the wrench");
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_PICKAXE));
+        h.assertFalse(ConduitCover.locked(level, pos, player), "Diamond pickaxe could not take out the obsidian");
+        h.assertTrue(ConduitCover.breakCover(h.getBlockState(AT), level, pos, player) && cover(h) == ConduitCover.State.FRAME,
+                "Obsidian did not come out with a diamond pickaxe");
+        use(h, player, new ItemStack(Items.OAK_PLANKS), Direction.UP);
+        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        h.assertTrue(ConduitCover.breakCover(h.getBlockState(AT), level, pos, player) && cover(h) == ConduitCover.State.FRAME,
+                "Planks did not come out by hand");
+        h.succeed();
+    }
+
+    /**
+     * 0.23.0: ブロック・ガラス入りのカバーは、はめ込んだブロックのウィザー・エンダードラゴンへの耐性を持つ。コラプサー強化パネル（ブロック入り）
+     * とコラプサー強化ガラス（ガラス入り）は、ウィザー・その頭蓋骨・ドラゴンに壊されず、青い頭蓋骨の爆発でも強さが下がらない。
+     * 石を入れたカバーと、枠だけのカバーは、これまでどおり壊される。
+     */
+    @GameTest(template = "empty", timeoutTicks = 20)
+    public static void inlayLendsItsWitherProofing(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos pos = h.absolutePos(AT);
+        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        var wither = net.minecraft.world.entity.EntityType.WITHER.create(level);
+        var skull = net.minecraft.world.entity.EntityType.WITHER_SKULL.create(level);
+        var dragon = net.minecraft.world.entity.EntityType.ENDER_DRAGON.create(level);
+        skull.setDangerous(true);
+        var blast = new net.minecraft.world.level.Explosion(level, skull, pos.getX(), pos.getY(), pos.getZ(), 1, false,
+                net.minecraft.world.level.Explosion.BlockInteraction.DESTROY);
+        h.setBlock(AT, SinguloBlocks.COPPER_WIRE.get());
+        use(h, player, new ItemStack(SinguloItems.COVER_FRAME.get()), Direction.UP);
+        h.assertTrue(h.getBlockState(AT).canEntityDestroy(level, pos, wither), "Empty frame resisted the Wither");
+        for (var inlay : new net.minecraft.world.level.block.Block[] {SinguloBlocks.COLLAPSAR_REINFORCED_PANEL.get(),
+                SinguloBlocks.COLLAPSAR_REINFORCED_GLASS.get(), Blocks.STONE}) {
+            use(h, player, new ItemStack(inlay), Direction.UP);
+            var state = h.getBlockState(AT);
+            h.assertTrue(ConduitCover.inlaid(state), inlay + " was not set in");
+            boolean proof = inlay != Blocks.STONE;
+            for (var entity : new net.minecraft.world.entity.Entity[] {wither, skull, dragon}) {
+                h.assertTrue(state.canEntityDestroy(level, pos, entity) != proof,
+                        "Cover with " + inlay + (proof ? " was breakable by " : " resisted ") + entity.getType());
+            }
+            float resistance = state.getExplosionResistance(level, pos, blast);
+            float lowered = skull.getBlockExplosionResistance(blast, level, pos, state, state.getFluidState(), resistance);
+            h.assertTrue((lowered == resistance) == proof, "Blue skull lowered the resistance of " + inlay + " to " + lowered);
+            ConduitCover.takeOne(level, pos);
+        }
+        h.succeed();
+    }
+
+    /**
+     * 0.23.0: 光るブロック（グロウストーン）をはめ込むと、カバーがそのブロックと同じ明るさで光る。はめ込み中（枠だけの間）はまだ光らず、
+     * 外すと消える。
+     */
+    @GameTest(template = "empty", timeoutTicks = 20)
+    public static void glowingInlayLightsTheCover(GameTestHelper h) {
+        h.setBlock(AT, SinguloBlocks.SUPERCONDUCTING_CABLE.get());
+        var level = h.getLevel();
+        BlockPos pos = h.absolutePos(AT);
+        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        use(h, player, new ItemStack(SinguloItems.COVER_FRAME.get()), Direction.UP);
+        h.assertTrue(level.getLightEmission(pos) == 0, "Empty frame glowed");
+        click(h, player, new ItemStack(Items.GLOWSTONE), Direction.UP);
+        h.assertTrue(cover(h) == ConduitCover.State.FRAME && level.getLightEmission(pos) == 0, "Cover glowed before the inlay settled");
+        ConduitCover.settle(h.getBlockState(AT), level, pos);
+        h.assertTrue(cover(h) == ConduitCover.State.BLOCK && level.getLightEmission(pos) == 15,
+                "Glowstone cover gave light " + level.getLightEmission(pos) + " instead of 15");
+        ItemStack off = ConduitCover.takeOne(level, pos);
+        h.assertTrue(off.is(Items.GLOWSTONE) && level.getLightEmission(pos) == 0, "Light stayed after the glowstone came off");
+        h.succeed();
+    }
+
+    /**
+     * 0.23.0: 枠にガラスもはめ込める（バニラのガラス・色付きガラス・この作品のガラス）。ガラス入りは光を通し、隣を隠さず、
+     * 当たり判定は枠だけのときと同じ中空の箱（外からは1ブロックいっぱい）。外すとガラス → 枠の順に戻る。
+     */
+    @GameTest(template = "empty", timeoutTicks = 20)
+    public static void coverTakesGlassAndStaysSeeThrough(GameTestHelper h) {
+        for (var ok : new net.minecraft.world.level.block.Block[] {Blocks.GLASS, Blocks.RED_STAINED_GLASS, Blocks.TINTED_GLASS,
+                SinguloBlocks.WHITE_GLASS_PANEL.get(), SinguloBlocks.COLLAPSAR_STAR_GLASS.get()}) {
+            h.assertTrue(ConduitCover.accepts(ok.defaultBlockState()) && ConduitCover.stateFor(ok.defaultBlockState()) == ConduitCover.State.GLASS,
+                    ok + " was not taken as glass");
+        }
+        h.assertTrue(ConduitCover.stateFor(Blocks.STONE.defaultBlockState()) == ConduitCover.State.BLOCK, "Stone was taken as glass");
+        h.setBlock(AT, SinguloBlocks.COPPER_WIRE.get());
+        var level = h.getLevel();
+        BlockPos pos = h.absolutePos(AT);
+        var player = h.makeMockPlayer(GameType.SURVIVAL);
+        use(h, player, new ItemStack(SinguloItems.COVER_FRAME.get()), Direction.UP);
+        ItemStack glass = new ItemStack(Items.GLASS, 2);
+        use(h, player, glass, Direction.UP);
+        h.assertTrue(cover(h) == ConduitCover.State.GLASS && glass.getCount() == 1, "Glass was not set in: " + cover(h));
+        var glazed = h.getBlockState(AT);
+        h.assertTrue(!glazed.isSolidRender(level, pos) && glazed.getLightBlock(level, pos) == 0 && glazed.propagatesSkylightDown(level, pos)
+                && !glazed.isSuffocating(level, pos), "Glass cover did not let light through");
+        h.assertTrue(glazed.getCollisionShape(level, pos).bounds().equals(new AABB(0, 0, 0, 1, 1, 1)) && !glazed.isCollisionShapeFullBlock(level, pos),
+                "Glass cover collision was not the hollow full-size box");
+        h.assertTrue(glazed.getOcclusionShape(level, pos).isEmpty(), "Glass cover hid its neighbours' faces");
+        ItemStack first = ConduitCover.takeOne(level, pos);
+        h.assertTrue(first.is(Items.GLASS) && cover(h) == ConduitCover.State.FRAME, "First removal did not return the glass: " + first);
+        h.succeed();
+    }
+
+    /**
      * カバーの枠をケーブルに取り付け（枠を1つ使う）、枠に丸太をはめ込む（1つ使う。向きは右クリックした面の軸）。
      * すき間のある・透ける・入れ物のブロック（ガラス・階段・葉・チェスト・かまど）は断り、向きのある丸太は受け付ける。
      * 枠だけの間は当たり判定が1ブロックいっぱいで、光を通し隣を隠さない。ブロック入りの間だけ隣を隠し、光をさえぎる。
@@ -58,9 +177,9 @@ public final class ConduitCoverGameTests {
         var player = h.makeMockPlayer(GameType.SURVIVAL);
         h.assertTrue(ConduitCover.allowed(Blocks.STONE.defaultBlockState()) && ConduitCover.allowed(Blocks.OAK_LOG.defaultBlockState())
                 && ConduitCover.allowed(Blocks.CARVED_PUMPKIN.defaultBlockState()), "Solid blocks (with or without a facing) were refused");
-        for (var bad : new net.minecraft.world.level.block.Block[] {Blocks.GLASS, Blocks.OAK_STAIRS, Blocks.CHEST,
+        for (var bad : new net.minecraft.world.level.block.Block[] {Blocks.GLASS_PANE, Blocks.OAK_STAIRS, Blocks.CHEST,
                 Blocks.OAK_LEAVES, Blocks.FURNACE, SinguloBlocks.COPPER_WIRE.get()}) {
-            h.assertFalse(ConduitCover.allowed(bad.defaultBlockState()), bad + " was allowed in a cover");
+            h.assertFalse(ConduitCover.accepts(bad.defaultBlockState()), bad + " was allowed in a cover");
         }
         var bare = h.getBlockState(AT);
         h.assertFalse(bare.isCollisionShapeFullBlock(level, pos), "Bare cable collided as a full block");
@@ -77,9 +196,9 @@ public final class ConduitCoverGameTests {
         h.assertTrue(!framed.isSolidRender(level, pos) && framed.getLightBlock(level, pos) == 0 && framed.propagatesSkylightDown(level, pos)
                 && !framed.isSuffocating(level, pos), "Empty frame did not let light through like glass");
 
-        ItemStack glass = new ItemStack(Items.GLASS, 3);
-        use(h, player, glass, Direction.UP);
-        h.assertTrue(cover(h) == ConduitCover.State.FRAME && glass.getCount() == 3, "Glass was set in");
+        ItemStack panes = new ItemStack(Items.GLASS_PANE, 3);
+        use(h, player, panes, Direction.UP);
+        h.assertTrue(cover(h) == ConduitCover.State.FRAME && panes.getCount() == 3, "Glass pane was set in");
 
         ItemStack logs = new ItemStack(Items.OAK_LOG, 3);
         use(h, player, logs, Direction.EAST);
