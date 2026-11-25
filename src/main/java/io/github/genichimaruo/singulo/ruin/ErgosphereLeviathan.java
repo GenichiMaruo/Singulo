@@ -391,6 +391,45 @@ public class ErgosphereLeviathan extends RuinBoss {
         return new String[][] {{"overclock_chip", "2"}, {"jet_condensate", "4"}, {"exotic_matter", "6"}};
     }
 
+    /** 放電型「エクレール」の設計メモリが落ちる確率（覚醒戦で倒したとき。人数に関係なく、1回の撃破で最大1個）。 */
+    public static final float SPARK_MEMORY_CHANCE = 0.25F;
+
+    /** 抽選の値 roll（0〜1）で、放電型の設計メモリが当たるか。 */
+    public static boolean awardsSparkMemory(float roll) {
+        return roll < SPARK_MEMORY_CHANCE;
+    }
+
+    /**
+     * 覚醒戦の隠し報酬: 放電型「エクレール」の設計メモリ（ここでだけ手に入る。ハンドブック・JEI・説明欄・設定には、
+     * どこで手に入るかを一切載せない）。
+     */
+    @Override
+    protected void dropAwakenedBonus(ServerLevel level) {
+        if (awardsSparkMemory(random.nextFloat())) {
+            dropSparkMemory(level);
+        }
+    }
+
+    /** 残骸から放電が走り、その場に放電型の設計メモリが1個残る。 */
+    public net.minecraft.world.entity.item.ItemEntity dropSparkMemory(ServerLevel level) {
+        Vec3 c = getBoundingBox().getCenter();
+        for (int i = 0; i < 8; i++) {
+            double a = Math.PI * 2 * i / 8;
+            for (int k = 1; k <= 4; k++) {
+                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, c.x + Math.cos(a) * k * 0.6, c.y + (random.nextDouble() - 0.5) * k * 0.4,
+                        c.z + Math.sin(a) * k * 0.6, 2, 0.05, 0.05, 0.05, 0.1);
+            }
+        }
+        level.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(ParticleTypes.FLASH, 0xFFFFFFFF), c.x, c.y, c.z, 1, 0, 0, 0, 0);
+        level.playSound(null, c.x, c.y, c.z, SinguloSounds.get("ergosphere_leviathan.memory_discharge"), SoundSource.HOSTILE, 2.0F, 1.0F);
+        var stack = new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.getValue(
+                Singulo.id(io.github.genichimaruo.singulo.android.AndroidKind.SPARK.memoryId())));
+        var item = new net.minecraft.world.entity.item.ItemEntity(level, c.x, c.y, c.z, stack);
+        item.setDefaultPickUpDelay();
+        level.addFreshEntity(item);
+        return item;
+    }
+
     @Override
     protected void registerGoals() {
         targetSelector.addGoal(1, new HurtByTargetGoal(this));

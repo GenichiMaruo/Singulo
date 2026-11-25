@@ -1,0 +1,32 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:android_weapon_module",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:entangled_element",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:optical_lattice_substrate",
+      "count": 1
+    }
+  ],
+  "shape": [
+    "     ",
+    " B B ",
+    "  A  ",
+    "  C  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:drain_module",
+    "count": 1
+  }
+}

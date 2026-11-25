@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "singulo:collapsar_reinforced_glass",
+  "result": {
+    "id": "singulo:collapsar_reinforced_glass_slab",
+    "count": 2
+  }
+}

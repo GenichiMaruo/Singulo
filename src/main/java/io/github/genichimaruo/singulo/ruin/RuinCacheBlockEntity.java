@@ -64,6 +64,9 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
     private long emptiedAt = -1;
     /** プレイヤーが置いた（壊して置き直した）保管庫。中身を入れない・再生しない。 */
     private boolean placedByPlayer;
+    private int reconstructionRevision;
+
+    public int reconstructionRevision() { return reconstructionRevision; }
 
     public RuinCacheBlockEntity(BlockPos pos, BlockState state) {
         super(SinguloBlockEntities.RUIN_CACHE.get(), pos, state);
@@ -242,6 +245,7 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
         tag.putBoolean("filled", filledOnce);
         tag.putLong("emptied_at", emptiedAt);
         tag.putBoolean("placed", placedByPlayer);
+        tag.putInt("reconstruction_revision", reconstructionRevision);
         });
     }
 
@@ -256,5 +260,6 @@ public class RuinCacheBlockEntity extends BaseContainerBlockEntity implements ne
         filledOnce = tag.getBooleanOr("filled", false);
         emptiedAt = tag.contains("emptied_at") ? tag.getLongOr("emptied_at", 0L) : -1;
         placedByPlayer = tag.getBooleanOr("placed", false);
+        reconstructionRevision = tag.getIntOr("reconstruction_revision", 0);
     }
 }

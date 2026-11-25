@@ -75,6 +75,16 @@
         ]
       }
     },
+    "android_memory_spark": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "singulo:android_memory_spark"
+          }
+        ]
+      }
+    },
     "android_memory_whip": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {

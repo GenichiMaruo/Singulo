@@ -1,0 +1,19 @@
+{
+  "category": "equipment",
+  "key": {
+    "C": "minecraft:copper_block",
+    "D": "minecraft:diamond",
+    "M": "singulo:crystal_memory",
+    "P": "singulo:precision_actuator"
+  },
+  "pattern": [
+    "PCP",
+    "DMD",
+    "PCP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "singulo:facility_reconstructor"
+  },
+  "type": "singulo:facility_reconstructor"
+}

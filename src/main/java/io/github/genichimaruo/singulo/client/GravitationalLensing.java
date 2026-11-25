@@ -24,6 +24,9 @@ import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.textures.FilterMode;
 import org.lwjgl.system.MemoryStack;
 import java.util.OptionalInt;
+import java.util.OptionalDouble;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.platform.CompareOp;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -64,6 +67,7 @@ public final class GravitationalLensing {
     }
 
     private static final List<Source> SOURCES = new ArrayList<>();
+    private static final List<Source> HELD_SOURCES = new ArrayList<>();
     /**
      * 画面をコピーし直す回数の上限。1回ごとに画面全体のミップマップを作り直すので、視線に沿って並んだレンズで重くなりすぎないよう抑える。
      * 超えた分も描くが、同じコピーを読むので、重なった所だけは手前のレンズが奥のレンズを歪めず上に重なる。
@@ -85,14 +89,28 @@ public final class GravitationalLensing {
     static float shadowRadius(float horizon, float region) {
         return Math.min(horizon * SHADOW_PER_HORIZON, region * 0.5F);
     }
-    private static final RenderPipeline shader = RenderPipeline.builder()
-            .withLocation(Singulo.id("pipeline/lensing")).withVertexShader(Singulo.id("core/lensing"))
-            .withFragmentShader(Singulo.id("core/lensing")).withSampler("Sampler0").withSampler("Sampler1")
-            .withUniform("LensData", UniformType.UNIFORM_BUFFER)
-            .withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).withCull(false).build();
+    private static final RenderPipeline shader = pipeline(false);
+    private static final RenderPipeline depthWritingShader = pipeline(true);
+
+    private static RenderPipeline pipeline(boolean writeDepth) {
+        var builder = RenderPipeline.builder()
+                .withLocation(Singulo.id(writeDepth ? "pipeline/lensing_depth" : "pipeline/lensing"))
+                .withVertexShader(Singulo.id("core/lensing")).withFragmentShader(Singulo.id("core/lensing"))
+                .withSampler("Sampler0").withSampler("Sampler1")
+                .withUniform("LensData", UniformType.UNIFORM_BUFFER)
+                .withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).withCull(false);
+        if (writeDepth) builder.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true));
+        return builder.build();
+    }
+
     private static LensingCopyTarget copy;
 
     private GravitationalLensing() {}
+
+    /** このフレームに、もうレンズが足されているか（固体だけの奥行きを写すかを決める）。 */
+    static boolean hasSources() {
+        return !SOURCES.isEmpty();
+    }
 
     /** このフレームのレンズを足す。radius はアインシュタイン半径（ブロック）、strength は 0〜1。 */
     public static void add(Vec3 pos, float radius, float strength) {
@@ -185,17 +203,19 @@ public final class GravitationalLensing {
                     tip = p.getPosition(pt).add(0, p.getBbHeight() * 0.62 + 0.55, 0)
                             .add(side.scale(right ? 0.38 : -0.38)).add(forward.scale(0.35));
                 }
-                addDistortion(tip, 0.1F, 0.8F, 0.32F);
+                HELD_SOURCES.add(new Source(tip, 0.1F, 0.8F, 0.32F, LensType.DISTORTION, null));
             }
         }
     }
 
     static void registerShaders(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(shader);
+        event.registerPipeline(depthWritingShader);
     }
 
     static void extract(ExtractLevelRenderStateEvent event) {
         StaffTipTracker.nextFrame();
+        HELD_SOURCES.clear();
         if (enabled()) addHeldStaffs(event);
     }
 
@@ -249,94 +269,127 @@ public final class GravitationalLensing {
         SOURCES.clear();
         SOURCES.addAll(p.sources());
         try {
-            apply(p.cam(), p.proj(), p.rotation(), false);
+            apply(p.cam(), p.proj(), p.rotation(), false, false);
         } finally {
             SOURCES.clear();
         }
     }
 
     static void onRenderStage(RenderLevelStageEvent event) {
-        if (!(event instanceof RenderLevelStageEvent.AfterLevel)) {
-            return;
-        }
+        if (!(event instanceof RenderLevelStageEvent.AfterLevel)) return;
         try {
-            if (!SOURCES.isEmpty() && shader != null && enabled()) {
+            SOURCES.addAll(HELD_SOURCES);
+            if (!SOURCES.isEmpty() && enabled()) {
+                var camera = event.getLevelRenderState().cameraRenderState;
                 if (shaderPackInUse()) {
-                    // シェーダーパックの合成のあとで掛ける
-                    pending = new Pending(List.copyOf(SOURCES), event.getLevelRenderState().cameraRenderState.pos, new Matrix4f(event.getLevelRenderState().cameraRenderState.projectionMatrix),
-                            new Quaternionf(event.getLevelRenderState().cameraRenderState.orientation));
+                    pending = new Pending(List.copyOf(SOURCES), camera.pos, new Matrix4f(camera.projectionMatrix),
+                            new Quaternionf(camera.orientation));
                 } else {
-                    // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）。
-                    // 鍛造炉の炉心のレンズは、遠い炉から順に「その炉の奥側の光 → 炉心のレンズ → 手前側の光」とはさむ
-                    // （カメラと炉心のあいだのジェットの上に、炉心のブラックホールが出ないように）
-                    Vec3 cam = event.getLevelRenderState().cameraRenderState.pos;
-                    var groups = new ArrayList<>(GlowDepth.jetGroups());
-                    groups.sort(Comparator.comparingDouble((GlowDepth.JetGroup g) -> -g.core.distanceToSqr(cam)));
-                    java.util.Map<GlowDepth.JetGroup, List<Source>> own = new java.util.IdentityHashMap<>();
-                    List<Source> behind = new ArrayList<>();
-                    List<Source> front = new ArrayList<>();
-                    for (Source s : SOURCES) {
-                        GlowDepth.JetGroup owner = null;
-                        for (GlowDepth.JetGroup g : groups) {
-                            if (g.core.distanceToSqr(s.pos) < 1) {
-                                owner = g;
-                                break;
-                            }
-                        }
-                        if (owner != null) {
-                            own.computeIfAbsent(owner, g -> new ArrayList<>()).add(s);
-                        } else if (GlowDepth.behindJet(cam, s.pos, s.region)) {
-                            behind.add(s);
-                        } else {
-                            front.add(s);
-                        }
-                    }
-                    applyOnly(behind, cam, event);
-                    GlowDepth.drawJets(event);
-                    // 炉心より奥にあるほかのレンズ（紡糸機・リアクターなど）は、その炉心のレンズと同じ回に掛ける。
-                    // 1回の中では奥から描くので、手前の炉心のレンズが奥のブラックホールもまわりの景色と一緒に歪める
-                    // （炉心のレンズより後に掛けると、奥のブラックホールだけが歪まない位置に出て、景色とずれる）。
-                    // ジェットが手前にかかるレンズは behind に入っているので、炉の奥側の光のあとに掛けてもよい
-                    front.sort(Comparator.comparingDouble((Source s) -> -s.pos.distanceToSqr(cam)));
-                    int next = 0;
-                    for (GlowDepth.JetGroup g : groups) {
-                        GlowDepth.drawJets(event, g, false);
-                        double reach = g.core.distanceToSqr(cam);
-                        List<Source> batch = new ArrayList<>(own.getOrDefault(g, List.of()));
-                        while (next < front.size() && front.get(next).pos.distanceToSqr(cam) > reach) {
-                            batch.add(front.get(next++));
-                        }
-                        applyOnly(batch, cam, event);
-                        GlowDepth.drawJets(event, g, true);
-                    }
-                    applyOnly(front.subList(next, front.size()), cam, event);
+                    applyWithJets(event, false);
                 }
             }
         } finally {
             SOURCES.clear();
-            // レンズがないフレームや、レンズを切っているときのジェット（組もここで片付ける）
+            HELD_SOURCES.clear();
             GlowDepth.finishJets(event);
         }
     }
 
+    /**
+     * このフレームのレンズを、鍛造炉のジェットとはさんで掛ける。writeDepth なら影と円盤の所に奥行きを書く（透ける物を描く前に掛けるとき）。
+     */
+    private static void applyWithJets(RenderLevelStageEvent event, boolean writeDepth) {
+            // ジェットより奥のレンズ → ジェット → 手前のレンズ（奥のブラックホールがジェットの上に出ないように）。
+            // 鍛造炉の炉心のレンズは、遠い炉から順に「その炉の奥側の光 → 炉心のレンズ → 手前側の光」とはさむ
+            // （カメラと炉心のあいだのジェットの上に、炉心のブラックホールが出ないように）
+            Vec3 cam = event.getLevelRenderState().cameraRenderState.pos;
+            var groups = new ArrayList<>(GlowDepth.jetGroups());
+            groups.sort(Comparator.comparingDouble((GlowDepth.JetGroup g) -> -g.core.distanceToSqr(cam)));
+            java.util.Map<GlowDepth.JetGroup, List<Source>> own = new java.util.IdentityHashMap<>();
+            List<Source> behind = new ArrayList<>();
+            List<Source> front = new ArrayList<>();
+            for (Source s : SOURCES) {
+                GlowDepth.JetGroup owner = null;
+                for (GlowDepth.JetGroup g : groups) {
+                    if (g.core.distanceToSqr(s.pos) < 1) {
+                        owner = g;
+                        break;
+                    }
+                }
+                if (owner != null) {
+                    own.computeIfAbsent(owner, g -> new ArrayList<>()).add(s);
+                } else if (GlowDepth.behindJet(cam, s.pos, s.region)) {
+                    behind.add(s);
+                } else {
+                    front.add(s);
+                }
+            }
+            applyOnly(behind, cam, event, writeDepth);
+            GlowDepth.drawJets(event);
+            // 炉心より奥にあるほかのレンズ（紡糸機・リアクターなど）は、その炉心のレンズと同じ回に掛ける。
+            // 1回の中では奥から描くので、手前の炉心のレンズが奥のブラックホールもまわりの景色と一緒に歪める
+            // （炉心のレンズより後に掛けると、奥のブラックホールだけが歪まない位置に出て、景色とずれる）。
+            // ジェットが手前にかかるレンズは behind に入っているので、炉の奥側の光のあとに掛けてもよい
+            front.sort(Comparator.comparingDouble((Source s) -> -s.pos.distanceToSqr(cam)));
+            int next = 0;
+            for (GlowDepth.JetGroup g : groups) {
+                GlowDepth.drawJets(event, g, false);
+                double reach = g.core.distanceToSqr(cam);
+                List<Source> batch = new ArrayList<>(own.getOrDefault(g, List.of()));
+                while (next < front.size() && front.get(next).pos.distanceToSqr(cam) > reach) {
+                    batch.add(front.get(next++));
+                }
+                applyOnly(batch, cam, event, writeDepth);
+                GlowDepth.drawJets(event, g, true);
+            }
+            applyOnly(front.subList(next, front.size()), cam, event, writeDepth);
+    }
+
     /** sources のレンズだけを掛ける（空なら何もしない）。 */
-    private static void applyOnly(List<Source> sources, Vec3 cam, RenderLevelStageEvent event) {
+    private static void applyOnly(List<Source> sources, Vec3 cam, RenderLevelStageEvent event, boolean writeDepth) {
         if (sources.isEmpty()) {
             return;
         }
         SOURCES.clear();
         SOURCES.addAll(sources);
-        apply(cam, event.getLevelRenderState().cameraRenderState.projectionMatrix, event.getLevelRenderState().cameraRenderState.orientation, true);
+        apply(cam, event.getLevelRenderState().cameraRenderState.projectionMatrix, event.getLevelRenderState().cameraRenderState.orientation, true, writeDepth);
     }
 
-    /** レンズを掛ける。useDepth が false なら深度を使わない（シェーダーパック使用時）。 */
-    private static void apply(Vec3 cam, Matrix4f proj, Quaternionf cameraRotation, boolean useDepth) {
+    /**
+     * 透ける物（ガラス・水など）を描く前に、このフレームのレンズを掛ける（0.23.0。GlowDepth が固体だけの奥行きを写した直後に呼ぶ）。
+     * 奥の景色を歪めてから、手前のガラスがその上に描かれる。影と降着円盤の所はレンズが奥行きを書くので、ブラックホールより
+     * 奥のガラスは影や円盤の上に出ない。
+     * 鍛造炉のジェットも、レンズとの前後の重ね方（奥のレンズ → ジェット → 手前のレンズ）のまま、ここで一緒に描く。
+     * シェーダーパック使用時は、これまでどおり合成のあとで掛ける。手に持った杖のレンズは、ワールドを描き終えてから足すので、
+     * そのとき掛ける。
+     */
+    static void beforeTranslucent(RenderLevelStageEvent event) {
+        if (SOURCES.isEmpty() || shader == null || !enabled() || shaderPackInUse()) {
+            return;
+        }
+        try {
+            applyWithJets(event, true);
+        } finally {
+            SOURCES.clear();
+        }
+    }
+
+    /**
+     * レンズを掛ける。useDepth が false なら深度を使わない（シェーダーパック使用時）。writeDepth なら、影と降着円盤の所に
+     * ブラックホールの奥行きを書く（透ける物を描く前に掛けるとき。あとで描く奥のガラスを、影や円盤の上に出さない）。
+     */
+    private static void apply(Vec3 cam, Matrix4f proj, Quaternionf cameraRotation, boolean useDepth, boolean writeDepth) {
         Minecraft mc = Minecraft.getInstance();
         RenderTarget main = mc.getMainRenderTarget();
         // Fabulous composites color back into main and clears its depth first. The
         // translucent target retains opaque terrain plus the translucent depth.
-        RenderTarget depthSource = mc.levelRenderer.getTranslucentTarget();
-        if (depthSource == null || !useDepth) {
+        // 0.23.0: ガラスなどの透ける物は、手前にあってもレンズを隠さない（向こうのブラックホールが見える）。透ける物を描く前に
+        // 写した固体だけの奥行きを読む。写していない（このフレームの途中で足したレンズだけの）ときは、これまでどおり
+        RenderTarget solid = useDepth ? GlowDepth.solidDepthThisFrame() : null;
+        RenderTarget depthSource = solid != null ? solid : main;
+        if (depthSource == null || !useDepth || writeDepth) {
+            // 透ける物を描く前（writeDepth）は、画面の奥行きがそのまま固体だけの奥行き。先に掛けたレンズが書いた影の奥行きも
+            // 次の回で読めるよう、画面から写す
             depthSource = main;
         }
         int w = main.width;
@@ -424,9 +477,9 @@ public final class GravitationalLensing {
             copy = new LensingCopyTarget(w, h, depthSource.useStencil, main.getColorTexture().getFormat());
         }
         for (int pass = 0; pass < passCount; pass++) {
-            copyScreen(main, depthSource, w, h, useDepth && pass == 0);
+            copyScreen(main, depthSource, w, h, useDepth && (pass == 0 || writeDepth));
             for (int i = 0; i < passes.length; i++) {
-                if (passes[i] == pass) drawLens(draws.get(i), main, proj, aspect, useDepth);
+                if (passes[i] == pass) drawLens(draws.get(i), main, proj, aspect, useDepth, writeDepth);
             }
         }
     }
@@ -462,7 +515,7 @@ public final class GravitationalLensing {
         copy.generateMipmaps();
     }
 
-    private static void drawLens(Draw d, RenderTarget main, Matrix4f proj, float aspect, boolean useDepth) {
+    private static void drawLens(Draw d, RenderTarget main, Matrix4f proj, float aspect, boolean useDepth, boolean writeDepth) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             Std140Builder data = Std140Builder.onStack(stack, 192);
             data.putMat4f(new Matrix4f(proj).invert());
@@ -476,8 +529,9 @@ public final class GravitationalLensing {
             data.putVec4(d.minX, d.minY, d.maxX, d.maxY);
             try (GpuBuffer uniforms = RenderSystem.getDevice().createBuffer(() -> "Singulo lens uniforms", GpuBuffer.USAGE_UNIFORM, data.get());
                  var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                         () -> "Singulo gravitational lens", main.getColorTextureView(), OptionalInt.empty())) {
-                pass.setPipeline(shader);
+                         () -> "Singulo gravitational lens", main.getColorTextureView(), OptionalInt.empty(),
+                         writeDepth ? main.getDepthTextureView() : null, OptionalDouble.empty())) {
+                pass.setPipeline(writeDepth ? depthWritingShader : shader);
                 pass.setUniform("LensData", uniforms);
                 pass.bindTexture("Sampler0", copy.getColorTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR, true));
                 pass.bindTexture("Sampler1", copy.getDepthTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));

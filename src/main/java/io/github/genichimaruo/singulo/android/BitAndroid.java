@@ -532,6 +532,9 @@ public class BitAndroid extends RuinAndroid {
         private void approach(LivingEntity target, double dist) {
             getLookControl().setLookAt(target, 30, 30);
             nextMove--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextMove--;
+            }
             boolean seen = hasLineOfSight(target);
             if (dist > 10 || !seen) {
                 if (stateTicks % 8 == 0 || getNavigation().isDone()) {

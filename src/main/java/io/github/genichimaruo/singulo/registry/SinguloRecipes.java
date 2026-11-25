@@ -1,6 +1,7 @@
 package io.github.genichimaruo.singulo.registry;
 
 import io.github.genichimaruo.singulo.Singulo;
+import io.github.genichimaruo.singulo.recipe.FacilityReconstructorRecipe;
 import io.github.genichimaruo.singulo.recipe.MachineRecipe;
 import io.github.genichimaruo.singulo.recipe.SmesUpgradeRecipe;
 import java.util.function.Supplier;
@@ -20,6 +21,9 @@ public final class SinguloRecipes {
             () -> MachineRecipe.SERIALIZER);
 
     public static final Supplier<RecipeSerializer<SmesUpgradeRecipe>> SMES_UPGRADE = SERIALIZERS.register("smes_upgrade", () -> SmesUpgradeRecipe.SERIALIZER);
+
+    public static final Supplier<RecipeSerializer<FacilityReconstructorRecipe>> FACILITY_RECONSTRUCTOR =
+            SERIALIZERS.register("facility_reconstructor", () -> FacilityReconstructorRecipe.SERIALIZER);
 
     private SinguloRecipes() {}
 }

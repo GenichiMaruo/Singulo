@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": "singulo:collapsar_reinforced_glass"
+  },
+  "result": {
+    "id": "singulo:collapsar_reinforced_glass_stairs",
+    "count": 4
+  }
+}
