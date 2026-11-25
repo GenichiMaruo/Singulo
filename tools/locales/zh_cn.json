@@ -16666,5 +16666,9 @@
   "message.singulo.cover.needs_tool": {
     "source": "Taking out %s needs a tool that can mine it",
     "translation": "%s需要能挖掘它的工具才能取下"
+  },
+  "block.singulo.mixed_panel_glass_slab": {
+    "source": "Stacked Glass and Panel Slabs",
+    "translation": "玻璃与面板双层台阶"
   }
 }

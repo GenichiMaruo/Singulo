@@ -100,6 +100,9 @@
     "singulo:black_reinforced_glass_slab",
     "singulo:android_gate_glass_slab",
     "singulo:android_barrier_glass_slab",
-    "singulo:mixed_glass_slab"
+    "singulo:mixed_glass_slab",
+    "singulo:mixed_panel_slab",
+    "singulo:mixed_collapsar_glass_slab",
+    "singulo:mixed_panel_glass_slab"
   ]
 }

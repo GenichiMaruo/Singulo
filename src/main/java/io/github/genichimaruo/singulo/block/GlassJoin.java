@@ -66,7 +66,8 @@ public final class GlassJoin {
      */
     public static boolean inFamily(BlockState state) {
         Block b = state.getBlock();
-        return b instanceof Glass || b instanceof MixedGlassSlab || b instanceof Shaped shaped && shaped.base() instanceof Glass;
+        return b instanceof Glass || b instanceof MixedGlassSlab || b instanceof MixedPanelGlassSlab
+                || b instanceof Shaped shaped && shaped.base() instanceof Glass;
     }
 
     /**
@@ -161,20 +162,23 @@ public final class GlassJoin {
     }
 
     /** White panel, black reinforced and collapsar reinforced glass slabs share vanilla slab placement rules and stack with each other. */
-    public static final class PairSlab extends Slab {
+    public static final class PairSlab extends Slab implements MixedPanelGlassSlab.Stackable {
         public PairSlab(Supplier<Block> base, Properties properties) { super(base, properties); }
 
-        private boolean fits(BlockState existing, BlockPlaceContext context) {
+        @Override public boolean fits(BlockState existing, BlockPlaceContext context) {
             return super.canBeReplaced(existing, context);
         }
 
         @Override protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
             // Vanilla checks the held item against "this", and the hit against the existing slab's shape.
-            return Block.byItem(context.getItemInHand().getItem()) instanceof PairSlab held && held.fits(state, context);
+            // 0.23.0: panel slabs stack onto glass slabs too ({@link MixedPanelGlassSlab}).
+            return Block.byItem(context.getItemInHand().getItem()) instanceof MixedPanelGlassSlab.Stackable held && held.fits(state, context);
         }
 
         @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
             BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
+            BlockState withPanel = MixedPanelGlassSlab.stack(existing, this);
+            if (withPanel != null) return withPanel;
             if (existing.getBlock() instanceof PairSlab other && other != this && existing.getValue(TYPE) != SlabType.DOUBLE) {
                 MixedGlassSlab.Glass mine = MixedGlassSlab.Glass.of(base()), theirs = MixedGlassSlab.Glass.of(other.base());
                 if (mine != null && theirs != null && mine != theirs) {

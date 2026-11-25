@@ -137,7 +137,7 @@ public final class MixedPanelSlab extends Block {
      * 3つのパネルのハーフブロック。バニラのハーフブロックの置き方のまま、別のパネルのハーフブロックを重ねると
      * {@link MixedPanelSlab} になる。
      */
-    public static final class PairSlab extends SlabBlock {
+    public static final class PairSlab extends SlabBlock implements MixedPanelGlassSlab.Stackable {
         private final Supplier<Block> base;
 
         public PairSlab(Supplier<Block> base, Properties properties) {
@@ -149,19 +149,25 @@ public final class MixedPanelSlab extends Block {
             return base.get();
         }
 
-        private boolean fits(BlockState existing, BlockPlaceContext context) {
+        @Override
+        public boolean fits(BlockState existing, BlockPlaceContext context) {
             return super.canBeReplaced(existing, context);
         }
 
         @Override
         protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
             // バニラは持っているアイテムが「このブロック」かを見るので、別のパネルのハーフブロックでも重ねられるようにする
-            return Block.byItem(context.getItemInHand().getItem()) instanceof PairSlab held && held.fits(state, context);
+            // （0.23.0: ガラスのハーフブロックも重ねられる。{@link MixedPanelGlassSlab}）
+            return Block.byItem(context.getItemInHand().getItem()) instanceof MixedPanelGlassSlab.Stackable held && held.fits(state, context);
         }
 
         @Override
         public BlockState getStateForPlacement(BlockPlaceContext context) {
             BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
+            BlockState withGlass = MixedPanelGlassSlab.stack(existing, this);
+            if (withGlass != null) {
+                return withGlass;
+            }
             if (existing.getBlock() instanceof PairSlab other && other != this && existing.getValue(TYPE) != SlabType.DOUBLE) {
                 Panel mine = Panel.of(base()), theirs = Panel.of(other.base());
                 if (mine != null && theirs != null) {

@@ -16666,5 +16666,9 @@
   "message.singulo.cover.needs_tool": {
     "source": "Taking out %s needs a tool that can mine it",
     "translation": "%s을(를) 빼려면 그것을 캘 수 있는 도구가 필요합니다"
+  },
+  "block.singulo.mixed_panel_glass_slab": {
+    "source": "Stacked Glass and Panel Slabs",
+    "translation": "겹친 유리와 패널 반 블록"
   }
 }

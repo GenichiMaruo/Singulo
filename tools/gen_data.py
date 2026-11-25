@@ -1604,6 +1604,7 @@ UI_LANG = {
     'gui.singulo.archivist.phase_3': ('光も記録も、いつかはこの暗がりに沈む。', 'Light and records alike sink into this dark in the end.'),
     'block.singulo.mixed_glass_slab': ('白黒ガラスの重ねハーフブロック', 'Stacked White and Black Glass Slabs'),
     'block.singulo.mixed_panel_slab': ('パネルの重ねハーフブロック', 'Stacked Panel Slabs'),
+    'block.singulo.mixed_panel_glass_slab': ('ガラスとパネルの重ねハーフブロック', 'Stacked Glass and Panel Slabs'),
     'block.singulo.mixed_collapsar_glass_slab': ('コラプサーガラスの重ねハーフブロック', 'Stacked Collapsar Glass Slabs'),
     'block.singulo.arena_hologram': ('ホログラムの床', 'Hologram Floor'),
     'item.singulo.afterglow_wings.tip_1': ('胴に着ける光の翼。エリトラのように滑空でき、壊れない', 'Wings of light worn on the chest. Glide like an elytra; they never break'),
@@ -3719,18 +3720,19 @@ def tags():
         if tag == 'bypasses_armor':
             values.insert(1, f'{MODID}:jet_beam')
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
-    from building_variants import MIXED_SLAB, MIXED_PANEL_SLAB, MIXED_COLLAPSAR_SLAB
+    from building_variants import MIXED_SLAB, MIXED_PANEL_SLAB, MIXED_COLLAPSAR_SLAB, MIXED_PANEL_GLASS_SLAB
     mixed_slab = f'{MODID}:{MIXED_SLAB}'
     mixed_panel = f'{MODID}:{MIXED_PANEL_SLAB}'
     mixed_collapsar = f'{MODID}:{MIXED_COLLAPSAR_SLAB}'
-    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab, mixed_panel, mixed_collapsar]
+    mixed_panel_glass = f'{MODID}:{MIXED_PANEL_GLASS_SLAB}'
+    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab, mixed_panel, mixed_collapsar, mixed_panel_glass]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     diamond_only = ('welded_hatch',)                      # 溶接された蓋はダイヤのツルハシ以上でないと掘れない
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
                {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
                    v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
                    or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)]
-                + [mixed_slab, mixed_panel, mixed_collapsar]})
+                + [mixed_slab, mixed_panel, mixed_collapsar, mixed_panel_glass]})
     # コラプサー強化パネル（0.23.0）: ダイヤ以上のツルハシで掘り、ウィザーとエンダードラゴンに壊されない（重ねハーフブロックは Java で見る）
     collapsar = (['collapsar_reinforced_panel', 'collapsar_reinforced_light_panel', 'collapsar_reinforced_glass', 'collapsar_star_glass']
                  + sorted(__import__('building_variants').COLLAPSAR_VARIANTS))

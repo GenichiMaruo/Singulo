@@ -396,6 +396,17 @@ public final class SinguloBlocks {
                             state -> state.getValue(io.github.genichimaruo.singulo.block.MixedPanelSlab.UPPER)
                                     == io.github.genichimaruo.singulo.block.MixedPanelSlab.Panel.WHITE ? MapColor.SNOW : MapColor.COLOR_BLACK)));
 
+    /**
+     * 白・黒・コラプサーのガラスのハーフブロックと、白・黒・コラプサーのパネルのハーフブロックを上下に重ねたもの（0.23.0。
+     * アイテムはなく、元のハーフブロックで置く）。半分が透けるので隣を隠さない。
+     */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.block.MixedPanelGlassSlab> MIXED_PANEL_GLASS_SLAB = BLOCKS.register(
+            "mixed_panel_glass_slab", () -> new io.github.genichimaruo.singulo.block.MixedPanelGlassSlab(
+                    BlockBehaviour.Properties.ofLegacyCopy(BLACK_REINFORCED_PANEL.get()).noOcclusion()
+                            .isRedstoneConductor((s, level, pos) -> false).isViewBlocking((s, level, pos) -> false)
+                            .mapColor(state -> state.getValue(io.github.genichimaruo.singulo.block.MixedPanelGlassSlab.PANEL)
+                                    == io.github.genichimaruo.singulo.block.MixedPanelSlab.Panel.WHITE ? MapColor.SNOW : MapColor.COLOR_BLACK)));
+
     public static final DeferredBlock<MixedGlassSlab> MIXED_GLASS_SLAB = BLOCKS.register(
             "mixed_glass_slab", () -> new MixedGlassSlab(
                     glassProperties(MapColor.SNOW, 3.0F, 9.0F, SoundType.METAL).mapColor(

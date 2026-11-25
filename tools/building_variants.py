@@ -319,6 +319,9 @@ MIXED_COLLAPSAR_SLAB = 'mixed_collapsar_glass_slab'
 GLASS_PAIR = ('white_glass_panel', 'black_reinforced_glass')
 GLASS_OTHERS = (('white', 'white_glass_panel'), ('black', 'black_reinforced_glass'))
 COLLAPSAR_GLASS = 'collapsar_reinforced_glass'
+# ガラスとパネルの重ねハーフブロック（0.23.0。Java の MixedPanelGlassSlab。ガラスは MixedGlassSlab.Glass と同じ順・名前）
+MIXED_PANEL_GLASS_SLAB = 'mixed_panel_glass_slab'
+GLASS_MATERIALS = (('white', 'white_glass_panel'), ('black', 'black_reinforced_glass'), ('collapsar', COLLAPSAR_GLASS))
 
 
 def mixed_slab_models(write_json, assets, block=MIXED_PANEL_SLAB, materials=PANEL_MATERIALS, translucent=False):
@@ -396,6 +399,53 @@ def mixed_glass_models(write_json, assets):
     write_json(assets / 'blockstates' / f'{MIXED_COLLAPSAR_SLAB}.json', {'variants': states})
 
 
+def _half_model(write_json, assets, name, base, top, inner, translucent):
+    """ハーフブロック base の上（top）か下の半分だけの模型。面の絵はそのハーフブロックと同じ。
+    inner なら、もう一方の半分に接する面も描く（cullface なし。透けるガラスの向こうに見えるパネルの面）。"""
+    f, t = [0, 8 if top else 0, 0], [16, 16 if top else 8, 16]
+    slab = base + ('_slab_top' if top else '_slab')
+    textures = {'particle': f'{MODID}:block/{base}'}
+    faces = {}
+    for face in _FACES:
+        inside = face == ('down' if top else 'up')
+        if inside and not inner:
+            continue
+        if face == 'up':
+            plane = 16 if top else 8
+        elif face == 'down':
+            plane = 8 if top else 0
+        else:
+            plane = 16 if face in ('south', 'east') else 0
+        textures[face] = f'{MODID}:block/{slab}_{face}{plane}'
+        entry = {'texture': '#' + face, 'uv': _face_uv(face, f, t)}
+        if not inside:
+            entry['cullface'] = face
+        faces[face] = entry
+    model = {'parent': 'minecraft:block/block'}
+    if translucent:
+        model['render_type'] = 'minecraft:translucent'
+    model.update({'textures': textures, 'elements': [{'from': f, 'to': t, 'faces': faces}]})
+    write_json(assets / 'models' / 'block' / f'{name}.json', model)
+
+
+def mixed_panel_glass_models(write_json, assets):
+    """ガラスとパネルの重ねハーフブロック（glass・panel・glass_on_top）。ガラスの半分（透ける描き方）とパネルの半分（不透明）の
+    模型を multipart で重ねる（描き方が違うので1つの模型にできない）。ガラスの、パネルに接する面は描かない。
+    パネルの、ガラスに接する面はガラス越しに見えるので描く。"""
+    parts = []
+    for top in (False, True):
+        where = 'top' if top else 'bottom'
+        for glass_name, glass in GLASS_MATERIALS:
+            name = f'{MIXED_PANEL_GLASS_SLAB}_glass_{glass_name}_{where}'
+            _half_model(write_json, assets, name, glass, top, False, True)
+            parts.append({'when': {'glass': glass_name, 'glass_on_top': str(top).lower()}, 'apply': {'model': f'{MODID}:block/{name}'}})
+        for panel_name, panel in PANEL_MATERIALS:
+            name = f'{MIXED_PANEL_GLASS_SLAB}_panel_{panel_name}_{where}'
+            _half_model(write_json, assets, name, panel, top, True, False)
+            parts.append({'when': {'panel': panel_name, 'glass_on_top': str(not top).lower()}, 'apply': {'model': f'{MODID}:block/{name}'}})
+    write_json(assets / 'blockstates' / f'{MIXED_PANEL_GLASS_SLAB}.json', {'multipart': parts})
+
+
 def mixed_loot(write_json, data, block, materials):
     """重ねハーフブロック: 下と上のハーフブロックを1つずつ落とす（状態の lower・upper で選ぶ）。"""
     write_json(data / 'loot_table' / 'blocks' / f'{block}.json', {
@@ -422,6 +472,7 @@ def models(write_json, assets):
     bs, mb, mi = assets / 'blockstates', assets / 'models' / 'block', assets / 'models' / 'item'
     mixed_glass_models(write_json, assets)
     mixed_slab_models(write_json, assets, MIXED_PANEL_SLAB, PANEL_MATERIALS, translucent=False)
+    mixed_panel_glass_models(write_json, assets)
     (assets / 'textures' / 'block').mkdir(parents=True, exist_ok=True)
     glass_join_textures(assets / 'textures' / 'block')     # ガラスの階段に接するガラスの面
     panel_join_textures(assets / 'textures' / 'block')     # ハーフブロック・階段に一部覆われたパネルの面
@@ -520,6 +571,15 @@ def loot(write_json, data):
                                        'properties': {'other': name}}],
                        'functions': [{'function': 'minecraft:explosion_decay'}]} for name, base in GLASS_OTHERS]}]}]})
     mixed_loot(write_json, data, MIXED_PANEL_SLAB, PANEL_MATERIALS)
+    # ガラスとパネルの重ねハーフブロック（0.23.0）: ガラス（状態 glass）とパネル（状態 panel）のハーフブロックを1つずつ
+    write_json(data / 'loot_table' / 'blocks' / f'{MIXED_PANEL_GLASS_SLAB}.json', {
+        'type': 'minecraft:block',
+        'pools': [{'rolls': 1, 'entries': [{'type': 'minecraft:alternatives', 'children': [
+            {'type': 'minecraft:item', 'name': f'{MODID}:{base}_slab',
+             'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:{MIXED_PANEL_GLASS_SLAB}',
+                             'properties': {prop: name}}],
+             'functions': [{'function': 'minecraft:explosion_decay'}]} for name, base in materials]}]}
+                  for prop, materials in (('glass', GLASS_MATERIALS), ('panel', PANEL_MATERIALS))]})
     for variant, (_base, shape) in VARIANTS.items():
         entry = {'type': 'minecraft:item', 'name': f'{MODID}:{variant}'}
         if shape == 'slab':
