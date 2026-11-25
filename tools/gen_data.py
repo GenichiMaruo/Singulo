@@ -94,7 +94,7 @@ def stage_of(name):
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
             '小型クリスタルメモリ（光剣型）': 2, '小型クリスタルメモリ（斧型）': 4, '小型クリスタルメモリ（ビット型）': 4,
-            '小型クリスタルメモリ（射撃型）': 4, 'ドローン用クリスタルメモリ': 2,
+            '小型クリスタルメモリ（射撃型）': 4, '小型クリスタルメモリ（放電型）': 5, 'ドローン用クリスタルメモリ': 2,
             'ドローン用クリスタルメモリ（ジェット型）': 3, 'ドローン用クリスタルメモリ（反重力型）': 4}.get(name, 1)
 
 
@@ -961,6 +961,7 @@ UI_LANG = {
     'gui.singulo.android.nickname.bit': ('ノクス', 'Nox'),
     'gui.singulo.android.nickname.gunner': ('シエル', 'Ciel'),
     'gui.singulo.android.nickname.katana': ('ルージュ', 'Rouge'),
+    'gui.singulo.android.nickname.spark': ('エクレール', 'Eclair'),
     'gui.singulo.android.rename': ('クリックで名前を変える', 'Click to rename'),
     'gui.singulo.android.dismantle': ('解体する（2回押す）', 'Dismantle (press twice)'),
     'gui.singulo.android.rename.reset': ('名前を元に戻す', 'Reset name'),
@@ -1519,6 +1520,7 @@ UI_LANG = {
     'entity.singulo.bit_android': ('ビット型アンドロイド「ノクス」', 'Bit Android "Nox"'),
     'entity.singulo.gunner_android': ('射撃型アンドロイド「シエル」', 'Gunner Android "Ciel"'),
     'entity.singulo.katana_android': ('刀型アンドロイド「ルージュ」', 'Katana Android "Rouge"'),
+    'entity.singulo.spark_android': ('放電型アンドロイド「エクレール」', 'Spark Android "Eclair"'),
     'entity.singulo.android_crescent': ('斬撃波', 'Crescent Slash'),
     'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
@@ -1677,6 +1679,7 @@ UI_LANG = {
     'item.singulo.bit_android_spawn_egg': ('ビット型アンドロイドのスポーンエッグ', 'Bit Android Spawn Egg'),
     'item.singulo.gunner_android_spawn_egg': ('射撃型アンドロイドのスポーンエッグ', 'Gunner Android Spawn Egg'),
     'item.singulo.katana_android_spawn_egg': ('刀型アンドロイドのスポーンエッグ', 'Katana Android Spawn Egg'),
+    'item.singulo.spark_android_spawn_egg': ('放電型アンドロイドのスポーンエッグ', 'Spark Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -2166,7 +2169,8 @@ def textures():
     import portable_printer
     save(portable_printer.entity_texture(), te / 'portable_printer.png')
     save(portable_printer.entity_texture(portable_printer.MK2), te / 'portable_printer_2.png')
-    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android', 'katana_android'):
+    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android', 'katana_android',
+                'spark_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
@@ -3285,6 +3289,16 @@ SOUNDS = {
     'android.katana_iai_charge': ('android/katana_iai_charge', '刀型が居合の構えを取る', 'Katana Android readies a draw', 32),
     'android.katana_iai_flash': ('android/katana_iai_flash', '二刀が閃く', 'Twin blades flash', 48),
     'android.katana_iai_release': ('android/katana_iai_release', '紅刀が響き、斬撃が走る', 'Blade rings, slashes erupt', 48),
+    # 放電型（0.23.0）
+    'android.spark_arc': ('android/spark_arc', '放電が走る', 'Arc crackles', 24),
+    'android.spark_palm': ('android/spark_palm', '掌底から放電がはじける', 'Palm discharge snaps', 16),
+    'android.spark_field': ('android/spark_field', '電場が張られる', 'Electric field hums', 16),
+    'android.spark_tenrai_charge': ('android/spark_tenrai_charge', '放電型が電荷を溜める', 'Spark Android gathers charge', 32),
+    'android.spark_tenrai_strike': ('android/spark_tenrai_strike', '天雷が落ちる', 'Lightning strikes down', 80),
+    'android.spark_supply': ('android/spark_supply', '放電型が仲間へ給電する', 'Spark Android shares power', 12),
+    'android.spark_link': ('android/spark_link', '放電型が電力を注ぎ足す', 'Spark Android lends charge', 16),
+    'android.spark_play': ('android/spark_play', '指先で火花がはじける', 'Fingertip sparks snap', 8),
+    'ergosphere_leviathan.memory_discharge': ('ergosphere_leviathan/memory_discharge', '残骸から放電が走る', 'Wreck discharges', 32),
     # 画面のボタンを押した音（バニラのボタンと同じく、字幕は出さない）
     'ui.click': ('ui/click', None, None, 16),
 }
@@ -4166,9 +4180,11 @@ TAB_GROUPS = [
         'wormhole_port', 'wormhole_seam_upgrade',
     ]),
     ('アンドロイド', [
-        'android_station', 'android_kit', 'android_repair_kit', 'android_charger', 'portable_android_printer', 'portable_android_printer_2',
-        'android_armor_plate', 'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
-        'android_memory_axe', 'android_memory_bit', 'android_memory_gunner', 'android_memory_katana',
+        'android_station', 'android_kit', 'android_repair_kit', 'android_charger', 'android_charger_2', 'android_charger_3',
+        'portable_android_printer', 'portable_android_printer_2',
+        'android_armor_plate', 'android_armor_plate_2', 'android_armor_plate_3', 'android_weapon_module', 'android_weapon_module_2', 'android_weapon_module_3', 'heavy_strike_module', 'rapid_strike_module', 'drain_module', 'piercing_module', 'frost_module', 'warden_breaker_module',
+        'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
+        'android_memory_axe', 'android_memory_bit', 'android_memory_gunner', 'android_memory_katana', 'android_memory_spark',
         'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack',
         'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench',
         'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
@@ -4288,7 +4304,8 @@ TAB_GROUPS = [
     ]),
     ('スポーンエッグ', [
         'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
-        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'katana_android_spawn_egg', 'security_drone_spawn_egg',
+        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'katana_android_spawn_egg', 'spark_android_spawn_egg',
+        'security_drone_spawn_egg',
         # ボスのスポーンエッグはタブに出さない（/give でだけ渡す。Java の SinguloItems.HIDDEN）
     ]),
 ]

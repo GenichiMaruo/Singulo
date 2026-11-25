@@ -136,6 +136,7 @@ public final class GeneratedContent {
             new ItemDef("android_memory_bit", "item", 4, 0),
             new ItemDef("android_memory_gunner", "item", 4, 0),
             new ItemDef("android_memory_katana", "item", 1, 0),
+            new ItemDef("android_memory_spark", "item", 5, 0),
             new ItemDef("canned_soda", "item", 1, 0),
             new ItemDef("sports_drink", "item", 1, 0),
             new ItemDef("energy_drink", "item", 1, 0),
@@ -390,6 +391,7 @@ public final class GeneratedContent {
             "android_memory_bit",
             "android_memory_gunner",
             "android_memory_katana",
+            "android_memory_spark",
             "android_work_console",
             "android_supply_port",
             "android_delivery_port",
@@ -730,6 +732,7 @@ public final class GeneratedContent {
             "bit_android_spawn_egg",
             "gunner_android_spawn_egg",
             "katana_android_spawn_egg",
+            "spark_android_spawn_egg",
             "security_drone_spawn_egg"
     );
 

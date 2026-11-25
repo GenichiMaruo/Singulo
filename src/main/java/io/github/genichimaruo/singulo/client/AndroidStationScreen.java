@@ -70,6 +70,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             case BIT -> io.github.genichimaruo.singulo.android.BitAndroid.ACCENT;
             case GUNNER -> io.github.genichimaruo.singulo.android.GunnerAndroid.ACCENT;
             case KATANA -> io.github.genichimaruo.singulo.android.KatanaAndroid.ACCENT;
+            case SPARK -> io.github.genichimaruo.singulo.android.SparkAndroid.ACCENT;
         };
     }
 

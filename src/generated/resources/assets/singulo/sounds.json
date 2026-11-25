@@ -2225,6 +2225,87 @@
       }
     ]
   },
+  "android.spark_arc": {
+    "subtitle": "subtitles.singulo.android.spark_arc",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_arc",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "android.spark_palm": {
+    "subtitle": "subtitles.singulo.android.spark_palm",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_palm",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "android.spark_field": {
+    "subtitle": "subtitles.singulo.android.spark_field",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_field",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "android.spark_tenrai_charge": {
+    "subtitle": "subtitles.singulo.android.spark_tenrai_charge",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_tenrai_charge",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "android.spark_tenrai_strike": {
+    "subtitle": "subtitles.singulo.android.spark_tenrai_strike",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_tenrai_strike",
+        "attenuation_distance": 80
+      }
+    ]
+  },
+  "android.spark_supply": {
+    "subtitle": "subtitles.singulo.android.spark_supply",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_supply",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "android.spark_link": {
+    "subtitle": "subtitles.singulo.android.spark_link",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_link",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "android.spark_play": {
+    "subtitle": "subtitles.singulo.android.spark_play",
+    "sounds": [
+      {
+        "name": "singulo:android/spark_play",
+        "attenuation_distance": 8
+      }
+    ]
+  },
+  "ergosphere_leviathan.memory_discharge": {
+    "subtitle": "subtitles.singulo.ergosphere_leviathan.memory_discharge",
+    "sounds": [
+      {
+        "name": "singulo:ergosphere_leviathan/memory_discharge",
+        "attenuation_distance": 32
+      }
+    ]
+  },
   "ui.click": {
     "sounds": [
       {

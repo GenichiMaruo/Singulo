@@ -99,6 +99,16 @@ VARIANTS = {
         'seed': 59,
         'inner': True,
     },
+    # 放電型「エクレール」: 濃い鋼灰色の髪に、電光の黄色のインナーカラーと、レモン寄りの白黄の光
+    # （腰の機械から両腕の放電籠手へケーブルがつながる。籠手と機械は描画で出す）
+    'spark_android': {
+        'hair': ((78, 82, 94), (58, 62, 72), (40, 43, 52)),
+        'streak': ((240, 226, 72), (198, 182, 40)),
+        'accent': (244, 242, 90),
+        'iris': ((140, 120, 24), (250, 240, 130)),
+        'seed': 61,
+        'inner': True,
+    },
     # ビット型「ノクス」: 紺の髪に菫のひと房
     'bit_android': {
         'hair': ((50, 58, 98), (36, 42, 76), (24, 28, 54)),
@@ -142,6 +152,55 @@ def textures(te, save):
     save(gunner_charge(VARIANTS['gunner_android'], Image), te / 'gunner_android_charge.png')
     for stage in range(len(KATANA_SURGE)):
         save(katana_surge(VARIANTS['katana_android'], stage, Image), te / f'katana_android_surge_{stage}.png')
+    for stage in range(len(KATANA_SURGE)):
+        save(katana_surge(VARIANTS['spark_android'], stage, Image, node=(255, 255, 220)), te / f'spark_android_surge_{stage}.png')
+    save(shield_hex(Image), te / 'android_shield_hex.png')
+    save(shield_collapsar(Image), te / 'android_shield_collapsar.png')
+
+
+def shield_hex(Image):
+    """装甲板 Mk2 のエネルギーシールドの模様（足し合わせで描くので、黒は透ける）: 六角の格子の細い線と、ところどころ明るい節。
+    色は描画でかけるので、白の濃淡で描く。格子の周期を絵の幅・高さに合わせて、上下左右につながる（流れても継ぎ目が出ない）。"""
+    import math
+    w, h = 64, 28
+    cw, ch = 8.0, 7.0                           # 六角の横の間隔と段の間隔（ほぼ正六角形。1段おきに半分ずらす。4段で高さ1つ分）
+    centers = [(i * cw + (cw / 2 if j % 2 else 0), j * ch) for j in range(int(h / ch)) for i in range(int(w / cw))]
+    im = Image.new('RGB', (w, h), (0, 0, 0))
+    px = im.load()
+
+    def wrap(d, size):
+        return (d + size / 2) % size - size / 2
+
+    for y in range(h):
+        for x in range(w):
+            ds = sorted(math.hypot(wrap(x + 0.5 - cx, w), wrap(y + 0.5 - cy, h)) for cx, cy in centers)
+            edge = max(0.0, 1 - (ds[1] - ds[0]) / 1.6)      # 2つの中心からの距離が近い所が、六角の辺
+            v = int(150 * edge)
+            px[x, y] = (v, v, v)
+    for (x, y) in ((4, 3), (20, 10), (36, 17), (52, 24), (12, 24), (44, 3)):
+        px[x, y] = (230, 230, 230)                  # ところどころ明るい節
+    return im
+
+
+def shield_collapsar(Image):
+    """装甲板 Mk3（コラプサー）のエネルギーシールドの模様: 降着円盤のような、斜めに流れる光の筋と、ゆらぐ明るい粒。
+    白の濃淡で描き、色は描画でかける。上下左右につながる。"""
+    import math
+    rng = random.Random(97)
+    w, h = 64, 32
+    im = Image.new('RGB', (w, h), (0, 0, 0))
+    px = im.load()
+    for y in range(h):
+        for x in range(w):
+            t = (x / w * 2 + y / h) * math.tau          # 斜めの筋（つながるよう、周期を絵の幅・高さに合わせる）
+            band = 0.5 + 0.5 * math.sin(t * 3)
+            fine = 0.5 + 0.5 * math.sin(t * 7 + math.sin(y / h * math.tau * 2) * 1.5)
+            v = int(120 * band ** 3 + 50 * fine ** 6)
+            px[x, y] = (v, v, v)
+    for _ in range(18):
+        x, y = rng.randrange(w), rng.randrange(h)
+        px[x, y] = (240, 240, 240)
+    return im
 
 
 # 刀型の紅一閃で、体の継ぎ目に浮き出る光の筋。胸の芯から外へ、3段に分けて浮き出る（段ごとに別の部品。重ならない）
@@ -152,8 +211,8 @@ KATANA_SURGE = (
 )
 
 
-def katana_surge(pal, stage, Image):
-    """刀型の紅一閃の間だけ重ねる、体の光の筋（stage 段目の部品だけ）。
+def katana_surge(pal, stage, Image, node=(255, 214, 220)):
+    """刀型の紅一閃の間だけ重ねる、体の光の筋（stage 段目の部品だけ）。放電型の天雷の溜めでも、同じ形の電光の筋を使う。
 
     部品の縦の面に、回路のような細い筋を1本ずつ: 途中で1ドット横へ折れ、端に明るい節がつく。上下の面には、縁を横切る短い筋。
     """
@@ -161,7 +220,6 @@ def katana_surge(pal, stage, Image):
     im = Image.new('RGBA', (128, 64), (0, 0, 0, 0))
     r, g, b = pal['accent']
     trace = (r, min(255, g + 40), min(255, b + 40))
-    node = (255, 214, 220)
 
     def put(x, y, c):
         im.putpixel((x, y), tuple(c) + (255,))
@@ -865,7 +923,43 @@ def katana_memory(accent, Image):
     return sheet
 
 
-ANIMATED_MEMORIES = {'gunner': animated_memory, 'katana': katana_memory}
+def spark_memory(accent, Image):
+    """放電型のアニメーションつきの小型クリスタルメモリ（縦に並べた16コマ）。
+
+    結晶の上から下へ、枝分かれした電光が2回続けて走り（2コマずつ）、そのたびに結晶が白黄に瞬く。そのあとは静かで、
+    結晶の縁にときおり小さな火花がはじける。表示灯は電光に合わせて2回点き、あとは暗い。
+    """
+    base = memory_icon(accent, Image)
+    sheet = Image.new('RGBA', (16, 16 * MEMORY_FRAMES), (0, 0, 0, 0))
+    hot = tuple(min(255, c + 60) for c in accent)
+    # 電光の道筋（上から下へジグザグに）と枝
+    bolts = ([(8, 2), (7, 3), (8, 4), (9, 5), (8, 6), (7, 7), (8, 8), (7, 9)],
+             [(7, 2), (8, 3), (7, 4), (6, 5), (7, 6), (8, 7), (9, 8), (9, 9)])
+    branches = ([(9, 5), (10, 6)], [(6, 5), (5, 6)])
+    sparks = ((10, 3, 9), (5, 8, 12), (10, 9, 14))     # (x, y, コマ)
+    for f in range(MEMORY_FRAMES):
+        im = base.copy()
+        px = im.load()
+        flash = 0 if f in (0, 1) else 1 if f in (3, 4) else -1
+        if flash >= 0:
+            strong = f in (0, 3)
+            for y in range(2, 10):                        # 結晶が瞬く
+                for x in range(5, 11):
+                    r, g, b, a = px[x, y]
+                    k = 0.45 if strong else 0.2
+                    px[x, y] = (int(r + (hot[0] - r) * k), int(g + (hot[1] - g) * k), int(b + (hot[2] - b) * k), min(255, a + int(70 * k)))
+            for x, y in bolts[flash] + (branches[flash] if strong else []):
+                px[x, y] = (255, 255, 240, 250) if strong else hot + (230,)
+        for x, y, at in sparks:
+            if f == at:
+                px[x, y] = (255, 255, 230, 240)
+        lamp = 1.0 if f in (0, 1, 3, 4) else 0.35
+        px[11, 11] = tuple(int(c * lamp) for c in accent) + (255,)
+        sheet.paste(im, (0, 16 * f))
+    return sheet
+
+
+ANIMATED_MEMORIES = {'gunner': animated_memory, 'katana': katana_memory, 'spark': spark_memory}
 
 
 def memory_icon(accent, Image):

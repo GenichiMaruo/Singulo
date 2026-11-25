@@ -16154,5 +16154,65 @@
   "item.singulo.facility_reconstructor.warning": {
     "source": "Warning: rebuilding %s overwrites terrain, blocks, builds and inventories from (%s, %s, %s) to (%s, %s, %s). Back up the world and move valuables first. This cannot be undone. Sneak and right-click this same core with this item again within 30 seconds to continue.",
     "translation": "警告：重建 %s 將覆蓋 (%s, %s, %s) 到 (%s, %s, %s) 範圍內的地形、方塊、建築與容器。請先備份世界並移走貴重物品。此操作無法復原。若要繼續，請在 30 秒內以同一物品潛行右擊同一核心。"
+  },
+  "entity.singulo.spark_android": {
+    "source": "Spark Android \"Eclair\"",
+    "translation": "放電型仿生人「艾克蕾兒」"
+  },
+  "gui.singulo.android.nickname.spark": {
+    "source": "Eclair",
+    "translation": "艾克蕾兒"
+  },
+  "item.singulo.spark_android_spawn_egg": {
+    "source": "Spark Android Spawn Egg",
+    "translation": "放電型仿生人生怪蛋"
+  },
+  "item.singulo.android_memory_spark": {
+    "source": "Compact Crystal Memory (Spark)",
+    "translation": "小型水晶記憶體（放電型）"
+  },
+  "desc.singulo.android_memory_spark": {
+    "source": "A compact crystal memory holding the design of the Spark Android. Now and then forked lightning flickers through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "記錄放電型仿生人設計的小型水晶記憶體。晶體中不時閃過分岔的電光。放入仿生人組裝站即可列印該型號（不會消耗）。"
+  },
+  "summary.singulo.android_memory_spark": {
+    "source": "The design for printing Spark Androids.",
+    "translation": "可列印放電型仿生人的設計。"
+  },
+  "subtitles.singulo.android.spark_arc": {
+    "source": "Arc crackles",
+    "translation": "電弧劈啪作響"
+  },
+  "subtitles.singulo.android.spark_palm": {
+    "source": "Palm discharge snaps",
+    "translation": "掌底放電迸裂"
+  },
+  "subtitles.singulo.android.spark_field": {
+    "source": "Electric field hums",
+    "translation": "電場嗡鳴"
+  },
+  "subtitles.singulo.android.spark_tenrai_charge": {
+    "source": "Spark Android gathers charge",
+    "translation": "放電型仿生人蓄積電荷"
+  },
+  "subtitles.singulo.android.spark_tenrai_strike": {
+    "source": "Lightning strikes down",
+    "translation": "天雷落下"
+  },
+  "subtitles.singulo.android.spark_supply": {
+    "source": "Spark Android shares power",
+    "translation": "放電型仿生人為同伴供電"
+  },
+  "subtitles.singulo.android.spark_link": {
+    "source": "Spark Android lends charge",
+    "translation": "放電型仿生人注入電力"
+  },
+  "subtitles.singulo.android.spark_play": {
+    "source": "Fingertip sparks snap",
+    "translation": "指尖火花迸裂"
+  },
+  "subtitles.singulo.ergosphere_leviathan.memory_discharge": {
+    "source": "Wreck discharges",
+    "translation": "殘骸放電"
   }
 }

@@ -410,6 +410,7 @@ MOD = {
     '小型クリスタルメモリ（ビット型）': ('android_memory_bit', 'Compact Crystal Memory (Bit)', 'item'),
     '小型クリスタルメモリ（射撃型）': ('android_memory_gunner', 'Compact Crystal Memory (Gunner)', 'item'),
     '小型クリスタルメモリ（刀型）': ('android_memory_katana', 'Compact Crystal Memory (Katana)', 'item'),
+    '小型クリスタルメモリ（放電型）': ('android_memory_spark', 'Compact Crystal Memory (Spark)', 'item'),
     '封印コンソール': ('seal_console', 'Seal Console', 'ruin_block'),
     '番人の封印核': ('guardian_core', 'Guardian Seal Core', 'boss_block'),
     '残響投影器': ('echo_projector', 'Echo Projector', 'boss_block'),

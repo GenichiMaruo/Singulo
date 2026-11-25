@@ -174,6 +174,7 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.BIT_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BIT));
         event.registerEntityRenderer(SinguloEntities.GUNNER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.GUNNER));
         event.registerEntityRenderer(SinguloEntities.KATANA_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.KATANA));
+        event.registerEntityRenderer(SinguloEntities.SPARK_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SPARK));
         event.registerEntityRenderer(SinguloEntities.ANDROID_CRESCENT.get(), AndroidCrescentRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ANDROID_LASER.get(), AndroidLaserRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
@@ -262,6 +263,7 @@ public final class SinguloClient {
         event.registerLayerDefinition(AndroidModel.BIT_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BIT));
         event.registerLayerDefinition(AndroidModel.GUNNER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.GUNNER));
         event.registerLayerDefinition(AndroidModel.KATANA_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.KATANA));
+        event.registerLayerDefinition(AndroidModel.SPARK_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.SPARK));
         event.registerLayerDefinition(HorizonWardenRenderer.LAYER, HorizonWardenRenderer::createLayer);
     }
 

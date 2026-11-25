@@ -16154,5 +16154,65 @@
   "item.singulo.facility_reconstructor.warning": {
     "source": "Warning: rebuilding %s overwrites terrain, blocks, builds and inventories from (%s, %s, %s) to (%s, %s, %s). Back up the world and move valuables first. This cannot be undone. Sneak and right-click this same core with this item again within 30 seconds to continue.",
     "translation": "경고: %s 재건은 (%s, %s, %s)에서 (%s, %s, %s)까지의 지형, 블록, 건축물과 보관함을 덮어씁니다. 먼저 세계를 백업하고 귀중품을 옮기세요. 되돌릴 수 없습니다. 계속하려면 30초 안에 같은 아이템을 들고 같은 코어를 웅크린 채 우클릭하세요."
+  },
+  "entity.singulo.spark_android": {
+    "source": "Spark Android \"Eclair\"",
+    "translation": "방전형 안드로이드 \"에클레르\""
+  },
+  "gui.singulo.android.nickname.spark": {
+    "source": "Eclair",
+    "translation": "에클레르"
+  },
+  "item.singulo.spark_android_spawn_egg": {
+    "source": "Spark Android Spawn Egg",
+    "translation": "방전형 안드로이드 생성 알"
+  },
+  "item.singulo.android_memory_spark": {
+    "source": "Compact Crystal Memory (Spark)",
+    "translation": "소형 크리스털 메모리(방전형)"
+  },
+  "desc.singulo.android_memory_spark": {
+    "source": "A compact crystal memory holding the design of the Spark Android. Now and then forked lightning flickers through its crystal. Put it in an Android Assembly Station to print that design (it is not used up).",
+    "translation": "방전형 안드로이드의 설계를 기록한 소형 크리스털 메모리. 결정 속을 갈라진 전광이 이따금 스친다. 안드로이드 조립 스테이션에 넣으면 그 형을 출력할 수 있다(소모되지 않음)."
+  },
+  "summary.singulo.android_memory_spark": {
+    "source": "The design for printing Spark Androids.",
+    "translation": "방전형 안드로이드를 출력할 수 있는 설계."
+  },
+  "subtitles.singulo.android.spark_arc": {
+    "source": "Arc crackles",
+    "translation": "방전이 지지직거린다"
+  },
+  "subtitles.singulo.android.spark_palm": {
+    "source": "Palm discharge snaps",
+    "translation": "장저 방전이 터진다"
+  },
+  "subtitles.singulo.android.spark_field": {
+    "source": "Electric field hums",
+    "translation": "전기장이 웅웅거린다"
+  },
+  "subtitles.singulo.android.spark_tenrai_charge": {
+    "source": "Spark Android gathers charge",
+    "translation": "방전형 안드로이드가 전하를 모은다"
+  },
+  "subtitles.singulo.android.spark_tenrai_strike": {
+    "source": "Lightning strikes down",
+    "translation": "천뢰가 떨어진다"
+  },
+  "subtitles.singulo.android.spark_supply": {
+    "source": "Spark Android shares power",
+    "translation": "방전형 안드로이드가 동료에게 급전한다"
+  },
+  "subtitles.singulo.android.spark_link": {
+    "source": "Spark Android lends charge",
+    "translation": "방전형 안드로이드가 전력을 보탠다"
+  },
+  "subtitles.singulo.android.spark_play": {
+    "source": "Fingertip sparks snap",
+    "translation": "손끝에서 불꽃이 튄다"
+  },
+  "subtitles.singulo.ergosphere_leviathan.memory_discharge": {
+    "source": "Wreck discharges",
+    "translation": "잔해가 방전한다"
   }
 }
