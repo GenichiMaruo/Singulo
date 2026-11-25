@@ -112,7 +112,7 @@ public final class PrecisionAssemblyGameTests {
     public static void everyInstalledAssemblyDiagramMatchesExactlyOneProduct(GameTestHelper h) {
         var all = MachineRecipeIndex.station(h.getLevel(), TYPE).stream()
                 .filter(r -> r.id().getNamespace().equals(Singulo.MODID)).toList();
-        h.assertTrue(all.size() == (ModList.get().isLoaded("mekanism") ? 143 : 141), "Unexpected number of bundled diagrams");
+        h.assertTrue(all.size() == (ModList.get().isLoaded("mekanism") ? 145 : 143), "Unexpected number of bundled diagrams");
         for (var holder : all) {
             var recipe = holder.value();
             h.assertTrue(recipe.hasAssemblyShape(), "Missing diagram: " + holder.id());

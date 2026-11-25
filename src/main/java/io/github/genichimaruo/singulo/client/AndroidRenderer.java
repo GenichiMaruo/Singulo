@@ -108,6 +108,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Blink(this));
         addLayer(new Accessories(this));
         addLayer(new ArmorGlint(this));
+        addLayer(new ArmorShield(this));
     }
 
     @Override
@@ -2266,6 +2267,67 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 default -> {
                 }
+            }
+        }
+    }
+
+    /**
+     * 上位の装甲板のエネルギーシールド: 体の部位の一部を、少し外側から透けて光る殻で覆う（頭は覆わない）。殻は部位ごとに、その部位の
+     * 動きに合わせて描くので、手足が動いてもずれない。Mk2 は胴と両肩（上腕）、Mk3 はさらに前腕・腰・太ももまで覆う。
+     * 模様は流れる（Mk2 は菫の六角の格子、Mk3 はコラプサーの橙の光の筋）。ふだんはかすかに光り、攻撃を受けた瞬間に明るく瞬く。
+     * 装甲の部品は Mk1 のまま。
+     */
+    final class ArmorShield extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final ResourceLocation HEX = Singulo.id("textures/entity/android_shield_hex.png");
+        private static final ResourceLocation COLLAPSAR = Singulo.id("textures/entity/android_shield_collapsar.png");
+        /** 殻を部位の箱からどれだけ外へ出すか（画素）。 */
+        private static final float GAP = 0.7F;
+
+        /** 覆う部位: 変形・箱（画素。部位の模型の箱と同じ）・Mk3 だけか。 */
+        private record Plate(java.util.function.BiConsumer<AndroidModel, PoseStack> to, float x0, float y0, float z0, float x1, float y1, float z1,
+                             boolean collapsarOnly) {}
+
+        private static final Plate[] PLATES = {
+                new Plate(AndroidModel::toTorso, -3, -8, -1.5F, 3, 0, 1.5F, false),                       // 胴
+                new Plate((m, p) -> m.toArm(p, true), -1, -0.5F, -1, 1, 4.5F, 1, false),                  // 左の上腕
+                new Plate((m, p) -> m.toArm(p, false), -1, -0.5F, -1, 1, 4.5F, 1, false),                 // 右の上腕
+                new Plate(AndroidModel::toLeftForearm, -1, 0, -1, 1, 5, 1, true),                         // 左の前腕
+                new Plate(AndroidModel::toRightForearm, -1.5F, 0, -1.5F, 1.5F, 5, 1.5F, true),            // 右の前腕（籠手）
+                new Plate(AndroidModel::toHips, -3.5F, -3, -2, 3.5F, 0, 2, true),                         // 腰
+                new Plate((m, p) -> m.toLeg(p, true), -1.5F, 0, -1.5F, 1.5F, 6, 1.5F, true),              // 左の太もも
+                new Plate((m, p) -> m.toLeg(p, false), -1.5F, 0, -1.5F, 1.5F, 6, 1.5F, true),             // 右の太もも
+        };
+
+        ArmorShield(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            var chest = android.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
+            var tier = io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.tierOf(chest);
+            if (chest.isEmpty() || tier == io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK1 || !android.printed()) {
+                return;
+            }
+            boolean collapsar = tier == io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK3;
+            float hit = android.hurtTime > 0 ? (android.hurtTime - partialTick) / Math.max(1, android.hurtDuration) : 0;
+            float pulse = 0.85F + 0.15F * Mth.sin(age * (collapsar ? 0.11F : 0.07F));
+            float strength = Mth.clamp((collapsar ? 0.5F : 0.4F) * pulse + 0.7F * Math.max(0, hit), 0, 1);
+            int rgb = tier.tint;
+            int shade = (int) (((rgb >> 16) & 0xFF) * strength) << 16 | (int) (((rgb >> 8) & 0xFF) * strength) << 8
+                    | (int) ((rgb & 0xFF) * strength);
+            float scroll = age * (collapsar ? 0.012F : 0.006F);
+            var vc = buffers.getBuffer(RenderType.energySwirl(collapsar ? COLLAPSAR : HEX, scroll % 1F, (collapsar ? scroll * 0.35F : scroll) % 1F));
+            AndroidModel m = getParentModel();
+            for (Plate plate : PLATES) {
+                if (plate.collapsarOnly() && !collapsar) continue;
+                pose.pushPose();
+                plate.to().accept(m, pose);
+                float g = GAP;
+                FxDraw.texBox(pose, vc, (plate.x0() - g) / 16F, (plate.y0() - g) / 16F, (plate.z0() - g) / 16F,
+                        (plate.x1() + g) / 16F, (plate.y1() + g) / 16F, (plate.z1() + g) / 16F, light, shade, 255);
+                pose.popPose();
             }
         }
     }

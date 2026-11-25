@@ -16266,5 +16266,57 @@
   "tooltip.singulo.android_charger.top_up": {
     "source": "Tops up your androids within %s blocks below half power without interrupting them",
     "translation": "%s 格內你的仿生人電量低於一半時，不打斷其工作或戰鬥地供電"
+  },
+  "item.singulo.android_armor_plate_2": {
+    "source": "Android Armor Plate Mk2",
+    "translation": "仿生人用裝甲板（Mk2）"
+  },
+  "item.singulo.android_armor_plate_3": {
+    "source": "Android Armor Plate Mk3",
+    "translation": "仿生人用裝甲板（Mk3）"
+  },
+  "howto.singulo.android_armor_plate_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製作：精密組裝台（階段3）"
+  },
+  "howto.singulo.android_armor_plate_3": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製作：精密組裝台（階段5）"
+  },
+  "uses.singulo.android_armor_plate": {
+    "source": "Used in: Android Armor Plate Mk2",
+    "translation": "用於：仿生人用裝甲板（Mk2）"
+  },
+  "uses.singulo.android_armor_plate_2": {
+    "source": "Used in: Android Armor Plate Mk3",
+    "translation": "用於：仿生人用裝甲板（Mk3）"
+  },
+  "uses.singulo.collapsar_lining": {
+    "source": "Used in: Android Armor Plate Mk3",
+    "translation": "用於：仿生人用裝甲板（Mk3）"
+  },
+  "desc.singulo.android_armor_plate_2": {
+    "source": "An Android Armor Plate reinforced with nihonium. Fitted to a guard android, it works as a chestplate (+10 armor, +4 toughness, +0.1 knockback resistance). Keeps the enchantments of the plate it was made from.",
+    "translation": "在仿生人用裝甲板上疊加鉨板的改良型。為護衛仿生人裝備一塊即可作為胸甲（護甲 +10，盔甲韌性 +4，擊退抗性 +0.1）。繼承作為材料的裝甲板的附魔。"
+  },
+  "desc.singulo.android_armor_plate_3": {
+    "source": "The top armor plate, reforged with collapsar. Fitted to a guard android, it works as a chestplate (+12 armor, +6 toughness, +0.25 knockback resistance). Does not burn. Keeps the enchantments of the plate it was made from.",
+    "translation": "以坍縮星材料重鑄的最高級裝甲板。為護衛仿生人裝備一塊即可作為胸甲（護甲 +12，盔甲韌性 +6，擊退抗性 +0.25）。不會燃燒。繼承作為材料的裝甲板的附魔。"
+  },
+  "summary.singulo.android_armor_plate_2": {
+    "source": "A stronger guard android chestplate that keeps its enchantments.",
+    "translation": "繼承附魔並強化的護衛仿生人胸甲。"
+  },
+  "summary.singulo.android_armor_plate_3": {
+    "source": "The toughest guard android chestplate, reforged with collapsar.",
+    "translation": "以坍縮星材料重鑄、最堅固的護衛仿生人胸甲。"
+  },
+  "tooltip.singulo.android_armor_plate_2": {
+    "source": "Chestplate for a guard android (+10 armor, +4 toughness, +0.1 knockback resistance)",
+    "translation": "護衛仿生人的胸甲（護甲 +10，盔甲韌性 +4，擊退抗性 +0.1）"
+  },
+  "tooltip.singulo.android_armor_plate_3": {
+    "source": "Chestplate for a guard android (+12 armor, +6 toughness, +0.25 knockback resistance)",
+    "translation": "護衛仿生人的胸甲（護甲 +12，盔甲韌性 +6，擊退抗性 +0.25）"
   }
 }

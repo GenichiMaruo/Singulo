@@ -797,6 +797,8 @@ def item_textures(ti, save):
     save(charger_icon(Image, 3), ti / 'android_charger_3.png')
     save(repair_icon(Image), ti / 'android_repair_kit.png')
     save(plate_icon(Image), ti / 'android_armor_plate.png')
+    save(plate_icon(Image, 2), ti / 'android_armor_plate_2.png')
+    save(plate_icon(Image, 3), ti / 'android_armor_plate_3.png')
     save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
     save(wear(production_icon(Image), 13), ti / 'android_production_upgrade.png')
     save(wear(battery_icon(Image), 17), ti / 'android_battery_upgrade.png')
@@ -1120,22 +1122,40 @@ def _kit_finish(Image, im):
     return out
 
 
-def plate_icon(Image):
-    """アンドロイド用装甲板（0.21.0 で描き直した）: これまでと同じ形の白い陶磁の胸当て（上が広く、首の左右に切り欠き、下がすぼまる）。
-    左が明るく右が陰。真ん中に水色の発光ライン（明・陰の2列）。輪郭を含めて14×14に収め、上下左右の真ん中に置く。"""
+# 装甲板の段ごとの色: (外装の明, 外装の陰, 発光ラインの明, 発光ラインの陰)。Mk2 はニホニウムの青い鋼と菫、Mk3 はコラプサーの黒と橙
+PLATE_TIERS = {
+    1: ((238, 240, 244), (210, 214, 224), (120, 225, 255), (90, 190, 230)),
+    2: ((196, 206, 232), (160, 172, 206), (180, 140, 255), (140, 100, 220)),
+    3: ((82, 74, 90), (58, 52, 66), (255, 154, 74), (220, 110, 50)),
+}
+
+
+def plate_icon(Image, tier=1):
+    """アンドロイド用装甲板（0.21.0 で描き直した）: これまでと同じ形の陶磁の胸当て（上が広く、首の左右に切り欠き、下がすぼまる）。
+    左が明るく右が陰。真ん中に発光ライン（明・陰の2列）。輪郭を含めて14×14に収め、上下左右の真ん中に置く。
+    上位版（0.23.0）は色だけを変え、Mk2 は肩に菫の鋲、Mk3 は肩と裾に橙の筋を足す。"""
     from art16 import outlined, rgba, SOFT_EDGE
     rows = [(4, 11), (2, 13), (2, 13), (2, 13), (3, 12), (3, 12), (3, 12), (4, 11), (4, 11), (5, 10), (6, 9), (7, 8)]
-    left, right = (238, 240, 244), (210, 214, 224)
+    left, right, line, line_sh = PLATE_TIERS[tier]
 
     def f(d):
         for i, (x0, x1) in enumerate(rows):
             y = 2 + i
             d.line([(x0, y), (7, y)], fill=rgba(left))
             d.line([(8, y), (x1, y)], fill=rgba(right))
-        d.line([(7, 5), (7, 11)], fill=rgba((120, 225, 255)))
-        d.line([(8, 5), (8, 11)], fill=rgba((90, 190, 230)))
-        d.point((3, 4), fill=(255, 255, 255, 255))
-        d.point((4, 3), fill=(255, 255, 255, 255))
+        d.line([(7, 5), (7, 11)], fill=rgba(line))
+        d.line([(8, 5), (8, 11)], fill=rgba(line_sh))
+        hi = (255, 255, 255, 255) if tier < 3 else rgba((130, 120, 140))
+        d.point((3, 4), fill=hi)
+        d.point((4, 3), fill=hi)
+        if tier >= 2:
+            d.point((3, 3), fill=rgba(line))          # 肩の鋲
+            d.point((12, 3), fill=rgba(line_sh))
+        if tier == 3:
+            d.line([(4, 5), (5, 5)], fill=rgba(line))     # 肩の筋
+            d.line([(10, 5), (11, 5)], fill=rgba(line_sh))
+            d.line([(6, 11), (6, 10)], fill=rgba(line_sh))  # 裾の筋
+            d.line([(9, 11), (9, 10)], fill=rgba(line_sh))
         d.point((6, 2), fill=(0, 0, 0, 0))   # 首の左右の切り欠き（輪郭を付ける前にも抜く）
         d.point((9, 2), fill=(0, 0, 0, 0))
     im = outlined(f, **SOFT_EDGE)

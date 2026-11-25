@@ -16266,5 +16266,57 @@
   "tooltip.singulo.android_charger.top_up": {
     "source": "Tops up your androids within %s blocks below half power without interrupting them",
     "translation": "%s블록 안의 내 안드로이드 충전량이 절반 아래면 작업이나 전투를 멈추지 않고 급전"
+  },
+  "item.singulo.android_armor_plate_2": {
+    "source": "Android Armor Plate Mk2",
+    "translation": "안드로이드용 장갑판 Mk2"
+  },
+  "item.singulo.android_armor_plate_3": {
+    "source": "Android Armor Plate Mk3",
+    "translation": "안드로이드용 장갑판 Mk3"
+  },
+  "howto.singulo.android_armor_plate_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.android_armor_plate_3": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "uses.singulo.android_armor_plate": {
+    "source": "Used in: Android Armor Plate Mk2",
+    "translation": "사용처: 안드로이드용 장갑판 Mk2"
+  },
+  "uses.singulo.android_armor_plate_2": {
+    "source": "Used in: Android Armor Plate Mk3",
+    "translation": "사용처: 안드로이드용 장갑판 Mk3"
+  },
+  "uses.singulo.collapsar_lining": {
+    "source": "Used in: Android Armor Plate Mk3",
+    "translation": "사용처: 안드로이드용 장갑판 Mk3"
+  },
+  "desc.singulo.android_armor_plate_2": {
+    "source": "An Android Armor Plate reinforced with nihonium. Fitted to a guard android, it works as a chestplate (+10 armor, +4 toughness, +0.1 knockback resistance). Keeps the enchantments of the plate it was made from.",
+    "translation": "안드로이드용 장갑판에 니호늄 판을 덧댄 개량형. 호위 안드로이드에 한 장 장착하면 흉갑으로 작동한다(방어 +10, 방어 강도 +4, 밀치기 저항 +0.1). 재료로 쓴 장갑판의 마법 부여를 이어받는다."
+  },
+  "desc.singulo.android_armor_plate_3": {
+    "source": "The top armor plate, reforged with collapsar. Fitted to a guard android, it works as a chestplate (+12 armor, +6 toughness, +0.25 knockback resistance). Does not burn. Keeps the enchantments of the plate it was made from.",
+    "translation": "콜랩서로 다시 단조한 최상위 장갑판. 호위 안드로이드에 한 장 장착하면 흉갑으로 작동한다(방어 +12, 방어 강도 +6, 밀치기 저항 +0.25). 불타지 않는다. 재료로 쓴 장갑판의 마법 부여를 이어받는다."
+  },
+  "summary.singulo.android_armor_plate_2": {
+    "source": "A stronger guard android chestplate that keeps its enchantments.",
+    "translation": "마법 부여를 이어받아 강화한 호위 안드로이드의 흉갑."
+  },
+  "summary.singulo.android_armor_plate_3": {
+    "source": "The toughest guard android chestplate, reforged with collapsar.",
+    "translation": "콜랩서로 단조한, 가장 단단한 호위 안드로이드의 흉갑."
+  },
+  "tooltip.singulo.android_armor_plate_2": {
+    "source": "Chestplate for a guard android (+10 armor, +4 toughness, +0.1 knockback resistance)",
+    "translation": "호위 안드로이드의 흉갑(방어 +10, 방어 강도 +4, 밀치기 저항 +0.1)"
+  },
+  "tooltip.singulo.android_armor_plate_3": {
+    "source": "Chestplate for a guard android (+12 armor, +6 toughness, +0.25 knockback resistance)",
+    "translation": "호위 안드로이드의 흉갑(방어 +12, 방어 강도 +6, 밀치기 저항 +0.25)"
   }
 }

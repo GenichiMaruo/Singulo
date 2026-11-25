@@ -115,6 +115,13 @@ public final class SinguloItems {
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
             "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
+    /** 装甲板の上位版（Mk2: ニホニウム、Mk3: コラプサー）。前の世代から作り、エンチャントを引き継ぐ。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE_2 = ITEMS.register(
+            "android_armor_plate_2", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK2));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE_3 = ITEMS.register(
+            "android_armor_plate_3", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties().rarity(Rarity.EPIC)
+                    .fireResistant(), io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK3));
     /** 採掘アップグレード（ツルハシのエンチャントを付けられる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem> ANDROID_MINING_UPGRADE = ITEMS.register(
             "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
@@ -322,6 +329,17 @@ public final class SinguloItems {
             Map.entry("battery_fluid_capsule", 2),
             Map.entry("large_battery_fluid_capsule", 3),
             Map.entry("android_armor_plate", 2),
+            Map.entry("android_armor_plate_2", 3),
+            Map.entry("android_armor_plate_3", 5),
+            Map.entry("android_weapon_module", 2),
+            Map.entry("android_weapon_module_2", 3),
+            Map.entry("android_weapon_module_3", 5),
+            Map.entry("heavy_strike_module", 4),
+            Map.entry("rapid_strike_module", 4),
+            Map.entry("drain_module", 3),
+            Map.entry("piercing_module", 3),
+            Map.entry("frost_module", 3),
+            Map.entry("warden_breaker_module", 4),
             Map.entry("android_mining_upgrade", 2),
             Map.entry("android_felling_upgrade", 2),
             Map.entry("android_fishing_upgrade", 2),
@@ -470,6 +488,8 @@ public final class SinguloItems {
         TAB_ORDER.add(PORTABLE_ANDROID_PRINTER);
         TAB_ORDER.add(PORTABLE_ANDROID_PRINTER_2);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
+        TAB_ORDER.add(ANDROID_ARMOR_PLATE_2);
+        TAB_ORDER.add(ANDROID_ARMOR_PLATE_3);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
         TAB_ORDER.add(ANDROID_FISHING_UPGRADE);
