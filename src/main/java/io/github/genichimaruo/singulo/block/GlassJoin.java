@@ -59,9 +59,23 @@ public final class GlassJoin {
         return s.getBlock() instanceof Shaped shaped && shaped.base() == base;
     }
 
-    /** Shape occupied by the requested glass material at this position. */
+    /**
+     * 0.23.0: 境目を描かないガラスの仲間か。この作品のガラス（白・黒・コラプサー・四芒星・遺構・研究所のガラス）と、その階段・
+     * ハーフブロック・重ねハーフブロックは、種類が違っても同じガラスのように扱い、接する面を描かない。アンドロイド用のガラスは入らない
+     * （つながって見える模様と、アンドロイドの通り抜けがあるので）。
+     */
+    public static boolean inFamily(BlockState state) {
+        Block b = state.getBlock();
+        return b instanceof Glass || b instanceof MixedGlassSlab || b instanceof Shaped shaped && shaped.base() instanceof Glass;
+    }
+
+    /**
+     * Shape occupied by the requested glass material at this position. Glass of the shared family ({@link #inFamily})
+     * counts as the same material, so the whole neighbouring shape is returned.
+     */
     @Nullable public static BlockState matchingPart(BlockState state, Block glass) {
         if (state.is(glass) || shapedOf(state, glass)) return state;
+        if (glass instanceof Glass && inFamily(state)) return state;
         if (!(state.getBlock() instanceof MixedGlassSlab)) return null;
         // 重ねたハーフブロックのうち、そのガラスの方（違うガラスどうしなので、合うのは多くても1つ）
         for (boolean top : new boolean[] {false, true}) {
@@ -77,7 +91,10 @@ public final class GlassJoin {
                 adjacent.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO), direction);
     }
 
-    /** 透けるガラス（ホワイトガラスパネル・黒色強化ガラス）。同じガラスの階段・ハーフブロックの、埋まった面との間も描かない。 */
+    /**
+     * 透けるガラス（ホワイトガラスパネル・黒色強化ガラスなど）。同じガラスの階段・ハーフブロックの、埋まった面との間も描かない。
+     * 0.23.0: 種類の違うガラスの仲間（{@link #inFamily}）との間も描かない。
+     */
     public static class Glass extends TransparentBlock {
         public Glass(Properties properties) {
             super(properties);

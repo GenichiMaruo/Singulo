@@ -81,6 +81,8 @@ final class GlassJoinModel extends BakedModelWrapper<BakedModel> {
     static void wrap(ModelEvent.ModifyBakingResult event) {
         for (Block glass : new Block[] {SinguloBlocks.WHITE_GLASS_PANEL.get(), SinguloBlocks.BLACK_REINFORCED_GLASS.get(),
                 SinguloBlocks.COLLAPSAR_REINFORCED_GLASS.get(),
+                // 0.23.0: 四芒星のガラスも、ほかのガラスの階段・ハーフブロックに一部覆われる面は、見える所だけを枠の絵で描く
+                SinguloBlocks.WHITE_STAR_GLASS_PANEL.get(), SinguloBlocks.BLACK_STAR_GLASS.get(), SinguloBlocks.COLLAPSAR_STAR_GLASS.get(),
                 SinguloBlocks.ANDROID_GATE_GLASS_PATTERNED.get(), SinguloBlocks.ANDROID_BARRIER_GLASS_PATTERNED.get()}) {
             // 元のガラスと、その階段・ハーフブロック（0.21.0。形どうしが接する面も、隠れていない所だけ描く）
             List<Block> blocks = new ArrayList<>(List.of(glass));

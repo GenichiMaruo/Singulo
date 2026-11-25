@@ -133,6 +133,13 @@ GLASS_STYLE = {
                                    'dark': (62, 52, 72, 255), 'dot': (200, 116, 58, 255)},
     'black_reinforced_glass': {'fill': (22, 24, 32, 128), 'edge': (12, 12, 16, 255), 'light': (46, 48, 58, 255),
                                'dark': (46, 48, 58, 255), 'dot': (120, 124, 136, 255)},
+    # 四芒星のガラス（0.23.0）: 一部が覆われた面の枠の絵だけに使う（階段・ハーフブロックはない）。色は元のガラスと同じ
+    'white_star_glass_panel': {'fill': (236, 244, 250, 72), 'edge': (196, 202, 210, 255), 'light': (254, 254, 255, 230),
+                               'dark': (218, 222, 228, 230), 'dot': (176, 184, 194, 255)},
+    'black_star_glass': {'fill': (22, 24, 32, 128), 'edge': (12, 12, 16, 255), 'light': (46, 48, 58, 255),
+                         'dark': (46, 48, 58, 255), 'dot': (120, 124, 136, 255)},
+    'collapsar_star_glass': {'fill': (30, 24, 38, 128), 'edge': (8, 6, 10, 255), 'light': (62, 52, 72, 255),
+                             'dark': (62, 52, 72, 255), 'dot': (200, 116, 58, 255)},
     # アンドロイド用のガラス: 中身（と模様）は元の絵のまま、縁は元の1ドットの縁（tools/androids.py）
     'android_gate_glass': {'android': 'android_gate_glass', 'patterned': False},
     'android_gate_glass_patterned': {'android': 'android_gate_glass', 'patterned': True},

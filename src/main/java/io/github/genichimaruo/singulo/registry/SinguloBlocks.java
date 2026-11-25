@@ -724,9 +724,12 @@ public final class SinguloBlocks {
                 .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).lightLevel(s -> light));
     }
 
-    /** 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。 */
+    /**
+     * 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。
+     * 0.23.0: この作品のほかのガラス（アンドロイド用を除く）との間の面も描かない（{@link io.github.genichimaruo.singulo.block.GlassJoin#inFamily}）。
+     */
     private static DeferredBlock<TransparentBlock> glass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
-        return BLOCKS.register(id, () -> new TransparentBlock(glassProperties(color, hardness, resistance, sound)));
+        return BLOCKS.register(id, () -> new io.github.genichimaruo.singulo.block.GlassJoin.Glass(glassProperties(color, hardness, resistance, sound)));
     }
 
     /** 階段を持つガラス: 同じガラスの階段との間の面も描かない（{@link io.github.genichimaruo.singulo.block.GlassJoin}）。 */
