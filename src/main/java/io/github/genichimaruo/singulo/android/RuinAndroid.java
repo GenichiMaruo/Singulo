@@ -128,6 +128,20 @@ public abstract class RuinAndroid extends Monster {
         return state >= STATE_SIT && state <= STATE_SWEEP;
     }
     public static final int FOLD_TICKS = 20;
+    /**
+     * 無線充電器から ticks tick 分を speed 倍の速さで受け取る（満タンを超える分は充電器から取らない）。増えた充電の量を返す。
+     */
+    int receiveWireless(net.minecraft.world.item.ItemStack charger, int ticks, int speed) {
+        int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
+        int missing = maxCharge() - charge();
+        if (rate <= 0 || missing <= 0) return 0;
+        long want = Math.min((long) CHARGER_FE_PER_TICK * ticks * speed, Math.ceilDiv((long) missing * CHARGER_FE_PER_TICK, rate));
+        int got = AndroidChargerItem.energy(charger).extractEnergy((int) want, false);
+        long added = Math.min(missing, (long) rate * got / CHARGER_FE_PER_TICK);
+        addCharge(added);
+        return (int) added;
+    }
+
     /** 無線充電器から1 tick にもらう電力（満充電 PER_ANDROID を 100 tick、5秒で）。 */
     static final int CHARGER_FE_PER_TICK = AndroidChargerItem.PER_ANDROID / 100;
 
@@ -4013,7 +4027,10 @@ public abstract class RuinAndroid extends Monster {
             }
             entityData.set(CHARGER_LINK, p.getId());
             double d = distanceTo(p);
-            if (d > 2.5) {
+            net.minecraft.world.item.ItemStack charger = AndroidChargerItem.find(p);
+            AndroidChargerItem.Tier tier = AndroidChargerItem.tierOf(charger);
+            // 上の段の充電器ほど、離れたまま充電できる（寄っていくのは届く所まで）
+            if (d > Math.max(2.5, tier.range - 1.5)) {
                 if (stateTicks % 5 == 0) {
                     getNavigation().moveTo(p, 1.15);
                 }
@@ -4021,13 +4038,8 @@ public abstract class RuinAndroid extends Monster {
                 getNavigation().stop();
                 getLookControl().setLookAt(p, 30, 30);
             }
-            if (d < 4) {
-                net.minecraft.world.item.ItemStack charger = AndroidChargerItem.find(p);
-                int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
-                if (rate > 0 && charge() < maxCharge()) {
-                    int got = AndroidChargerItem.energy(charger).extractEnergy(CHARGER_FE_PER_TICK, false);
-                    addCharge((long) rate * got / CHARGER_FE_PER_TICK);
-                }
+            if (d < tier.range) {
+                receiveWireless(charger, 1, tier.speed);
                 if (stateTicks % 8 == 0) {
                     sparks(level, position().add(0, 1.0, 0), 2, 0.25);
                 }

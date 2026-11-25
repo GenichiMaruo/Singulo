@@ -26,6 +26,9 @@ DIAGRAMS = {
     'android_work_console': 'BEB/BAB/CDC',
     'android_station': 'EDE/BAB/CDC',
     'android_charger': 'DAD/BCB/DAD',
+    # Upgraded chargers: the previous charger in the middle, link elements or field emitters above, storage below.
+    'android_charger_2': 'B.B/CAC/D.D',
+    'android_charger_3': 'D.D/BAB/C',
     'android_factory_print_unit': 'BCB/AAA/DCD',
     'portable_android_printer': 'A/CDC/BADAB/EAE',
     'portable_android_printer_2': 'EBE/DCACD/E.E',

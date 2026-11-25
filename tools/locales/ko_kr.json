@@ -16214,5 +16214,57 @@
   "subtitles.singulo.ergosphere_leviathan.memory_discharge": {
     "source": "Wreck discharges",
     "translation": "잔해가 방전한다"
+  },
+  "item.singulo.android_charger_2": {
+    "source": "Android Wireless Charger Mk2",
+    "translation": "안드로이드 무선 충전기 Mk2"
+  },
+  "item.singulo.android_charger_3": {
+    "source": "Android Wireless Charger Mk3",
+    "translation": "안드로이드 무선 충전기 Mk3"
+  },
+  "howto.singulo.android_charger_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "제작: 정밀 조립기(3단계)"
+  },
+  "howto.singulo.android_charger_3": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "제작: 정밀 조립기(5단계)"
+  },
+  "uses.singulo.android_charger": {
+    "source": "Used in: Android Wireless Charger Mk2",
+    "translation": "사용처: 안드로이드 무선 충전기 Mk2"
+  },
+  "uses.singulo.android_charger_2": {
+    "source": "Used in: Android Wireless Charger Mk3",
+    "translation": "사용처: 안드로이드 무선 충전기 Mk3"
+  },
+  "uses.singulo.smes_module": {
+    "source": "Used in: Android Wireless Charger Mk3",
+    "translation": "사용처: 안드로이드 무선 충전기 Mk3"
+  },
+  "desc.singulo.android_charger_2": {
+    "source": "An improved Android Wireless Charger. Holds 150 full android charges and charges androids that ran out of power twice as fast, from up to 8 blocks away. Right-click a block that outputs power to charge it.",
+    "translation": "안드로이드 무선 충전기의 개량형. 안드로이드 완충 150회분을 저장하며, 전력이 떨어진 안드로이드를 2배 속도로 최대 8블록 떨어진 채 충전한다. 전력을 내보내는 블록을 우클릭하면 충전된다."
+  },
+  "desc.singulo.android_charger_3": {
+    "source": "The top wireless charger, housed in collapsar. Holds 800 full android charges and charges four times as fast from up to 16 blocks away. It also tops up your androids within 16 blocks once they drop below half, without interrupting their work or fights (the power comes out of the charger).",
+    "translation": "콜랩서 외장에 담은 최상위 무선 충전기. 안드로이드 완충 800회분을 저장하며, 4배 속도로 최대 16블록 떨어진 곳까지 충전한다. 또한 16블록 안의 내 안드로이드의 충전량이 절반 아래로 떨어지면, 작업이나 전투를 멈추게 하지 않고 조금씩 급전한다(사용한 만큼 충전기에서 줄어든다)."
+  },
+  "summary.singulo.android_charger_2": {
+    "source": "Charges following androids twice as fast, from farther away.",
+    "translation": "따라오는 안드로이드를 2배 속도로, 더 멀리서 충전한다."
+  },
+  "summary.singulo.android_charger_3": {
+    "source": "Keeps nearby androids powered without interrupting their work or fights.",
+    "translation": "근처 안드로이드에 작업이나 전투를 멈추지 않고 전력을 공급한다."
+  },
+  "tooltip.singulo.android_charger.reach": {
+    "source": "Charges from up to %s blocks at %sx speed",
+    "translation": "최대 %s블록 떨어진 곳에서 %s배 속도로 충전"
+  },
+  "tooltip.singulo.android_charger.top_up": {
+    "source": "Tops up your androids within %s blocks below half power without interrupting them",
+    "translation": "%s블록 안의 내 안드로이드 충전량이 절반 아래면 작업이나 전투를 멈추지 않고 급전"
   }
 }

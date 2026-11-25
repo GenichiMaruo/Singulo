@@ -16214,5 +16214,57 @@
   "subtitles.singulo.ergosphere_leviathan.memory_discharge": {
     "source": "Wreck discharges",
     "translation": "殘骸放電"
+  },
+  "item.singulo.android_charger_2": {
+    "source": "Android Wireless Charger Mk2",
+    "translation": "仿生人無線充電器（Mk2）"
+  },
+  "item.singulo.android_charger_3": {
+    "source": "Android Wireless Charger Mk3",
+    "translation": "仿生人無線充電器（Mk3）"
+  },
+  "howto.singulo.android_charger_2": {
+    "source": "Made in: Precision Assembler (stage 3)",
+    "translation": "製作：精密組裝台（階段3）"
+  },
+  "howto.singulo.android_charger_3": {
+    "source": "Made in: Precision Assembler (stage 5)",
+    "translation": "製作：精密組裝台（階段5）"
+  },
+  "uses.singulo.android_charger": {
+    "source": "Used in: Android Wireless Charger Mk2",
+    "translation": "用於：仿生人無線充電器（Mk2）"
+  },
+  "uses.singulo.android_charger_2": {
+    "source": "Used in: Android Wireless Charger Mk3",
+    "translation": "用於：仿生人無線充電器（Mk3）"
+  },
+  "uses.singulo.smes_module": {
+    "source": "Used in: Android Wireless Charger Mk3",
+    "translation": "用於：仿生人無線充電器（Mk3）"
+  },
+  "desc.singulo.android_charger_2": {
+    "source": "An improved Android Wireless Charger. Holds 150 full android charges and charges androids that ran out of power twice as fast, from up to 8 blocks away. Right-click a block that outputs power to charge it.",
+    "translation": "仿生人無線充電器的改良型。可儲存150次仿生人滿充電的電力，以2倍速度在最遠8格外為斷電的仿生人充電。右鍵點擊輸出電力的方塊即可為其充電。"
+  },
+  "desc.singulo.android_charger_3": {
+    "source": "The top wireless charger, housed in collapsar. Holds 800 full android charges and charges four times as fast from up to 16 blocks away. It also tops up your androids within 16 blocks once they drop below half, without interrupting their work or fights (the power comes out of the charger).",
+    "translation": "以坍縮星材料為外殼的最高級無線充電器。可儲存800次仿生人滿充電的電力，以4倍速度在最遠16格外充電。此外，16格內你的仿生人電量低於一半時，會在不打斷其工作或戰鬥的情況下逐步供電（所用電力從充電器中扣除）。"
+  },
+  "summary.singulo.android_charger_2": {
+    "source": "Charges following androids twice as fast, from farther away.",
+    "translation": "以2倍速度、在更遠處為跟隨的仿生人充電。"
+  },
+  "summary.singulo.android_charger_3": {
+    "source": "Keeps nearby androids powered without interrupting their work or fights.",
+    "translation": "在不打斷工作或戰鬥的情況下為附近的仿生人持續供電。"
+  },
+  "tooltip.singulo.android_charger.reach": {
+    "source": "Charges from up to %s blocks at %sx speed",
+    "translation": "可在最遠 %s 格外以 %s 倍速度充電"
+  },
+  "tooltip.singulo.android_charger.top_up": {
+    "source": "Tops up your androids within %s blocks below half power without interrupting them",
+    "translation": "%s 格內你的仿生人電量低於一半時，不打斷其工作或戰鬥地供電"
   }
 }

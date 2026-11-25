@@ -381,6 +381,8 @@ public final class GeneratedContent {
             "android_kit",
             "android_repair_kit",
             "android_charger",
+            "android_charger_2",
+            "android_charger_3",
             "portable_android_printer",
             "portable_android_printer_2",
             "android_armor_plate",

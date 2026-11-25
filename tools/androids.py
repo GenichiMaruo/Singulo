@@ -793,6 +793,8 @@ def item_textures(ti, save):
     save(decor_strands(Image), ti.parent / 'entity' / 'android_decor_strands.png')
     save(kit_icon(Image), ti / 'android_kit.png')
     save(charger_icon(Image), ti / 'android_charger.png')
+    save(charger_icon(Image, 2), ti / 'android_charger_2.png')
+    save(charger_icon(Image, 3), ti / 'android_charger_3.png')
     save(repair_icon(Image), ti / 'android_repair_kit.png')
     save(plate_icon(Image), ti / 'android_armor_plate.png')
     save(wear(upgrade_icon(Image), 11), ti / 'android_transfer_upgrade.png')
@@ -1051,22 +1053,39 @@ def kit_icon(Image):
     return _kit_finish(Image, outlined(f, **SOFT_EDGE))
 
 
-def charger_icon(Image):
-    """無線充電器: 黒い本体に白い外装の輪、水色に光る送電の輪と稲妻の印。"""
-    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-    px = im.load()
-    import math
-    for y in range(16):
-        for x in range(16):
-            d = math.hypot(x - 7.5, y - 7.5)
-            if d <= 7.0:
-                c = (236, 238, 242) if d > 5.6 else (120, 225, 255) if d > 4.6 else (44, 48, 60)
-                if 5.6 < d <= 7.0 and y > 9:
-                    c = (200, 206, 216)
-                px[x, y] = c + (255,)
-    for (x, y) in ((8, 4), (7, 5), (7, 6), (6, 7), (7, 7), (8, 7), (9, 7), (8, 8), (8, 9), (7, 10)):
-        px[x, y] = (255, 236, 140, 255)
-    return im
+# 無線充電器の段ごとの色: (本体, 外装, 光, 光の芯)。Mk1 は水色、Mk2 は菫、Mk3 は黒いコラプサーの筐体に橙
+CHARGER_TIERS = {
+    1: ((44, 48, 60), (236, 238, 242), (120, 225, 255), (220, 250, 255)),
+    2: ((40, 40, 64), (214, 220, 232), (180, 140, 255), (236, 222, 255)),
+    3: ((26, 22, 30), (70, 62, 74), (255, 154, 74), (255, 232, 190)),
+}
+
+
+def charger_icon(Image, tier=1):
+    """無線充電器（携帯端末の形）: 縦長の白い本体に、黒い画面と残量の目盛り、下に送電の格子、上にアンテナ。
+    段が上がるほど目盛りとアンテナが増える。Mk3 はコラプサーの黒い筐体で、両側面に光の帯が走る。"""
+    import art16
+    body, shell, glow, hot = CHARGER_TIERS[tier]
+    rgba, darken = art16.rgba, art16.darken
+
+    def f(d):
+        d.rectangle([4, 4, 11, 14], fill=rgba(shell))
+        d.rectangle([5, 5, 10, 9], fill=rgba(body))                     # 画面
+        for i in range(tier + 1):                                       # 残量の目盛り（段ごとに増える）
+            d.line([(6, 8 - i), (9, 8 - i)], fill=rgba(glow))
+        d.rectangle([5, 11, 10, 13], fill=rgba(darken(shell, 0.18)))    # 送電の格子
+        for x in (6, 8, 10):
+            d.point((x, 12), fill=rgba(glow))
+        d.line([(9, 3), (9, 1)], fill=rgba(darken(shell, 0.3)))         # アンテナ
+        d.point((9, 0), fill=rgba(glow))
+        if tier >= 2:
+            d.line([(6, 3), (6, 2)], fill=rgba(darken(shell, 0.3)))
+            d.point((6, 1), fill=rgba(glow))
+        if tier == 3:
+            d.rectangle([3, 6, 3, 12], fill=rgba(glow))                 # 側面の光の帯
+            d.rectangle([12, 6, 12, 12], fill=rgba(glow))
+        d.point((7, 6), fill=rgba((255, 236, 140) if tier < 3 else hot))
+    return art16.grain(art16.outlined(f), seed=110 + tier)
 
 
 def repair_icon(Image):

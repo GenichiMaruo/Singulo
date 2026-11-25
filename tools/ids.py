@@ -141,6 +141,8 @@ MOD = {
     'アンドロイドキット': ('android_kit', 'Android Kit', 'item'),
     'アンドロイド組立ステーション': ('android_station', 'Android Assembly Station', 'machine'),
     'アンドロイド用無線充電器': ('android_charger', 'Android Wireless Charger', 'tool'),
+    'アンドロイド用無線充電器（Mk2）': ('android_charger_2', 'Android Wireless Charger Mk2', 'tool'),
+    'アンドロイド用無線充電器（Mk3）': ('android_charger_3', 'Android Wireless Charger Mk3', 'tool'),
     '携帯型アンドロイド印刷機': ('portable_android_printer', 'Portable Android Printer', 'tool'),
     '携帯型アンドロイド印刷機（Mk2）': ('portable_android_printer_2', 'Portable Android Printer Mk2', 'tool'),
     '自己修理キット': ('android_repair_kit', 'Self-Repair Kit', 'item'),

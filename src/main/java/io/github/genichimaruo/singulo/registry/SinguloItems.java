@@ -99,6 +99,13 @@ public final class SinguloItems {
     /** アンドロイド用の無線充電器。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
             "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
+    /** 無線充電器の上位版（Mk2: 量子の段階、Mk3: コラプサーの段階）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER_2 = ITEMS.register(
+            "android_charger_2", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidChargerItem.Tier.MK2));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER_3 = ITEMS.register(
+            "android_charger_3", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties().rarity(Rarity.EPIC),
+                    io.github.genichimaruo.singulo.android.AndroidChargerItem.Tier.MK3));
     /** 携帯型アンドロイド印刷機（0.21.0。外出先でアンドロイドを1体ずつ印刷する、カバン型の印刷機）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem> PORTABLE_ANDROID_PRINTER = ITEMS.register(
             "portable_android_printer", () -> new io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem(new Item.Properties(), 1));
@@ -306,6 +313,8 @@ public final class SinguloItems {
             Map.entry("magnetic_bottle", 4),
             Map.entry("neutrino_scanner", 3),
             Map.entry("android_charger", 2),
+            Map.entry("android_charger_2", 3),
+            Map.entry("android_charger_3", 5),
             Map.entry("packing_crate", 2),
             Map.entry("battery_packing_crate", 2),
             Map.entry("large_battery_packing_crate", 3),
@@ -456,6 +465,8 @@ public final class SinguloItems {
         block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);
         block(SinguloBlocks.QUANTUM_ANDROID_WORKBENCH, 4);
         TAB_ORDER.add(ANDROID_CHARGER);
+        TAB_ORDER.add(ANDROID_CHARGER_2);
+        TAB_ORDER.add(ANDROID_CHARGER_3);
         TAB_ORDER.add(PORTABLE_ANDROID_PRINTER);
         TAB_ORDER.add(PORTABLE_ANDROID_PRINTER_2);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
