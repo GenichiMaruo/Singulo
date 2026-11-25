@@ -122,7 +122,7 @@ public class PortablePrinterMenu extends AbstractContainerMenu {
         }
         // 武装モジュールの枠は、中身の並びのうしろ（組の枠のあと）。画面では各行の装甲板の右
         for (int u = 0; u < units; u++) {
-            addSlot(new Slot(contents, PortableAndroidPrinterItem.weaponSlot(units, u), WEAPON_X, rowY(u)) {
+            addSlot(new PrinterSlot(contents, PortableAndroidPrinterItem.weaponSlot(units, u), WEAPON_X, rowY(u)) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return RuinAndroid.isWeaponModule(stack);
