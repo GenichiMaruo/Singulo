@@ -348,6 +348,10 @@ final class GlowDepth {
             active = true;
             solidDepthFresh = false;
         } else if (event instanceof RenderLevelStageEvent.AfterOpaqueFeatures) {
+            // Capture only the opaque pass for the early world lenses. The weapon,
+            // liquid and special-glass queues are submitted after translucent terrain.
+            if (anyPending() || GravitationalLensing.hasSources()) captureDepth();
+        } else if (event instanceof RenderLevelStageEvent.AfterTranslucentFeatures) {
             active = false;
             // 固体をすべて描いてから、光を奥から順に描き、最後に深度を書く
             net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
@@ -363,13 +367,15 @@ final class GlowDepth {
                 SOURCE.endBatch();
                 GLAZED_SOURCE.endBatch();
             } finally { modelView.popMatrix(); }
-            if (anyPending() || GravitationalLensing.hasSources()) {
-                RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
-                solidDepth = sized(solidDepth, main);
-                copyDepth(main, solidDepth);
-                solidDepthFresh = true;
-            }
+            if (anyPending()) captureDepth();
         }
+    }
+
+    private static void captureDepth() {
+        RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
+        solidDepth = sized(solidDepth, main);
+        copyDepth(main, solidDepth);
+        solidDepthFresh = true;
     }
 
     /** 奥行きを固体だけに戻してジェットを足し、元へ戻す（重力レンズはジェットのない奥行きを読む）。このフレームのジェットがなければ何もしない。 */
