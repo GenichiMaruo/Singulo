@@ -1,0 +1,87 @@
+name: One-shot CurseForge recovery (Singulo 0.23.0 1.21.1)
+on:
+  workflow_dispatch:
+    inputs:
+      author_check_declaration:
+        description: 'After checking all statuses in the authenticated project-owner Files tab, enter ABSENT IN ALL STATUSES: Singulo-0.23.0-1.21.1N.jar'
+        required: true
+        type: string
+      author_checked_utc:
+        description: 'Time the authenticated file check was performed (YYYY-MM-DDTHH:MM:SSZ, within 20 min)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: curseforge-0230-1211-one-shot-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: github.repository == 'GenichiMaruo/Singulo' && github.actor_id == '85728541' && github.run_attempt == '1' && github.ref == 'refs/heads/1.21.1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment: curseforge
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          ref: c0175e4e1e523a7bba178302bfa0de8eb4c1f631
+          path: release-source
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Verify owner and exact source provenance
+        id: verified
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTHOR_CHECK_DECLARATION: ${{ inputs.author_check_declaration }}
+          AUTHOR_CHECKED_UTC: ${{ inputs.author_checked_utc }}
+        shell: bash
+        run: |
+          PYTHONPATH=tools python3 -c 'import os; from recover_curseforge_0230_1211 import verify_attestation; verify_attestation(os.environ)'
+          python3 tools/verified_release_1211.py check --repo GenichiMaruo/Singulo --run 45643660201 --tag v0.23.0 --source release-source
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: '45643660201'
+          name: ${{ steps.verified.outputs.neoforge_artifact }}
+          path: verified-artifacts/${{ steps.verified.outputs.neoforge_artifact }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: '45651013778'
+          name: cf-lock-45651013778-1
+          path: original-lock
+      - name: Promote exact prior CI JAR, without rebuilding
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/verified_release_1211.py promote --repo GenichiMaruo/Singulo --run 45643660201 --tag v0.23.0 --source release-source
+      - name: Read-only proof of skipped original upload and artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/recover_curseforge_0230_1211.py --inspect
+      - name: Reserve one recovery and send exactly one CurseForge request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTHOR_CHECK_DECLARATION: ${{ inputs.author_check_declaration }}
+          AUTHOR_CHECKED_UTC: ${{ inputs.author_checked_utc }}
+          CF_PROJECT: ${{ secrets.CURSEFORGE_PROJECT_ID || vars.CURSEFORGE_PROJECT_ID }}
+          CF_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: python3 tools/recover_curseforge_0230_1211.py
+      - name: Retain recovery audit evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cf-0230-1211-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: cf-recovery-receipts/
+          if-no-files-found: ignore
+          retention-days: 30
