@@ -1,0 +1,38 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 4,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:android_weapon_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:phase_sync_plate"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 1
+    }
+  ],
+  "shape": [
+    "     ",
+    " B B ",
+    "  A  ",
+    "  C  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:warden_breaker_module",
+    "count": 1
+  }
+}

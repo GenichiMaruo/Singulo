@@ -357,6 +357,17 @@ public final class SinguloBlocks {
     public static final DeferredBlock<Block> BLACK_REINFORCED_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_panel",
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.NETHERITE_BLOCK));
+    /**
+     * コラプサー強化パネル（0.23.0）: 爆発ではまず壊れず（岩盤なみの爆発への強さ）、ウィザーとエンダードラゴンにも壊されない
+     * （タグ minecraft:wither_immune・dragon_immune）。ダイヤ以上のツルハシで、黒曜石なみに時間をかけて掘る。
+     */
+    public static final DeferredBlock<Block> COLLAPSAR_REINFORCED_PANEL = BLOCKS.registerSimpleBlock("collapsar_reinforced_panel",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(50.0F, 3_600_000.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK));
+    /** 発光コラプサー強化パネル（0.23.0。コラプサー強化パネルと同じ硬さ・強さで、明るさ15）。 */
+    public static final DeferredBlock<Block> COLLAPSAR_REINFORCED_LIGHT_PANEL = BLOCKS.registerSimpleBlock("collapsar_reinforced_light_panel",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(50.0F, 3_600_000.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK).lightLevel(s -> 15));
     /** 発光黒色強化パネル（0.20.0。黒色強化パネルと同じ硬さで、明るさ15）。 */
     public static final DeferredBlock<Block> BLACK_REINFORCED_LIGHT_PANEL = BLOCKS.registerSimpleBlock("black_reinforced_light_panel",
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(20.0F, 1200.0F).requiresCorrectToolForDrops()
@@ -369,14 +380,45 @@ public final class SinguloBlocks {
             SoundType.METAL);
     public static final DeferredBlock<TransparentBlock> BLACK_REINFORCED_GLASS = joinedGlass("black_reinforced_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
+    /** コラプサー強化ガラス（0.23.0）: コラプサー強化パネルと同じ硬さ・強さの透けるガラス。同じガラスの階段・ハーフブロックとの境目を描かない。 */
+    public static final DeferredBlock<TransparentBlock> COLLAPSAR_REINFORCED_GLASS = joinedGlass("collapsar_reinforced_glass", MapColor.COLOR_BLACK,
+            50.0F, 3_600_000.0F, SoundType.NETHERITE_BLOCK);
+    /** 四芒星コラプサー強化ガラス（0.23.0）: 四芒星の模様が入ったコラプサー強化ガラス。強さはコラプサー強化ガラスと同じ。 */
+    public static final DeferredBlock<TransparentBlock> COLLAPSAR_STAR_GLASS = glass("collapsar_star_glass", MapColor.COLOR_BLACK,
+            50.0F, 3_600_000.0F, SoundType.NETHERITE_BLOCK);
     public static final DeferredBlock<TransparentBlock> BLACK_STAR_GLASS = glass("black_star_glass", MapColor.COLOR_BLACK,
             20.0F, 1200.0F, SoundType.NETHERITE_BLOCK);
+
+    /** 白・黒・コラプサーのパネルのうち違う2つのハーフブロックを上下に重ねたもの（0.23.0。アイテムはなく、元のハーフブロックで置く）。 */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.block.MixedPanelSlab> MIXED_PANEL_SLAB = BLOCKS.register(
+            "mixed_panel_slab", () -> new io.github.genichimaruo.singulo.block.MixedPanelSlab(
+                    BlockBehaviour.Properties.ofLegacyCopy(BLACK_REINFORCED_PANEL.get()).mapColor(
+                            state -> state.getValue(io.github.genichimaruo.singulo.block.MixedPanelSlab.UPPER)
+                                    == io.github.genichimaruo.singulo.block.MixedPanelSlab.Panel.WHITE ? MapColor.SNOW : MapColor.COLOR_BLACK)));
+
+    /**
+     * 白・黒・コラプサーのガラスのハーフブロックと、白・黒・コラプサーのパネルのハーフブロックを上下に重ねたもの（0.23.0。
+     * アイテムはなく、元のハーフブロックで置く）。半分が透けるので隣を隠さない。
+     */
+    public static final DeferredBlock<io.github.genichimaruo.singulo.block.MixedPanelGlassSlab> MIXED_PANEL_GLASS_SLAB = BLOCKS.register(
+            "mixed_panel_glass_slab", () -> new io.github.genichimaruo.singulo.block.MixedPanelGlassSlab(
+                    BlockBehaviour.Properties.ofLegacyCopy(BLACK_REINFORCED_PANEL.get()).noOcclusion()
+                            .isRedstoneConductor((s, level, pos) -> false).isViewBlocking((s, level, pos) -> false)
+                            .mapColor(state -> state.getValue(io.github.genichimaruo.singulo.block.MixedPanelGlassSlab.PANEL)
+                                    == io.github.genichimaruo.singulo.block.MixedPanelSlab.Panel.WHITE ? MapColor.SNOW : MapColor.COLOR_BLACK)));
 
     public static final DeferredBlock<MixedGlassSlab> MIXED_GLASS_SLAB = BLOCKS.register(
             "mixed_glass_slab", () -> new MixedGlassSlab(
                     glassProperties(MapColor.SNOW, 3.0F, 9.0F, SoundType.METAL).mapColor(
                             state -> state.getValue(MixedGlassSlab.BLACK_ON_TOP)
                                     ? MapColor.COLOR_BLACK : MapColor.SNOW)));
+    /** コラプサー強化ガラスと、白か黒のガラスのハーフブロックを重ねたもの（0.23.0。アイテムはなく、元のハーフブロックで置く）。 */
+    public static final DeferredBlock<MixedGlassSlab.Collapsar> MIXED_COLLAPSAR_GLASS_SLAB = BLOCKS.register(
+            "mixed_collapsar_glass_slab", () -> new MixedGlassSlab.Collapsar(
+                    glassProperties(MapColor.COLOR_BLACK, 3.0F, 9.0F, SoundType.METAL).mapColor(
+                            state -> !state.getValue(MixedGlassSlab.Collapsar.COLLAPSAR_ON_TOP)
+                                    && state.getValue(MixedGlassSlab.Collapsar.OTHER) == MixedGlassSlab.Glass.WHITE
+                                    ? MapColor.SNOW : MapColor.COLOR_BLACK)));
 
     /** アンドロイド用のガラス（遮断: アンドロイドだけ通れない、透過: アンドロイドだけ通れる。無地は隣とつながる）。 */
     public static final DeferredBlock<io.github.genichimaruo.singulo.android.AndroidGlassBlock> ANDROID_BARRIER_GLASS = BLOCKS.register(
@@ -693,9 +735,12 @@ public final class SinguloBlocks {
                 .strength(8.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).lightLevel(s -> light));
     }
 
-    /** 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。 */
+    /**
+     * 透けるブロック（ガラスのように、同じブロックどうしの間の面は描かない）。ツルハシで掘る。
+     * 0.23.0: この作品のほかのガラス（アンドロイド用を除く）との間の面も描かない（{@link io.github.genichimaruo.singulo.block.GlassJoin#inFamily}）。
+     */
     private static DeferredBlock<TransparentBlock> glass(String id, MapColor color, float hardness, float resistance, SoundType sound) {
-        return BLOCKS.register(id, () -> new TransparentBlock(glassProperties(color, hardness, resistance, sound)));
+        return BLOCKS.register(id, () -> new io.github.genichimaruo.singulo.block.GlassJoin.Glass(glassProperties(color, hardness, resistance, sound)));
     }
 
     /** 階段を持つガラス: 同じガラスの階段との間の面も描かない（{@link io.github.genichimaruo.singulo.block.GlassJoin}）。 */
@@ -802,8 +847,12 @@ public final class SinguloBlocks {
             // ガラスのハーフブロック（0.21.0）も、元のガラスや同じガラスの階段・ハーフブロックとの境目を描かない
             case "slab" -> base instanceof io.github.genichimaruo.singulo.android.AndroidGlassBlock
                     ? new io.github.genichimaruo.singulo.android.AndroidGlassSlab(() -> base, properties)
-                    : base == WHITE_GLASS_PANEL.get() || base == BLACK_REINFORCED_GLASS.get()
+                    // 白・黒・コラプサーのガラスのハーフブロックは、互いに同じマスへ重ねられる（コラプサーは 0.23.0）
+                    : base == WHITE_GLASS_PANEL.get() || base == BLACK_REINFORCED_GLASS.get() || base == COLLAPSAR_REINFORCED_GLASS.get()
                     ? new io.github.genichimaruo.singulo.block.GlassJoin.PairSlab(() -> base, properties)
+                    // 白いパネルと黒色強化パネルのハーフブロック（0.23.0）は、互いに同じマスへ重ねられる
+                    : base == WHITE_PANEL.get() || base == BLACK_REINFORCED_PANEL.get() || base == COLLAPSAR_REINFORCED_PANEL.get()
+                    ? new io.github.genichimaruo.singulo.block.MixedPanelSlab.PairSlab(() -> base, properties)
                     : new net.minecraft.world.level.block.SlabBlock(properties);
             case "wall" -> new net.minecraft.world.level.block.WallBlock(properties.forceSolidOn());
             default -> throw new IllegalArgumentException("Unknown building variant shape: " + v.shape());

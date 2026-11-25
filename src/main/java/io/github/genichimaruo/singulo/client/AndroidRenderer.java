@@ -9,6 +9,7 @@ import io.github.genichimaruo.singulo.android.BitAndroid;
 import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.GunnerAndroid;
 import io.github.genichimaruo.singulo.android.KatanaAndroid;
+import io.github.genichimaruo.singulo.android.SparkAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
 import io.github.genichimaruo.singulo.android.SaberAndroid;
 import io.github.genichimaruo.singulo.android.WhipAndroid;
@@ -45,7 +46,8 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         AXE("axe_android", AxeAndroid.ACCENT, AndroidModel.AXE_LAYER, false),
         BIT("bit_android", BitAndroid.ACCENT, AndroidModel.BIT_LAYER, true),
         GUNNER("gunner_android", GunnerAndroid.ACCENT, AndroidModel.GUNNER_LAYER, false),
-        KATANA("katana_android", KatanaAndroid.ACCENT, AndroidModel.KATANA_LAYER, false);
+        KATANA("katana_android", KatanaAndroid.ACCENT, AndroidModel.KATANA_LAYER, false),
+        SPARK("spark_android", SparkAndroid.ACCENT, AndroidModel.SPARK_LAYER, false);
 
         final ResourceLocation texture;
         final ResourceLocation glow;
@@ -69,6 +71,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
     /** 銃を描いたときの、銃口の位置（体の原点から。光弾・光線をここから出す）と、それを描いた個体の番号。 */
     private Vec3 muzzle = Vec3.ZERO;
     private int muzzleOf = -1;
+    private SparkGear.Anchors sparkAnchors;
 
     /** 描いた銃の銃口の位置（体の原点から）。まだ描いていなければ fallback。 */
     private Vec3 muzzle(RuinAndroid android, Vec3 fallback) {
@@ -95,6 +98,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new StowedBits(this));
         addLayer(new Gun(this));
         addLayer(new Katana(this));
+        addLayer(new SparkLayer(this));
         addLayer(new Solar(this));
         addLayer(new Pickaxe(this));
         addLayer(new Tanks(this));
@@ -104,6 +108,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         addLayer(new Blink(this));
         addLayer(new Accessories(this));
         addLayer(new ArmorGlint(this));
+        addLayer(new ArmorShield(this));
     }
 
     @Override
@@ -167,8 +172,12 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
         }
         base.set(pose.last().pose());
         muzzleOf = -1;
+        sparkAnchors = null;
         super.render(android, yaw, partialTick, pose, buffers, light);
         renderMoves(android, partialTick, pose, buffers);
+        if (android instanceof SparkAndroid spark) {
+            SparkGear.renderFx(spark, partialTick, pose, buffers, entityRenderDispatcher.cameraOrientation(), sparkAnchors);
+        }
         if (android instanceof BitAndroid bit) {
             renderBits(bit, partialTick, pose, buffers, light);
         }
@@ -370,8 +379,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             case GunnerAndroid.STATE_RAIL_CHARGE -> {
                 if (android instanceof GunnerAndroid gun) {
                     // 狙いの光線: 細く揺らぎながら、溜まるほど濃く太く。狙いが固まると白く点滅する
-                    boolean locked = t >= GunnerAndroid.RAIL_CHARGE - GunnerAndroid.RAIL_LOCK;
-                    float k = Mth.clamp(t / GunnerAndroid.RAIL_CHARGE, 0, 1);
+                    boolean locked = t >= gun.railCharge() - GunnerAndroid.RAIL_LOCK;
+                    float k = Mth.clamp(t / gun.railCharge(), 0, 1);
+                    if (gun.boosted()) accent = SparkAndroid.ACCENT;
                     Vec3 base = android.getPosition(partialTick);
                     int color = locked && ((int) (age * 0.8F)) % 2 == 0 ? 0xFFFFFF : accent;
                     VertexConsumer fx = buffers.getBuffer(RenderType.lightning());
@@ -389,8 +399,9 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
             case GunnerAndroid.STATE_RAIL_FIRE -> {
                 if (android instanceof GunnerAndroid gun && t < 8) {
-                    // 貫く光線: 太い水緑の外側と白い芯が、だんだん細く薄く消える
-                    float k = 1 - t / 8;
+                    // 貫く光線: 太い水緑の外側と白い芯が、だんだん細く薄く消える（放電型の電磁加速を受けると電光の色で太い）
+                    float k = (1 - t / 8) * (gun.boosted() ? 1.25F : 1);
+                    if (gun.boosted()) accent = SparkAndroid.ACCENT;
                     Vec3 base = android.getPosition(partialTick);
                     Vec3 a = muzzle(android, gun.railFrom().subtract(base)), b = gun.railTo().subtract(base);
                     FxDraw.beam(pose.last(), buffers.getBuffer(AndroidWeaponLight.CORE), a, b, 0.07F + 0.12F * k, 0xFFFFFF, (int) (250 * k));
@@ -1028,6 +1039,20 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                             0xFF000000 | level << 16 | level << 8 | level);
                 }
             }
+            if (android instanceof SparkAndroid spark) {
+                // 天雷: 体の継ぎ目に電光の筋が、胸の芯から手足の先へ段ごとに浮き出て、不規則に瞬く。
+                float k = spark.surge(partialTick);
+                if (k > 0) {
+                    float flicker = 0.7F + 0.3F * Math.abs(Mth.sin(ageInTicks * 2.3F) * Mth.sin(ageInTicks * 0.9F + 1));
+                    for (int i = 0; i < SPARK_SURGE.length; i++) {
+                        float stage = Mth.clamp(k * SPARK_SURGE.length - i, 0, 1);
+                        if (stage <= 0) continue;
+                        int level = (int) (255 * Math.min(1, stage * flicker));
+                        getParentModel().renderToBuffer(pose, buffers.getBuffer(RenderType.eyes(SPARK_SURGE[i])), 0xF00000,
+                                OverlayTexture.NO_OVERLAY, 0xFF000000 | level << 16 | level << 8 | level);
+                    }
+                }
+            }
             if (android instanceof KatanaAndroid katana) {
                 // 紅一閃: 体の継ぎ目に光の筋が、胸の芯から手足の先へ段ごとに浮き出て、心臓の鼓動のように脈打つ。
                 // 遅れて斬撃が走ると、外側の段から光が引いていく。
@@ -1048,6 +1073,13 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
             }
         }
     }
+
+    /** 放電型の天雷の溜めで体に浮き出る電光の筋（刀型と同じく3段。tools/androids.py の katana_surge で作る）。 */
+    private static final ResourceLocation[] SPARK_SURGE = {
+            Singulo.id("textures/entity/spark_android_surge_0.png"),
+            Singulo.id("textures/entity/spark_android_surge_1.png"),
+            Singulo.id("textures/entity/spark_android_surge_2.png"),
+    };
 
     /** 射撃型がレールガンを溜めている間だけ重ねる、髪の光。 */
     private static final ResourceLocation GUNNER_CHARGE = Singulo.id("textures/entity/gunner_android_charge.png");
@@ -1595,6 +1627,7 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 case AXE -> 0xBA6646;
                 case GUNNER -> 0xCCE4F6;
                 case KATANA -> 0x28222A;
+                case SPARK -> 0x4A4E58;
                 case BIT -> 0x323A62;
             };
         }
@@ -2234,6 +2267,67 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
                 }
                 default -> {
                 }
+            }
+        }
+    }
+
+    /**
+     * 上位の装甲板のエネルギーシールド: 体の部位の一部を、少し外側から透けて光る殻で覆う（頭は覆わない）。殻は部位ごとに、その部位の
+     * 動きに合わせて描くので、手足が動いてもずれない。Mk2 は胴と両肩（上腕）、Mk3 はさらに前腕・腰・太ももまで覆う。
+     * 模様は流れる（Mk2 は菫の六角の格子、Mk3 はコラプサーの橙の光の筋）。ふだんはかすかに光り、攻撃を受けた瞬間に明るく瞬く。
+     * 装甲の部品は Mk1 のまま。
+     */
+    final class ArmorShield extends RenderLayer<RuinAndroid, AndroidModel> {
+        private static final ResourceLocation HEX = Singulo.id("textures/entity/android_shield_hex.png");
+        private static final ResourceLocation COLLAPSAR = Singulo.id("textures/entity/android_shield_collapsar.png");
+        /** 殻を部位の箱からどれだけ外へ出すか（画素）。 */
+        private static final float GAP = 0.7F;
+
+        /** 覆う部位: 変形・箱（画素。部位の模型の箱と同じ）・Mk3 だけか。 */
+        private record Plate(java.util.function.BiConsumer<AndroidModel, PoseStack> to, float x0, float y0, float z0, float x1, float y1, float z1,
+                             boolean collapsarOnly) {}
+
+        private static final Plate[] PLATES = {
+                new Plate(AndroidModel::toTorso, -3, -8, -1.5F, 3, 0, 1.5F, false),                       // 胴
+                new Plate((m, p) -> m.toArm(p, true), -1, -0.5F, -1, 1, 4.5F, 1, false),                  // 左の上腕
+                new Plate((m, p) -> m.toArm(p, false), -1, -0.5F, -1, 1, 4.5F, 1, false),                 // 右の上腕
+                new Plate(AndroidModel::toLeftForearm, -1, 0, -1, 1, 5, 1, true),                         // 左の前腕
+                new Plate(AndroidModel::toRightForearm, -1.5F, 0, -1.5F, 1.5F, 5, 1.5F, true),            // 右の前腕（籠手）
+                new Plate(AndroidModel::toHips, -3.5F, -3, -2, 3.5F, 0, 2, true),                         // 腰
+                new Plate((m, p) -> m.toLeg(p, true), -1.5F, 0, -1.5F, 1.5F, 6, 1.5F, true),              // 左の太もも
+                new Plate((m, p) -> m.toLeg(p, false), -1.5F, 0, -1.5F, 1.5F, 6, 1.5F, true),             // 右の太もも
+        };
+
+        ArmorShield(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            var chest = android.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
+            var tier = io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.tierOf(chest);
+            if (chest.isEmpty() || tier == io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK1 || !android.printed()) {
+                return;
+            }
+            boolean collapsar = tier == io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK3;
+            float hit = android.hurtTime > 0 ? (android.hurtTime - partialTick) / Math.max(1, android.hurtDuration) : 0;
+            float pulse = 0.85F + 0.15F * Mth.sin(age * (collapsar ? 0.11F : 0.07F));
+            float strength = Mth.clamp((collapsar ? 0.5F : 0.4F) * pulse + 0.7F * Math.max(0, hit), 0, 1);
+            int rgb = tier.tint;
+            int shade = (int) (((rgb >> 16) & 0xFF) * strength) << 16 | (int) (((rgb >> 8) & 0xFF) * strength) << 8
+                    | (int) ((rgb & 0xFF) * strength);
+            float scroll = age * (collapsar ? 0.012F : 0.006F);
+            var vc = buffers.getBuffer(RenderType.energySwirl(collapsar ? COLLAPSAR : HEX, scroll % 1F, (collapsar ? scroll * 0.35F : scroll) % 1F));
+            AndroidModel m = getParentModel();
+            for (Plate plate : PLATES) {
+                if (plate.collapsarOnly() && !collapsar) continue;
+                pose.pushPose();
+                plate.to().accept(m, pose);
+                float g = GAP;
+                FxDraw.texBox(pose, vc, (plate.x0() - g) / 16F, (plate.y0() - g) / 16F, (plate.z0() - g) / 16F,
+                        (plate.x1() + g) / 16F, (plate.y1() + g) / 16F, (plate.z1() + g) / 16F, light, shade, 255);
+                pose.popPose();
             }
         }
     }
@@ -3177,6 +3271,22 @@ public class AndroidRenderer extends MobRenderer<RuinAndroid, AndroidModel> {
      *     紅一閃で引き抜き、勝利時は刀礼を取ってから納める。刀身は暗い鋼に紅く光る刃文で、光が満ちるほど強く光る。</li>
      * </ul>
      */
+    /** 放電型の腰の機械・両腕の放電籠手・その間のケーブル（{@link SparkGear}）。 */
+    final class SparkLayer extends RenderLayer<RuinAndroid, AndroidModel> {
+        SparkLayer(RenderLayerParent<RuinAndroid, AndroidModel> parent) {
+            super(parent);
+        }
+
+        @Override
+        public void render(PoseStack pose, MultiBufferSource buffers, int light, RuinAndroid android, float limbSwing, float limbSwingAmount,
+                           float partialTick, float age, float netHeadYaw, float headPitch) {
+            if (android instanceof SparkAndroid spark) {
+                SparkGear.renderGear(getParentModel(), pose, buffers, light, spark, partialTick, age);
+                sparkAnchors = SparkGear.anchors(getParentModel(), new org.joml.Matrix4f(base).invert().mul(pose.last().pose()));
+            }
+        }
+    }
+
     final class Katana extends RenderLayer<RuinAndroid, AndroidModel> {
         private static final int LACQUER = 0x1A161C, LACQUER_HI = 0x2C2630, CRIMSON = 0x9C1A2E, GOLD = 0xB89650, DARK_GOLD = 0x6E5A38;
         private static final int SHU = 0x7A1424, SHU_HI = 0x9A2032, SILVER = 0xA8AEB8, IRON = 0x3A3840;

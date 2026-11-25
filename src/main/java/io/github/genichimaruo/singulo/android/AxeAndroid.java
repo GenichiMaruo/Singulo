@@ -271,6 +271,10 @@ public class AxeAndroid extends RuinAndroid {
             getLookControl().setLookAt(target, 30, 30);
             nextMove--;
             chopCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextMove--;
+                chopCooldown--;
+            }
             boolean seen = hasLineOfSight(target);
             if (dist > 2.6 || !seen) {
                 if (stateTicks % 8 == 0 || getNavigation().isDone()) {

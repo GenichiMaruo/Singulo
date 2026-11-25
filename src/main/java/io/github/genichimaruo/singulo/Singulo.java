@@ -98,6 +98,8 @@ public final class Singulo {
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.pipe.FluidPipeNetwork::onLevelUnload);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.HorizonWarden::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.RuinBoss::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.AndroidWeaponModules::onIncoming);
+        NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.android.AndroidWeaponModules::onDamaged);
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOWEST, io.github.genichimaruo.singulo.ruin.BossScaling::onDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDamage);
         NeoForge.EVENT_BUS.addListener(io.github.genichimaruo.singulo.ruin.BossCombatLog::onDeath);

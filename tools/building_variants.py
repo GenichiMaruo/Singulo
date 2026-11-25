@@ -23,6 +23,16 @@ BASES = (
     ('研究所の床タイル', 'lab_tiles', 'lab_tile', 'Lab Floor Tile'),
 )
 
+# 0.23.0 で足した建材（階段・ハーフブロック・塀）。作業台のレシピは一覧の番号がずれないよう、recipes.py の最後で足す
+LATE_BASES = (
+    ('コラプサー強化パネル', 'collapsar_reinforced_panel', 'collapsar_reinforced_panel', 'Collapsar Reinforced Panel'),
+)
+
+# 0.23.0 で足したガラス（階段・ハーフブロック）。作業台のレシピは recipes.py の最後で足す
+LATE_GLASS_BASES = (
+    ('コラプサー強化ガラス', 'collapsar_reinforced_glass', 'collapsar_reinforced_glass', 'Collapsar Reinforced Glass'),
+)
+
 # (形, 日本語, 英語, 作業台の形, 作業台で使う数, できる数)
 SHAPES = (
     ('stairs', '階段', 'Stairs', ('B  ', 'BB ', 'BBB'), 6, 4),
@@ -45,24 +55,30 @@ GLASS_SHAPES = tuple(s for s in SHAPES if s[0] == 'stairs')
 GLASS_SLAB_BASES = tuple(b for b in GLASS_BASES
                          if b[1] in ('white_glass_panel', 'black_reinforced_glass', 'android_gate_glass', 'android_barrier_glass'))
 GLASS_SLAB_SHAPES = tuple(s for s in SHAPES if s[0] == 'slab')
+# 0.23.0 のガラスの形（階段とハーフブロック）
+LATE_GLASS_SHAPES = tuple(s for s in SHAPES if s[0] in ('stairs', 'slab'))
 # 石切台で元の建材1個からできる数
 STONECUT = {'stairs': 1, 'slab': 2, 'wall': 1}
 
 # 変種の ID → (元の ID, 形)
-VARIANTS = {f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in BASES for shape, *_ in SHAPES}
+VARIANTS = {f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in BASES + LATE_BASES for shape, *_ in SHAPES}
 VARIANTS.update({f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in GLASS_BASES for shape, *_ in GLASS_SHAPES})
 VARIANTS.update({f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in GLASS_SLAB_BASES for shape, *_ in GLASS_SLAB_SHAPES})
+VARIANTS.update({f'{prefix}_{shape}': (base_id, shape) for _, base_id, prefix, _ in LATE_GLASS_BASES for shape, *_ in LATE_GLASS_SHAPES})
 # 半透明で描く変種（ガラス）
-GLASS_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base in {b for _, b, _, _ in GLASS_BASES}}
+GLASS_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base in {b for _, b, _, _ in GLASS_BASES + LATE_GLASS_BASES}}
 # 遺構の建材（ニュートリノの探知で遺構と見なす）
 RUIN_VARIANTS = {v for v, (base, _) in VARIANTS.items() if 'ruin' in base}
 # 鉄以上のツルハシで掘る（元の建材と同じ）
 IRON_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base.startswith(('pristine_', 'lab_', 'black_', 'white_', 'android_'))}
+# ダイヤ以上のツルハシで掘り、ウィザーとエンダードラゴンに壊されない変種（コラプサー強化パネル）
+COLLAPSAR_VARIANTS = {v for v, (base, _) in VARIANTS.items() if base in ('collapsar_reinforced_panel', 'collapsar_reinforced_glass')}
 
 IDS = {}
 DESC = {}
-for _ja, _base, _prefix, _en, _shapes in ([b + (SHAPES,) for b in BASES] + [b + (GLASS_SHAPES,) for b in GLASS_BASES]
-                                         + [b + (GLASS_SLAB_SHAPES,) for b in GLASS_SLAB_BASES]):
+for _ja, _base, _prefix, _en, _shapes in ([b + (SHAPES,) for b in BASES + LATE_BASES] + [b + (GLASS_SHAPES,) for b in GLASS_BASES]
+                                         + [b + (GLASS_SLAB_SHAPES,) for b in GLASS_SLAB_BASES]
+                                         + [b + (LATE_GLASS_SHAPES,) for b in LATE_GLASS_BASES]):
     for _shape, _sja, _sen, *_ in _shapes:
         _name = f'{_ja}の{_sja}'
         IDS[_name] = (f'{_prefix}_{_shape}', f'{_en} {_sen}', 'variant')
@@ -113,14 +129,82 @@ def _face_uv(name, f, t):
 GLASS_STYLE = {
     'white_glass_panel': {'fill': (236, 244, 250, 72), 'edge': (196, 202, 210, 255), 'light': (254, 254, 255, 230),
                           'dark': (218, 222, 228, 230), 'dot': (176, 184, 194, 255)},
+    'collapsar_reinforced_glass': {'fill': (30, 24, 38, 128), 'edge': (8, 6, 10, 255), 'light': (62, 52, 72, 255),
+                                   'dark': (62, 52, 72, 255), 'dot': (200, 116, 58, 255)},
     'black_reinforced_glass': {'fill': (22, 24, 32, 128), 'edge': (12, 12, 16, 255), 'light': (46, 48, 58, 255),
                                'dark': (46, 48, 58, 255), 'dot': (120, 124, 136, 255)},
+    # 四芒星のガラス（0.23.0）: 一部が覆われた面の枠の絵だけに使う（階段・ハーフブロックはない）。色は元のガラスと同じ
+    'white_star_glass_panel': {'fill': (236, 244, 250, 72), 'edge': (196, 202, 210, 255), 'light': (254, 254, 255, 230),
+                               'dark': (218, 222, 228, 230), 'dot': (176, 184, 194, 255)},
+    'black_star_glass': {'fill': (22, 24, 32, 128), 'edge': (12, 12, 16, 255), 'light': (46, 48, 58, 255),
+                         'dark': (46, 48, 58, 255), 'dot': (120, 124, 136, 255)},
+    'collapsar_star_glass': {'fill': (30, 24, 38, 128), 'edge': (8, 6, 10, 255), 'light': (62, 52, 72, 255),
+                             'dark': (62, 52, 72, 255), 'dot': (200, 116, 58, 255)},
     # アンドロイド用のガラス: 中身（と模様）は元の絵のまま、縁は元の1ドットの縁（tools/androids.py）
     'android_gate_glass': {'android': 'android_gate_glass', 'patterned': False},
     'android_gate_glass_patterned': {'android': 'android_gate_glass', 'patterned': True},
     'android_barrier_glass': {'android': 'android_barrier_glass', 'patterned': False},
     'android_barrier_glass_patterned': {'android': 'android_barrier_glass', 'patterned': True},
 }
+
+
+# 白いパネル・黒色強化パネルの階段・ハーフブロックの面（0.23.0）。元の絵（tools/blocks_extra.py）と同じ色
+PANEL_STYLE = {
+    'white_panel': {'fill': (240, 242, 245, 255), 'edge': (196, 202, 210, 255), 'light': (254, 254, 255, 255),
+                    'dark': (218, 222, 228, 255), 'dot': (176, 184, 194, 255)},
+    'black_reinforced_panel': {'fill': (30, 32, 38, 255), 'edge': (12, 12, 16, 255), 'light': (64, 66, 76, 255),
+                               'dark': (20, 20, 24, 255), 'dot': (120, 124, 136, 255), 'brace': (46, 48, 56, 255)},
+    'collapsar_reinforced_panel': {'fill': (24, 20, 30, 255), 'edge': (8, 6, 10, 255), 'light': (70, 60, 82, 255),
+                                   'dark': (14, 10, 18, 255), 'dot': (200, 116, 58, 255), 'brace': (42, 36, 52, 255)},
+}
+# 重ねハーフブロックの材料（Java の MixedPanelSlab.Panel と同じ順・名前）
+PANEL_MATERIALS = (('white', 'white_panel'), ('black', 'black_reinforced_panel'), ('collapsar', 'collapsar_reinforced_panel'))
+MIXED_PANEL_SLAB = 'mixed_panel_slab'
+
+
+def panel_face_texture(mask, style):
+    """パネルの見える面（mask: UV の画素の集まり）の形に沿って、元のパネルと同じ縁を描く。
+    外周は1画素の縁、その内側は上・左が明るく下・右が暗い線。出っぱった角から3画素内に鋲。黒色強化パネルは、角から内へ補強の筋。
+    外の画素は透明（面の外なので見えない）。"""
+    from PIL import Image
+    if len(mask) == 256:
+        # 面いっぱいの面は、元のパネルの絵そのまま（黒色強化パネルの真ん中の四角も残す）
+        import blocks_extra
+        return blocks_extra.DECO_ART[[k for k, v in PANEL_STYLE.items() if v is style][0]]()
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+
+    def inside(u, v):
+        return (u, v) in mask
+
+    for (u, v) in mask:
+        px[u, v] = style['fill']
+    corners = [(u, v, du, dv) for (u, v) in mask for du in (1, -1) for dv in (1, -1)
+               if not inside(u - du, v) and not inside(u, v - dv)]           # 出っぱった角（その外へ向かう向きが -du, -dv）
+    if 'brace' in style:
+        for (u, v, du, dv) in corners:
+            for k in range(2, 16):
+                p = (u + k * du, v + k * dv)
+                if not inside(*p) or not inside(p[0] + 2 * du, p[1] + 2 * dv):
+                    break
+                px[p] = style['brace']
+    edge = {(u, v) for (u, v) in mask if not all(inside(u + du, v + dv) for du, dv in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
+    for (u, v) in mask:
+        if (u, v) in edge:
+            px[u, v] = style['edge']
+        elif (u - 1, v) in edge or (u, v - 1) in edge:
+            px[u, v] = style['light']
+        elif (u + 1, v) in edge or (u, v + 1) in edge:
+            px[u, v] = style['dark']
+    rivets = []
+    for (u, v, du, dv) in sorted(corners):
+        p = (u + 3 * du, v + 3 * dv)
+        # 狭い所（幅8画素）では両側の角の鋲がとなり合うので、1つにまとめる
+        if inside(*p) and p not in edge and all(abs(p[0] - q[0]) + abs(p[1] - q[1]) > 2 for q in rivets):
+            rivets.append(p)
+    for p in rivets:
+        px[p] = style['dot']
+    return im
 
 
 def android_face_texture(mask, style):
@@ -173,7 +257,8 @@ def glass_face_texture(mask, style):
 
 def glass_join_textures(textures):
     """ガラスの階段に接するガラスの面のうち、階段に隠れずに見える所の枠の絵（Java の GlassJoinModel が貼る）。
-    面を UV の4つの 1/4 に分け、見える 1/4 の組（bits: 1 左上・2 右上・4 左下・8 右下）ごとに <元のガラス>_join_<bits>.png。"""
+    面を UV の4つの 1/4 に分け、見える 1/4 の組（bits: 1 左上・2 右上・4 左下・8 右下）ごとに <元のガラス>_join_<bits>.png。
+    枠の内側は、階段・ハーフブロックの面と同じ地の色だけ（どの 1/4 も同じ見た目にするため、単体のときの補強の筋・四芒星は描かない）。"""
     quarters = {1: (0, 0), 2: (8, 0), 4: (0, 8), 8: (8, 8)}
     for base, style in GLASS_STYLE.items():
         for bits in range(1, 16):
@@ -181,7 +266,7 @@ def glass_join_textures(textures):
             glass_face_texture(mask, style).save(textures / f'{base}_join_{bits}.png')
 
 
-def glass_stairs_model(tex, tops, name=None, base=None, textures=None, cells=None):
+def glass_stairs_model(tex, tops, name=None, base=None, textures=None, cells=None, panel=False):
     """透けるガラスの階段: 形を 1/8 の箱に分け、箱どうしが接する内側の面は描かない。
 
     バニラの階段（下の板と上の段の2つの箱）のままだと、下の板の天面のうち上の段に隠れた所と、上の段の底面がガラス越しに見え、
@@ -214,72 +299,205 @@ def glass_stairs_model(tex, tops, name=None, base=None, textures=None, cells=Non
     for key, mask in planes.items():
         tex_map[key] = f'{MODID}:block/{name}_{key}'
         if textures is not None:
-            glass_face_texture(mask, GLASS_STYLE[base]).save(textures / f'{name}_{key}.png')
-    return {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent',
+            painter = panel_face_texture(mask, PANEL_STYLE[base]) if panel else glass_face_texture(mask, GLASS_STYLE[base])
+            painter.save(textures / f'{name}_{key}.png')
+    model = {'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent',
             'textures': tex_map, 'elements': elements,
             'display': {'gui': {'rotation': [30, 135, 0], 'translation': [0, 0, 0], 'scale': [0.625, 0.625, 0.625]},
                         'head': {'rotation': [0, -90, 0], 'translation': [0, 0, 0], 'scale': [1, 1, 1]},
                         'thirdperson_lefthand': {'rotation': [75, -135, 0], 'translation': [0, 2.5, 0],
                                                  'scale': [0.375, 0.375, 0.375]}}}
+    if panel:
+        del model['render_type']                           # パネルは不透明
+    return model
 
 
+# 白黒ガラスの重ねハーフブロック（0.21.0。状態 black_on_top は保存されているので変えない）と、
+# コラプサー強化ガラスと白か黒のガラスの重ねハーフブロック（0.23.0。状態 collapsar_on_top・other）
 MIXED_SLAB = 'mixed_glass_slab'
+MIXED_COLLAPSAR_SLAB = 'mixed_collapsar_glass_slab'
 GLASS_PAIR = ('white_glass_panel', 'black_reinforced_glass')
+GLASS_OTHERS = (('white', 'white_glass_panel'), ('black', 'black_reinforced_glass'))
+COLLAPSAR_GLASS = 'collapsar_reinforced_glass'
+# ガラスとパネルの重ねハーフブロック（0.23.0。Java の MixedPanelGlassSlab。ガラスは MixedGlassSlab.Glass と同じ順・名前）
+MIXED_PANEL_GLASS_SLAB = 'mixed_panel_glass_slab'
+GLASS_MATERIALS = (('white', 'white_glass_panel'), ('black', 'black_reinforced_glass'), ('collapsar', COLLAPSAR_GLASS))
 
 
-def mixed_slab_models(write_json, assets):
+def mixed_slab_models(write_json, assets, block=MIXED_PANEL_SLAB, materials=PANEL_MATERIALS, translucent=False):
+    """違う2つのガラス（またはパネル）のハーフブロックを上下に重ねた模型（下・上の材料の組ごと）。面の絵は各ハーフブロックと同じ。
+    同じ材料どうしの状態は使わないが、元のブロックの模型を当てる。"""
+    states = {}
+    for lower_name, lower in materials:
+        for upper_name, upper in materials:
+            key = f'lower={lower_name},upper={upper_name}'
+            if lower == upper:
+                states[key] = {'model': f'{MODID}:block/{lower}'}
+                continue
+            name = f'{block}_{lower_name}_{upper_name}'
+            states[key] = {'model': f'{MODID}:block/{name}'}
+            textures = {'particle': f'{MODID}:block/{upper}'}
+            elements = []
+            for top, base in ((False, lower), (True, upper)):
+                f, t = [0, 8 if top else 0, 0], [16, 16 if top else 8, 16]
+                slab = base + ('_slab_top' if top else '_slab')
+                faces = {}
+                for face in _FACES:
+                    if face == ('down' if top else 'up'):
+                        continue
+                    plane = 16 if face in ('south', 'east', 'up') else 0
+                    tkey = ('upper_' if top else 'lower_') + face
+                    textures[tkey] = f'{MODID}:block/{slab}_{face}{plane}'
+                    faces[face] = {'texture': '#' + tkey, 'uv': _face_uv(face, f, t), 'cullface': face}
+                elements.append({'from': f, 'to': t, 'faces': faces})
+            model = {'parent': 'minecraft:block/block', 'textures': textures, 'elements': elements}
+            if translucent:
+                model['render_type'] = 'minecraft:translucent'
+            write_json(assets / 'models' / 'block' / f'{name}.json', model)
+    write_json(assets / 'blockstates' / f'{block}.json', {'variants': states})
+
+
+def _stack_model(write_json, assets, name, lower, upper, translucent):
+    """下 lower・上 upper のハーフブロックを重ねた模型。面の絵は各ハーフブロックと同じ。"""
+    textures = {'particle': f'{MODID}:block/{upper}'}
+    elements = []
+    for top, base in ((False, lower), (True, upper)):
+        f, t = [0, 8 if top else 0, 0], [16, 16 if top else 8, 16]
+        slab = base + ('_slab_top' if top else '_slab')
+        faces = {}
+        for face in _FACES:
+            if face == ('down' if top else 'up'):
+                continue
+            plane = 16 if face in ('south', 'east', 'up') else 0
+            tkey = ('upper_' if top else 'lower_') + face
+            textures[tkey] = f'{MODID}:block/{slab}_{face}{plane}'
+            faces[face] = {'texture': '#' + tkey, 'uv': _face_uv(face, f, t), 'cullface': face}
+        elements.append({'from': f, 'to': t, 'faces': faces})
+    model = {'parent': 'minecraft:block/block'}
+    if translucent:
+        model['render_type'] = 'minecraft:translucent'
+    model.update({'textures': textures, 'elements': elements})
+    write_json(assets / 'models' / 'block' / f'{name}.json', model)
+
+
+def mixed_glass_models(write_json, assets):
+    """白黒ガラスの重ねハーフブロック（black_on_top）と、コラプサーガラスとの重ねハーフブロック（collapsar_on_top・other）。"""
     states = {}
     for black_on_top in (False, True):
-        lower, upper = GLASS_PAIR if black_on_top else reversed(GLASS_PAIR)
+        lower, upper = GLASS_PAIR if black_on_top else tuple(reversed(GLASS_PAIR))
         name = f'{MIXED_SLAB}_{"black" if black_on_top else "white"}_top'
         states[f'black_on_top={str(black_on_top).lower()}'] = {'model': f'{MODID}:block/{name}'}
-        textures = {'particle': f'{MODID}:block/{upper}'}
-        elements = []
-        for top, base in ((False, lower), (True, upper)):
-            f, t = [0, 8 if top else 0, 0], [16, 16 if top else 8, 16]
-            slab = base + ('_slab_top' if top else '_slab')
-            faces = {}
-            for face in _FACES:
-                if face == ('down' if top else 'up'):
-                    continue
-                plane = 16 if face in ('south', 'east', 'up') else 0
-                key = ('upper_' if top else 'lower_') + face
-                textures[key] = f'{MODID}:block/{slab}_{face}{plane}'
-                faces[face] = {'texture': '#' + key, 'uv': _face_uv(face, f, t), 'cullface': face}
-            elements.append({'from': f, 'to': t, 'faces': faces})
-        write_json(assets / 'models' / 'block' / f'{name}.json', {
-            'parent': 'minecraft:block/block', 'render_type': 'minecraft:translucent',
-            'textures': textures, 'elements': elements})
+        _stack_model(write_json, assets, name, lower, upper, True)
     write_json(assets / 'blockstates' / f'{MIXED_SLAB}.json', {'variants': states})
+    states = {}
+    for other_name, other in GLASS_OTHERS:
+        for on_top in (False, True):
+            lower, upper = (other, COLLAPSAR_GLASS) if on_top else (COLLAPSAR_GLASS, other)
+            name = f'{MIXED_COLLAPSAR_SLAB}_{other_name}_{"collapsar" if on_top else other_name}_top'
+            states[f'collapsar_on_top={str(on_top).lower()},other={other_name}'] = {'model': f'{MODID}:block/{name}'}
+            _stack_model(write_json, assets, name, lower, upper, True)
+    write_json(assets / 'blockstates' / f'{MIXED_COLLAPSAR_SLAB}.json', {'variants': states})
+
+
+def _half_model(write_json, assets, name, base, top, inner, translucent):
+    """ハーフブロック base の上（top）か下の半分だけの模型。面の絵はそのハーフブロックと同じ。
+    inner なら、もう一方の半分に接する面も描く（cullface なし。透けるガラスの向こうに見えるパネルの面）。"""
+    f, t = [0, 8 if top else 0, 0], [16, 16 if top else 8, 16]
+    slab = base + ('_slab_top' if top else '_slab')
+    textures = {'particle': f'{MODID}:block/{base}'}
+    faces = {}
+    for face in _FACES:
+        inside = face == ('down' if top else 'up')
+        if inside and not inner:
+            continue
+        if face == 'up':
+            plane = 16 if top else 8
+        elif face == 'down':
+            plane = 8 if top else 0
+        else:
+            plane = 16 if face in ('south', 'east') else 0
+        textures[face] = f'{MODID}:block/{slab}_{face}{plane}'
+        entry = {'texture': '#' + face, 'uv': _face_uv(face, f, t)}
+        if not inside:
+            entry['cullface'] = face
+        faces[face] = entry
+    model = {'parent': 'minecraft:block/block'}
+    if translucent:
+        model['render_type'] = 'minecraft:translucent'
+    model.update({'textures': textures, 'elements': [{'from': f, 'to': t, 'faces': faces}]})
+    write_json(assets / 'models' / 'block' / f'{name}.json', model)
+
+
+def mixed_panel_glass_models(write_json, assets):
+    """ガラスとパネルの重ねハーフブロック（glass・panel・glass_on_top）。ガラスの半分（透ける描き方）とパネルの半分（不透明）の
+    模型を multipart で重ねる（描き方が違うので1つの模型にできない）。ガラスの、パネルに接する面は描かない。
+    パネルの、ガラスに接する面はガラス越しに見えるので描く。"""
+    parts = []
+    for top in (False, True):
+        where = 'top' if top else 'bottom'
+        for glass_name, glass in GLASS_MATERIALS:
+            name = f'{MIXED_PANEL_GLASS_SLAB}_glass_{glass_name}_{where}'
+            _half_model(write_json, assets, name, glass, top, False, True)
+            parts.append({'when': {'glass': glass_name, 'glass_on_top': str(top).lower()}, 'apply': {'model': f'{MODID}:block/{name}'}})
+        for panel_name, panel in PANEL_MATERIALS:
+            name = f'{MIXED_PANEL_GLASS_SLAB}_panel_{panel_name}_{where}'
+            _half_model(write_json, assets, name, panel, top, True, False)
+            parts.append({'when': {'panel': panel_name, 'glass_on_top': str(not top).lower()}, 'apply': {'model': f'{MODID}:block/{name}'}})
+    write_json(assets / 'blockstates' / f'{MIXED_PANEL_GLASS_SLAB}.json', {'multipart': parts})
+
+
+def mixed_loot(write_json, data, block, materials):
+    """重ねハーフブロック: 下と上のハーフブロックを1つずつ落とす（状態の lower・upper で選ぶ）。"""
+    write_json(data / 'loot_table' / 'blocks' / f'{block}.json', {
+        'type': 'minecraft:block',
+        'pools': [{'rolls': 1, 'entries': [{'type': 'minecraft:alternatives', 'children': [
+            {'type': 'minecraft:item', 'name': f'{MODID}:{base}_slab',
+             'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:{block}', 'properties': {layer: name}}],
+             'functions': [{'function': 'minecraft:explosion_decay'}]} for name, base in materials]}]}
+                  for layer in ('lower', 'upper')]})
+
+
+def panel_join_textures(textures):
+    """パネルの面のうち、となりのハーフブロック・階段に隠れずに見える所の縁の絵（Java の PanelJoinModel が貼る）。
+    面を UV の4つの 1/4 に分け、見える 1/4 の組（bits: 1 左上・2 右上・4 左下・8 右下）ごとに <パネル>_join_<bits>.png。"""
+    quarters = {1: (0, 0), 2: (8, 0), 4: (0, 8), 8: (8, 8)}
+    for base, style in PANEL_STYLE.items():
+        for bits in range(1, 16):
+            mask = {(u0 + du, v0 + dv) for bit, (u0, v0) in quarters.items() if bits & bit for du in range(8) for dv in range(8)}
+            panel_face_texture(mask, style).save(textures / f'{base}_join_{bits}.png')
 
 
 def models(write_json, assets):
     """ブロックの状態・モデル・アイテムのモデル（バニラの階段・ハーフブロック・塀の形に、元の建材の絵を貼る）。"""
     bs, mb, mi = assets / 'blockstates', assets / 'models' / 'block', assets / 'models' / 'item'
-    mixed_slab_models(write_json, assets)
+    mixed_glass_models(write_json, assets)
+    mixed_slab_models(write_json, assets, MIXED_PANEL_SLAB, PANEL_MATERIALS, translucent=False)
+    mixed_panel_glass_models(write_json, assets)
     (assets / 'textures' / 'block').mkdir(parents=True, exist_ok=True)
     glass_join_textures(assets / 'textures' / 'block')     # ガラスの階段に接するガラスの面
+    panel_join_textures(assets / 'textures' / 'block')     # ハーフブロック・階段に一部覆われたパネルの面
     for variant, (base, shape) in VARIANTS.items():
         tex = f'{MODID}:block/{base}'
         m = f'{MODID}:block/{variant}'
         if shape == 'stairs':
             for suffix, parent in (('', 'stairs'), ('_inner', 'inner_stairs'), ('_outer', 'outer_stairs')):
-                if variant in GLASS_VARIANTS:
+                if variant in GLASS_VARIANTS or base in PANEL_STYLE:
                     tb = assets / 'textures' / 'block'
                     tb.mkdir(parents=True, exist_ok=True)
-                    model = glass_stairs_model(tex, STAIR_TOPS[parent], f'{variant}{suffix}', base, tb)
+                    model = glass_stairs_model(tex, STAIR_TOPS[parent], f'{variant}{suffix}', base, tb, panel=base in PANEL_STYLE)
                 else:
                     model = {'parent': f'minecraft:block/{parent}', 'textures': {'bottom': tex, 'top': tex, 'side': tex}}
                 write_json(mb / f'{variant}{suffix}.json', model)
             # ガラスは面ごとの枠の絵を形と一緒に回す（uvlock だと絵が世界に固定され、枠が形からずれる）
-            write_json(bs / f'{variant}.json', {'variants': stairs_variants(m, uvlock=variant not in GLASS_VARIANTS)})
+            write_json(bs / f'{variant}.json', {'variants': stairs_variants(m, uvlock=variant not in GLASS_VARIANTS and base not in PANEL_STYLE)})
             write_json(mi / f'{variant}.json', {'parent': m})
-        elif shape == 'slab' and variant in GLASS_VARIANTS:
+        elif shape == 'slab' and (variant in GLASS_VARIANTS or base in PANEL_STYLE):
             # ガラスのハーフブロック: 階段と同じく、見える面の形に沿った枠の絵。2つ重ねると元のガラス
             tb = assets / 'textures' / 'block'
             for suffix, y in (('', 0), ('_top', 1)):
                 cells = {(x, y, z) for x in (0, 1) for z in (0, 1)}
-                write_json(mb / f'{variant}{suffix}.json', glass_stairs_model(tex, (), f'{variant}{suffix}', base, tb, cells))
+                write_json(mb / f'{variant}{suffix}.json',
+                           glass_stairs_model(tex, (), f'{variant}{suffix}', base, tb, cells, panel=base in PANEL_STYLE))
             write_json(bs / f'{variant}.json', {'variants': {
                 'type=bottom': {'model': m}, 'type=top': {'model': f'{m}_top'}, 'type=double': {'model': f'{MODID}:block/{base}'}}})
             write_json(mi / f'{variant}.json', {'parent': m})
@@ -337,11 +555,31 @@ def wall_multipart(m):
 
 def loot(write_json, data):
     """ハーフブロックは2つ重ねたものを壊すと2個（バニラと同じ）。階段・塀は1個。"""
+    # 白黒ガラス: 白と黒を1つずつ。コラプサーガラスとの組: コラプサーと、もう一方（状態 other）を1つずつ
     write_json(data / 'loot_table' / 'blocks' / f'{MIXED_SLAB}.json', {
         'type': 'minecraft:block',
         'pools': [{'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:{base}_slab',
                                             'functions': [{'function': 'minecraft:explosion_decay'}]}]}
                   for base in GLASS_PAIR]})
+    write_json(data / 'loot_table' / 'blocks' / f'{MIXED_COLLAPSAR_SLAB}.json', {
+        'type': 'minecraft:block',
+        'pools': [{'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:{COLLAPSAR_GLASS}_slab',
+                                            'functions': [{'function': 'minecraft:explosion_decay'}]}]},
+                  {'rolls': 1, 'entries': [{'type': 'minecraft:alternatives', 'children': [
+                      {'type': 'minecraft:item', 'name': f'{MODID}:{base}_slab',
+                       'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:{MIXED_COLLAPSAR_SLAB}',
+                                       'properties': {'other': name}}],
+                       'functions': [{'function': 'minecraft:explosion_decay'}]} for name, base in GLASS_OTHERS]}]}]})
+    mixed_loot(write_json, data, MIXED_PANEL_SLAB, PANEL_MATERIALS)
+    # ガラスとパネルの重ねハーフブロック（0.23.0）: ガラス（状態 glass）とパネル（状態 panel）のハーフブロックを1つずつ
+    write_json(data / 'loot_table' / 'blocks' / f'{MIXED_PANEL_GLASS_SLAB}.json', {
+        'type': 'minecraft:block',
+        'pools': [{'rolls': 1, 'entries': [{'type': 'minecraft:alternatives', 'children': [
+            {'type': 'minecraft:item', 'name': f'{MODID}:{base}_slab',
+             'conditions': [{'condition': 'minecraft:block_state_property', 'block': f'{MODID}:{MIXED_PANEL_GLASS_SLAB}',
+                             'properties': {prop: name}}],
+             'functions': [{'function': 'minecraft:explosion_decay'}]} for name, base in materials]}]}
+                  for prop, materials in (('glass', GLASS_MATERIALS), ('panel', PANEL_MATERIALS))]})
     for variant, (_base, shape) in VARIANTS.items():
         entry = {'type': 'minecraft:item', 'name': f'{MODID}:{variant}'}
         if shape == 'slab':

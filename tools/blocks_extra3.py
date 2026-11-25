@@ -241,6 +241,23 @@ def black_reinforced_glass(star=False):
     return im
 
 
+def collapsar_reinforced_glass(star=False):
+    """コラプサー強化ガラス（0.23.0）: 紫がかった黒の半透明に、二重の枠と、角から角への補強の筋。四隅の鋲は橙。
+    star なら補強の筋の代わりに、四芒星黒色強化ガラスと同じ形の四芒星（紫の地に、中心の光は橙）。"""
+    im, d = new((30, 24, 38, 128))
+    d.rectangle([0, 0, S - 1, S - 1], outline=(8, 6, 10, 255))
+    d.rectangle([1, 1, S - 2, S - 2], outline=(62, 52, 72, 255))
+    for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+        d.point((x, y), fill=(200, 116, 58, 255))
+    if star:
+        _star_symmetric(d, (56, 40, 70, 140), (150, 112, 168, 200))
+        d.point([(7, 7), (8, 7), (7, 8), (8, 8)], fill=(255, 170, 96, 230))   # 中心の光（降着円盤の橙）
+    else:
+        d.line([(3, 3), (12, 12)], fill=(84, 70, 98, 170))
+        d.line([(12, 3), (3, 12)], fill=(84, 70, 98, 170))
+    return im
+
+
 # ---------------------------------------------------------------- 衝撃発電パネル
 
 def impact_top(on):
@@ -482,6 +499,8 @@ def textures(tb, save, weather, write_json):
     save(white_glass_panel(star=True), tb / 'white_star_glass_panel.png')
     save(black_reinforced_glass(), tb / 'black_reinforced_glass.png')
     save(black_reinforced_glass(star=True), tb / 'black_star_glass.png')
+    save(collapsar_reinforced_glass(), tb / 'collapsar_reinforced_glass.png')
+    save(collapsar_reinforced_glass(star=True), tb / 'collapsar_star_glass.png')
     for on in (False, True):
         suffix = '_on' if on else ''
         save(impact_top(on), tb / f'impact_generator_panel_top{suffix}.png')

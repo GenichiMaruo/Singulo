@@ -200,6 +200,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
     public void setCoverState(@Nullable BlockState state) {
         coverState = state;
         setChanged();
+        io.github.genichimaruo.singulo.cable.ConduitCover.updateLight(level, worldPosition, state);
     }
 
     @Override
@@ -213,6 +214,7 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
         BlockState before = coverState;
         coverState = io.github.genichimaruo.singulo.cable.ConduitCover.load(tag, registries);
         if (before != coverState && level != null && level.isClientSide) {
+            io.github.genichimaruo.singulo.cable.ConduitCover.updateLight(level, worldPosition, coverState);
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
         }
@@ -254,6 +256,10 @@ public class FluidPipeBlockEntity extends BlockEntity implements io.github.genic
     @Override
     public void onLoad() {
         super.onLoad();
+        // 光るブロックの明るさを書き直す（0.23.0 より前にはめ込んだ物も光るように）
+        if (coverState != null) {
+            io.github.genichimaruo.singulo.cable.ConduitCover.updateLight(level, worldPosition, coverState);
+        }
         if (level != null && level.isClientSide) {
             CLIENT.add(this);
         }

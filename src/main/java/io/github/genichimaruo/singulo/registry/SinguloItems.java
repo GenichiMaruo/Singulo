@@ -75,6 +75,8 @@ public final class SinguloItems {
             "neutrino_scanner", () -> new io.github.genichimaruo.singulo.item.NeutrinoScannerItem(new Item.Properties().rarity(Rarity.RARE), 3));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.ExplorerCompassItem> EXPLORER_COMPASS = ITEMS.register(
             "explorer_compass", () -> new io.github.genichimaruo.singulo.item.ExplorerCompassItem(new Item.Properties(), 1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.item.FacilityReconstructorItem> FACILITY_RECONSTRUCTOR = ITEMS.register(
+            "facility_reconstructor", () -> new io.github.genichimaruo.singulo.item.FacilityReconstructorItem(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.MeteorCompassItem> METEOR_COMPASS = ITEMS.register(
             "meteor_compass", () -> new io.github.genichimaruo.singulo.item.MeteorCompassItem(new Item.Properties(), 2));
     public static final DeferredItem<io.github.genichimaruo.singulo.item.CreativeCatalystItem> CREATIVE_CATALYST = ITEMS.register(
@@ -97,6 +99,13 @@ public final class SinguloItems {
     /** アンドロイド用の無線充電器。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER = ITEMS.register(
             "android_charger", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties()));
+    /** 無線充電器の上位版（Mk2: 量子の段階、Mk3: コラプサーの段階）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER_2 = ITEMS.register(
+            "android_charger_2", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidChargerItem.Tier.MK2));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidChargerItem> ANDROID_CHARGER_3 = ITEMS.register(
+            "android_charger_3", () -> new io.github.genichimaruo.singulo.android.AndroidChargerItem(new Item.Properties().rarity(Rarity.EPIC),
+                    io.github.genichimaruo.singulo.android.AndroidChargerItem.Tier.MK3));
     /** 携帯型アンドロイド印刷機（0.21.0。外出先でアンドロイドを1体ずつ印刷する、カバン型の印刷機）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem> PORTABLE_ANDROID_PRINTER = ITEMS.register(
             "portable_android_printer", () -> new io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem(new Item.Properties(), 1));
@@ -106,6 +115,41 @@ public final class SinguloItems {
     /** アンドロイド用装甲板（護衛のアンドロイドに積む防具）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE = ITEMS.register(
             "android_armor_plate", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties()));
+    /** 武装モジュール（0.23.0）: 出力増幅器 Mk1〜Mk3 と、6つの特化モジュール。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> ANDROID_WEAPON_MODULE = ITEMS.register(
+            "android_weapon_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.COMMON),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.AMP_1));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> ANDROID_WEAPON_MODULE_2 = ITEMS.register(
+            "android_weapon_module_2", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.AMP_2));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> ANDROID_WEAPON_MODULE_3 = ITEMS.register(
+            "android_weapon_module_3", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.EPIC).fireResistant(),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.AMP_3));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> HEAVY_STRIKE_MODULE = ITEMS.register(
+            "heavy_strike_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.HEAVY));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> RAPID_STRIKE_MODULE = ITEMS.register(
+            "rapid_strike_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.RAPID));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> DRAIN_MODULE = ITEMS.register(
+            "drain_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.DRAIN));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> PIERCING_MODULE = ITEMS.register(
+            "piercing_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.PIERCE));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> FROST_MODULE = ITEMS.register(
+            "frost_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.FROST));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem> WARDEN_BREAKER_MODULE = ITEMS.register(
+            "warden_breaker_module", () -> new io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidWeaponModuleItem.Kind.WARDEN));
+    /** 装甲板の上位版（Mk2: ニホニウム、Mk3: コラプサー）。前の世代から作り、エンチャントを引き継ぐ。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE_2 = ITEMS.register(
+            "android_armor_plate_2", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties().rarity(Rarity.RARE),
+                    io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK2));
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidArmorPlateItem> ANDROID_ARMOR_PLATE_3 = ITEMS.register(
+            "android_armor_plate_3", () -> new io.github.genichimaruo.singulo.android.AndroidArmorPlateItem(new Item.Properties().rarity(Rarity.EPIC)
+                    .fireResistant(), io.github.genichimaruo.singulo.android.AndroidArmorPlateItem.Tier.MK3));
     /** 採掘アップグレード（ツルハシのエンチャントを付けられる）。 */
     public static final DeferredItem<io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem> ANDROID_MINING_UPGRADE = ITEMS.register(
             "android_mining_upgrade", () -> new io.github.genichimaruo.singulo.android.AndroidMiningUpgradeItem(new Item.Properties()));
@@ -244,6 +288,9 @@ public final class SinguloItems {
     /** 刀型のスポーンエッグ（射撃型と同じく、まだクリエイティブでだけ。一覧には出さない。/give で取る）。 */
     public static final DeferredItem<DeferredSpawnEggItem> KATANA_ANDROID_SPAWN_EGG = ITEMS.register("katana_android_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.KATANA_ANDROID, 0x28222A, 0xFF3A54, new Item.Properties()));
+    /** 放電型のスポーンエッグ（隠し型。一覧には出さない。/give で取る）。 */
+    public static final DeferredItem<DeferredSpawnEggItem> SPARK_ANDROID_SPAWN_EGG = ITEMS.register("spark_android_spawn_egg",
+            () -> new DeferredSpawnEggItem(SinguloEntities.SPARK_ANDROID, 0x4A4E58, 0xF4F25A, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> HORIZON_WARDEN_SPAWN_EGG = ITEMS.register("horizon_warden_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.HORIZON_WARDEN, 0xECEEF0, 0xE86060, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> ECHO_SENTINEL_SPAWN_EGG = ITEMS.register("echo_sentinel_spawn_egg",
@@ -301,6 +348,8 @@ public final class SinguloItems {
             Map.entry("magnetic_bottle", 4),
             Map.entry("neutrino_scanner", 3),
             Map.entry("android_charger", 2),
+            Map.entry("android_charger_2", 3),
+            Map.entry("android_charger_3", 5),
             Map.entry("packing_crate", 2),
             Map.entry("battery_packing_crate", 2),
             Map.entry("large_battery_packing_crate", 3),
@@ -308,6 +357,17 @@ public final class SinguloItems {
             Map.entry("battery_fluid_capsule", 2),
             Map.entry("large_battery_fluid_capsule", 3),
             Map.entry("android_armor_plate", 2),
+            Map.entry("android_armor_plate_2", 3),
+            Map.entry("android_armor_plate_3", 5),
+            Map.entry("android_weapon_module", 2),
+            Map.entry("android_weapon_module_2", 3),
+            Map.entry("android_weapon_module_3", 5),
+            Map.entry("heavy_strike_module", 4),
+            Map.entry("rapid_strike_module", 4),
+            Map.entry("drain_module", 3),
+            Map.entry("piercing_module", 3),
+            Map.entry("frost_module", 3),
+            Map.entry("warden_breaker_module", 4),
             Map.entry("android_mining_upgrade", 2),
             Map.entry("android_felling_upgrade", 2),
             Map.entry("android_fishing_upgrade", 2),
@@ -338,11 +398,11 @@ public final class SinguloItems {
     public static final List<DeferredItem<? extends Item>> TAB_ORDER = new ArrayList<>();
     /** 射撃型・刀型とボスのスポーンエッグ、隠し型のメモリと残光の翼は、クリエイティブタブと JEI の一覧から隠す。 */
     public static final java.util.Set<String> HIDDEN = java.util.Set.of("gunner_android_spawn_egg", "android_memory_gunner", "afterglow_wings",
-            "katana_android_spawn_egg", "android_memory_katana",
+            "katana_android_spawn_egg", "android_memory_katana", "spark_android_spawn_egg", "android_memory_spark",
             "horizon_warden_spawn_egg", "echo_sentinel_spawn_egg", "gravity_remnant_spawn_egg", "ergosphere_leviathan_spawn_egg",
             "last_archivist_spawn_egg", "foundry_overseer_spawn_egg");
     /** 段階に関係なく、名前を紫（エピック）にするアイテム（とても珍しい物）。 */
-    private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner", "android_memory_katana");
+    private static final java.util.Set<String> EPIC = java.util.Set.of("android_memory_gunner", "android_memory_katana", "android_memory_spark");
 
     static {
         // 装置ブロック
@@ -368,6 +428,7 @@ public final class SinguloItems {
         TAB_ORDER.add(HOLO_PROJECTOR);
         TAB_ORDER.add(EXPLORER_COMPASS);
         TAB_ORDER.add(METEOR_COMPASS);
+        TAB_ORDER.add(FACILITY_RECONSTRUCTOR);
         TAB_ORDER.add(DECODED_RECORD);
         TAB_ORDER.add(FLUID_CANISTER);
         TAB_ORDER.addAll(java.util.List.of(BLUEPRINT_RUIN_PANELS, BLUEPRINT_PRISTINE_RUIN, BLUEPRINT_RUIN_GLASS,
@@ -450,9 +511,22 @@ public final class SinguloItems {
         block(SinguloBlocks.ADVANCED_ANDROID_WORKBENCH, 3);
         block(SinguloBlocks.QUANTUM_ANDROID_WORKBENCH, 4);
         TAB_ORDER.add(ANDROID_CHARGER);
+        TAB_ORDER.add(ANDROID_CHARGER_2);
+        TAB_ORDER.add(ANDROID_CHARGER_3);
         TAB_ORDER.add(PORTABLE_ANDROID_PRINTER);
         TAB_ORDER.add(PORTABLE_ANDROID_PRINTER_2);
         TAB_ORDER.add(ANDROID_ARMOR_PLATE);
+        TAB_ORDER.add(ANDROID_ARMOR_PLATE_2);
+        TAB_ORDER.add(ANDROID_ARMOR_PLATE_3);
+        TAB_ORDER.add(ANDROID_WEAPON_MODULE);
+        TAB_ORDER.add(ANDROID_WEAPON_MODULE_2);
+        TAB_ORDER.add(ANDROID_WEAPON_MODULE_3);
+        TAB_ORDER.add(HEAVY_STRIKE_MODULE);
+        TAB_ORDER.add(RAPID_STRIKE_MODULE);
+        TAB_ORDER.add(DRAIN_MODULE);
+        TAB_ORDER.add(PIERCING_MODULE);
+        TAB_ORDER.add(FROST_MODULE);
+        TAB_ORDER.add(WARDEN_BREAKER_MODULE);
         TAB_ORDER.add(ANDROID_MINING_UPGRADE);
         TAB_ORDER.add(ANDROID_FELLING_UPGRADE);
         TAB_ORDER.add(ANDROID_FISHING_UPGRADE);
@@ -541,10 +615,14 @@ public final class SinguloItems {
         block(SinguloBlocks.GLOWING_BISMUTH_CRYSTAL, 2);
         block(SinguloBlocks.BLACK_REINFORCED_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_LIGHT_PANEL, 1);
+        block(SinguloBlocks.COLLAPSAR_REINFORCED_PANEL, 5);
+        block(SinguloBlocks.COLLAPSAR_REINFORCED_LIGHT_PANEL, 5);
         block(SinguloBlocks.WHITE_GLASS_PANEL, 1);
         block(SinguloBlocks.WHITE_STAR_GLASS_PANEL, 1);
         block(SinguloBlocks.BLACK_REINFORCED_GLASS, 1);
         block(SinguloBlocks.BLACK_STAR_GLASS, 1);
+        block(SinguloBlocks.COLLAPSAR_REINFORCED_GLASS, 5);
+        block(SinguloBlocks.COLLAPSAR_STAR_GLASS, 5);
         block(SinguloBlocks.ANDROID_BARRIER_GLASS, 2);
         block(SinguloBlocks.ANDROID_BARRIER_GLASS_PATTERNED, 2);
         block(SinguloBlocks.ANDROID_GATE_GLASS, 2);

@@ -145,7 +145,10 @@ class Builder:
             self.set(x, y, z, name, props)
 
     def cache(self, x, y, z, ruin, sealed=False):
-        self.set(x, y, z, CACHE, {'sealed': 'true' if sealed else 'false'}, {'ruin': ruin})
+        data = {'ruin': ruin}
+        if sealed:
+            data['reconstruction_revision'] = 1
+        self.set(x, y, z, CACHE, {'sealed': 'true' if sealed else 'false'}, data)
 
     def dock(self, x, y, z, tier):
         self.set(x, y, z, DOCK, None, {'tier': tier})

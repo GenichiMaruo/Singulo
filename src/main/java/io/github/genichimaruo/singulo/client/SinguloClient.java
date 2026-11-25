@@ -47,6 +47,8 @@ public final class SinguloClient {
         modBus.addListener(StaffTipTracker::wrapModel);
         modBus.addListener(CoverModel::wrap);
         modBus.addListener(GlassJoinModel::wrap);     // ガラスの階段に接するガラスの面
+        modBus.addListener(PanelJoinModel::wrap);     // ハーフブロック・階段に一部覆われたパネルの面
+        modBus.addListener(MixedPanelGlassModel::wrap);   // ガラスとパネルの重ねハーフブロックの、半分だけ隠れる面
         modBus.addListener(ConnectedGlassModel::wrap);     // つながって見えるアンドロイド透過ガラスとその階段
         modBus.addListener(CoverModel::registerColors);
         modBus.addListener(SinguloClient::addPacks);
@@ -55,7 +57,8 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(SinguloClient::onTooltip);
         NeoForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
-        NeoForge.EVENT_BUS.addListener(GlowDepth::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, GlowDepth::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOW, GravitationalLensing::beforeTranslucent);
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGHEST, AndroidWeaponLight::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
@@ -174,6 +177,7 @@ public final class SinguloClient {
         event.registerEntityRenderer(SinguloEntities.BIT_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.BIT));
         event.registerEntityRenderer(SinguloEntities.GUNNER_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.GUNNER));
         event.registerEntityRenderer(SinguloEntities.KATANA_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.KATANA));
+        event.registerEntityRenderer(SinguloEntities.SPARK_ANDROID.get(), ctx -> new AndroidRenderer(ctx, AndroidRenderer.Variant.SPARK));
         event.registerEntityRenderer(SinguloEntities.ANDROID_CRESCENT.get(), AndroidCrescentRenderer::new);
         event.registerEntityRenderer(SinguloEntities.ANDROID_LASER.get(), AndroidLaserRenderer::new);
         event.registerEntityRenderer(SinguloEntities.HORIZON_WARDEN.get(), HorizonWardenRenderer::new);
@@ -262,6 +266,7 @@ public final class SinguloClient {
         event.registerLayerDefinition(AndroidModel.BIT_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.BIT));
         event.registerLayerDefinition(AndroidModel.GUNNER_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.GUNNER));
         event.registerLayerDefinition(AndroidModel.KATANA_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.KATANA));
+        event.registerLayerDefinition(AndroidModel.SPARK_LAYER, () -> AndroidModel.createLayer(AndroidRenderer.Variant.SPARK));
         event.registerLayerDefinition(HorizonWardenRenderer.LAYER, HorizonWardenRenderer::createLayer);
     }
 

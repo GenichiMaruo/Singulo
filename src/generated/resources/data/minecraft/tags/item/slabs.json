@@ -11,9 +11,11 @@
     "singulo:pristine_ruin_tile_slab",
     "singulo:lab_panel_slab",
     "singulo:lab_tile_slab",
+    "singulo:collapsar_reinforced_panel_slab",
     "singulo:white_glass_panel_slab",
     "singulo:black_reinforced_glass_slab",
     "singulo:android_gate_glass_slab",
-    "singulo:android_barrier_glass_slab"
+    "singulo:android_barrier_glass_slab",
+    "singulo:collapsar_reinforced_glass_slab"
   ]
 }

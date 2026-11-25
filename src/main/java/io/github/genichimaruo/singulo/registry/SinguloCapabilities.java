@@ -175,7 +175,7 @@ public final class SinguloCapabilities {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.SMES_CELL.get(), (be, side) -> be.chargeAutomation());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SinguloBlockEntities.SMES_MODULE.get(), (be, side) -> be.chargeAutomation());
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ctx) -> io.github.genichimaruo.singulo.android.AndroidChargerItem.energy(stack),
-                SinguloItems.ANDROID_CHARGER.get());
+                SinguloItems.ANDROID_CHARGER.get(), SinguloItems.ANDROID_CHARGER_2.get(), SinguloItems.ANDROID_CHARGER_3.get());
         event.registerItem(Capabilities.EnergyStorage.ITEM,
                 (stack, ctx) -> io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.energy(stack),
                 SinguloItems.PORTABLE_ANDROID_PRINTER.get(), SinguloItems.PORTABLE_ANDROID_PRINTER_2.get());

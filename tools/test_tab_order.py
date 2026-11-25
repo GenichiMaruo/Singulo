@@ -42,7 +42,7 @@ class CreativeTabOrderTests(unittest.TestCase):
                    and i not in data.ITEMLESS_BLOCKS and i not in data.TAB_EXCLUDED}
         eggs = {'security_drone_spawn_egg', 'blade_android_spawn_egg', 'whip_android_spawn_egg',
                 'saber_android_spawn_egg', 'axe_android_spawn_egg', 'bit_android_spawn_egg',
-                'gunner_android_spawn_egg', 'katana_android_spawn_egg'}
+                'gunner_android_spawn_egg', 'katana_android_spawn_egg', 'spark_android_spawn_egg'}
         self.assertEqual(set(self.order), content | eggs)
         self.assertFalse([i for i in self.order if i.endswith('_spawn_egg') and i[:-len('_spawn_egg')] in
                           ('horizon_warden', 'echo_sentinel', 'gravity_remnant', 'ergosphere_leviathan',

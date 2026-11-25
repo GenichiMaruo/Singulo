@@ -111,6 +111,17 @@ final class GlowDepth extends RenderType {
     /** 固体と白い光だけの奥行き（ジェットはこれと比べる）と、ジェットを描く間に取っておく今の奥行き。 */
     @Nullable
     private static TextureTarget solidDepth;
+    /** solidDepth がこのフレームに写したものか（写していなければ前のフレームの古い奥行き）。 */
+    private static boolean solidDepthFresh;
+
+    /**
+     * 透ける物（ガラス・水など）を描く前の、固体だけの奥行き（このフレームに写していなければ null）。重力レンズが、手前の物に
+     * 隠れるかを見るのに使う。
+     */
+    @Nullable
+    static RenderTarget solidDepthThisFrame() {
+        return solidDepthFresh ? solidDepth : null;
+    }
     @Nullable
     private static TextureTarget laterDepth;
 
@@ -328,6 +339,7 @@ final class GlowDepth extends RenderType {
     static void onRenderStage(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY) {
             active = true;
+            solidDepthFresh = false;
         } else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
             active = false;
             // 固体をすべて描いてから、光を奥から順に描き、最後に深度を書く
@@ -339,11 +351,14 @@ final class GlowDepth extends RenderType {
             COLOR_SOURCE.endBatch();
             SOURCE.endBatch();
             GLAZED_SOURCE.endBatch();
-            if (anyPending()) {
+            // 重力レンズも、この固体だけの奥行きを読む（0.23.0。あとで描くガラスなどの透ける物が手前にあっても、レンズを隠さない）
+            solidDepthFresh = false;
+            if (anyPending() || GravitationalLensing.hasSources()) {
                 RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
                 solidDepth = sized(solidDepth, main);
                 copyDepth(main, solidDepth);
                 main.bindWrite(false);
+                solidDepthFresh = true;
             }
         }
     }

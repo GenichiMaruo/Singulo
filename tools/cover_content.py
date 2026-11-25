@@ -30,44 +30,56 @@ def recipes(R, shaped):
 
 
 UI = {
-    'message.singulo.cover.not_allowed': ('%sははめ込めない（すき間のない不透明な1ブロックだけ）',
-                                          "%s can't be set in a cover (only full, solid, opaque blocks)"),
+    'message.singulo.cover.not_allowed': ('%sははめ込めない（すき間のない不透明な1ブロックか、ガラスだけ）',
+                                          "%s can't be set in a cover (only full, solid, opaque blocks or glass)"),
+    'message.singulo.cover.needs_tool': ('%sを外すには、それを掘れる道具が要る',
+                                         'Taking out %s needs a tool that can mine it'),
     'block.singulo.cover_frame': ('カバーの枠', 'Cover Frame'),
     'tooltip.singulo.cover_frame.fit': ('ケーブル・パイプを右クリックで取り付ける。ほかの場所には枠だけを置け、あとからケーブル・パイプを入れられる',
                                         'Right-click a cable or pipe to fit it. Elsewhere it places as an empty frame you can put a cable or pipe into later'),
-    'tooltip.singulo.cover_frame.inlay': ('取り付けた枠をブロックで右クリックすると、はめ込んでその見た目になる',
-                                          'Right-click the fitted frame with a block to set it in and take its look'),
-    'tooltip.singulo.cover_frame.remove': ('壊すと、ケーブルは残してブロック → 枠の順に外れる',
-                                           'Breaking it takes off the block, then the frame, and leaves the cable'),
+    'tooltip.singulo.cover_frame.inlay': ('取り付けた枠をブロックかガラスで右クリックすると、はめ込む。ブロックならその見た目に、ガラスなら中のケーブルが見える',
+                                          'Right-click the fitted frame with a block or glass to set it in: a block gives its look, glass shows the cable inside'),
+    'tooltip.singulo.cover_frame.remove': ('壊すと、ケーブルは残してはめ込んだ物 → 枠の順に外れる',
+                                           'Breaking it takes off what is set in, then the frame, and leaves the cable'),
 }
 
 CHAPTER = ('cover', 'singulo:cover_frame', 'ケーブルのカバー', 'Cable Covers', [
     ('cover', 'カバーの枠',
-     'カバーの枠は、ケーブルやパイプを、ほかのブロックの見た目にする枠です。作業台で、鉄インゴット4つと鉄格子4つから8個作ります。\n'
+     'カバーの枠は、ケーブルやパイプを、ほかのブロックの見た目にしたり、ガラス越しに見せたりする枠です。作業台で、鉄インゴット4つと鉄格子4つから8個作ります。\n'
      '枠を持ってケーブルやパイプ（全種類）を右クリックすると、枠が取り付きます。取り付けた枠を、石や木材などのブロックで右クリックすると、'
      'そのブロックを1つはめ込み、その場所がはめ込んだブロックの見た目になります。見た目は、はめ込んだ本物のブロックそのものです。'
      '向きのあるブロックは、その場所にふつうに置いたときと同じ向きになります（丸太は右クリックした面の向き、くり抜かれたカボチャは顔がこちらを向きます）。\n'
-     'カバーを付けても、つながりや送れる量は変わりません。当たり判定は1ブロックいっぱいになります。枠だけの間はガラスのように光を通し、ブロックをはめ込むと、ふつうのブロックと同じように光をさえぎります。'
-     'はめ込めるのは、すき間のない不透明な1ブロックです（ガラス・葉・階段・ハーフブロック・チェストやかまどのような中に物を持つブロックは使えません）。\n'
+     'カバーを付けても、つながりや送れる量は変わりません。当たり判定は1ブロックいっぱいになります。'
+     'はめ込めるのは、すき間のない不透明な1ブロックと、ガラスです（葉・階段・ハーフブロック・板ガラス・チェストやかまどのような中に物を持つブロックは使えません）。'
+     '不透明なブロックをはめ込むと、ふつうのブロックと同じように光をさえぎります。グロウストーンのような光るブロックなら、そのブロックと同じ明るさで光ります。'
+     'ガラス（ガラスブロック・色付きガラス・この作品のガラス）をはめ込むと、枠と中のケーブルやパイプが見えたまま、枠の内側にガラスの板が入り、光を通します。'
+     '枠だけの間も、ガラスのように光を通します。\n'
      '外すときは、カバーを付けたケーブルを壊します。ケーブルは残り、1回目ではめ込んだブロック、2回目で枠が外れて落ちます'
-     '（ブロック入りのときは、はめ込んだブロックを掘る速さで壊れます）。移設レンチ（装置の移設モード）でスニークして右クリックしても、同じ順に外れて持ち物に戻ります。'
+     '（ブロックやガラスが入っているときは、はめ込んだブロックを掘る速さで壊れます）。'
+     '黒曜石やコラプサー強化パネルのように、掘るのに道具の要るブロックは、それを掘れる道具（ダイヤモンドのツルハシなど）で壊さないと外れません。'
+     'はめ込んだブロックの強さはカバーにも付き、爆発への強さや、ウィザー・エンダードラゴンに壊されないことも同じになります。移設レンチ（装置の移設モード）でスニークして右クリックしても、同じ順に外れて持ち物に戻ります。'
      'ブロックを替えるときは、外してから別のブロックをはめ込みます。撤去モードのレンチでは、ケーブルごと外れ、枠とブロックも一緒に戻ります。\n'
      '枠は、ケーブルのないところにも、ふつうのブロックのように置けます。置いた枠をケーブルやパイプで右クリックすると、その中にケーブルやパイプが入ります'
      '（スニークすると、ケーブルやパイプは枠の隣に置けます）。先に枠を並べておいて、あとから配線を通せます。'
-     'ブロックをはめ込んでいない枠のケーブルを撤去モードのレンチで外すと、ケーブルだけが外れ、枠はその場に残ります。',
+     '何もはめ込んでいない枠のケーブルを撤去モードのレンチで外すと、ケーブルだけが外れ、枠はその場に残ります。',
      'Cover Frame',
-     'A Cover Frame makes a cable or pipe look like another block. Craft 8 on a crafting table from 4 iron ingots and 4 iron bars.\n'
+     'A Cover Frame makes a cable or pipe look like another block, or shows it behind glass. Craft 8 on a crafting table from 4 iron ingots and 4 iron bars.\n'
      'Right-click any cable or pipe with a frame to fit it. Then right-click the fitted frame with a block such as stone or planks: '
      'one block is set in, and that spot takes its look. What you see is the real block you set in. '
      'A block that faces a direction keeps the facing it would get if placed there normally (a log follows the clicked face, a carved pumpkin faces you).\n'
-     'A cover changes neither the connections nor how much flows. It collides as a full block. An empty frame lets light through like glass; once a block is set in, it blocks light like an ordinary block. '
-     'Only full, solid, opaque blocks can be set in: glass, leaves, stairs, slabs, and blocks that hold items, such as chests and furnaces, cannot.\n'
+     'A cover changes neither the connections nor how much flows. It collides as a full block. '
+     'Full, solid, opaque blocks and glass can be set in: leaves, stairs, slabs, glass panes, and blocks that hold items, such as chests and furnaces, cannot. '
+     'A solid block blocks light like an ordinary block, and a glowing block such as glowstone gives off the same light it would on its own. '
+     'Glass (glass blocks, stained glass and glass from this mod) keeps the frame and the cable or pipe inside visible, with panes of the glass filling the frame, and lets light through. '
+     'An empty frame also lets light through, like glass.\n'
      'To take a cover off, break the covered cable: the cable stays, and the first break drops the block, the second the frame '
-     '(with a block set in, it breaks as fast as that block would). Sneak-right-clicking with the Relocation Wrench in relocate mode takes them off in the same order, straight into your inventory. '
+     '(with a block or glass set in, it breaks as fast as that block would). '
+     'A block that needs a tool to mine, such as obsidian or Collapsar Reinforced Panel, only comes out when broken with a tool that can mine it, such as a diamond pickaxe. '
+     'The cover also takes on the toughness of the block set in: the same blast resistance, and the same proofing against the Wither and the Ender Dragon. Sneak-right-clicking with the Relocation Wrench in relocate mode takes them off in the same order, straight into your inventory. '
      'To change the block, take it off and set in another. The wrench in cable mode removes the whole cable, returning the frame and block too.\n'
      'A frame can also be placed on its own like an ordinary block. Right-click a placed frame with a cable or pipe to put it inside '
      '(sneak to place the cable or pipe next to the frame instead), so you can lay out frames first and run the wiring later. '
-     'Removing the cable from a frame with no block in it, with the wrench in cable mode, takes only the cable and leaves the frame in place.'),
+     'Removing the cable from a frame with nothing set in it, with the wrench in cable mode, takes only the cable and leaves the frame in place.'),
 ])
 
 DESC = {
@@ -136,9 +148,11 @@ def models(ctx):
     loot = Path(ctx['RES']) / 'data' / MODID / 'loot_table' / 'blocks' / 'cover_frame.json'
     write(loot, {'type': 'minecraft:block', 'pools': [{'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': f'{MODID}:cover_frame'}],
                                                        'conditions': [{'condition': 'minecraft:survives_explosion'}]}]})
-    part = {'when': {'cover': 'frame|block'}, 'apply': {'model': f'{MODID}:block/cover_frame'}}
+    old = {'when': {'cover': 'frame|block'}, 'apply': {'model': f'{MODID}:block/cover_frame'}}
+    # ガラス入り（0.23.0）も枠を描く（ガラスの板はモデルの包み（CoverModel）が足す）
+    part = {'when': {'cover': 'frame|block|glass'}, 'apply': {'model': f'{MODID}:block/cover_frame'}}
     for iid in CONDUITS:
         path = assets / 'blockstates' / f'{iid}.json'
         state = json.loads(path.read_text(encoding='utf-8'))
-        state['multipart'] = [p for p in state['multipart'] if p != part] + [part]
+        state['multipart'] = [p for p in state['multipart'] if p != part and p != old] + [part]
         write(path, state)

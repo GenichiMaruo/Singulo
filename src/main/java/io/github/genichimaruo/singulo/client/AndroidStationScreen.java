@@ -70,6 +70,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             case BIT -> io.github.genichimaruo.singulo.android.BitAndroid.ACCENT;
             case GUNNER -> io.github.genichimaruo.singulo.android.GunnerAndroid.ACCENT;
             case KATANA -> io.github.genichimaruo.singulo.android.KatanaAndroid.ACCENT;
+            case SPARK -> io.github.genichimaruo.singulo.android.SparkAndroid.ACCENT;
         };
     }
 
@@ -433,12 +434,12 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     /** 左の列の専用スロット（空のときは入れる物の見本と、重ねると名前）。 */
     private static final int[] SIDE_SLOTS = {AndroidStationBlockEntity.SLOT_MEMORY, AndroidStationBlockEntity.SLOT_KIT,
             AndroidStationBlockEntity.SLOT_PRINT_UNIT, AndroidStationBlockEntity.SLOT_UPGRADE, AndroidStationBlockEntity.SLOT_PRODUCTION,
-            AndroidStationBlockEntity.SLOT_REPAIR_STOCK, AndroidStationBlockEntity.SLOT_PERMIT};
+            AndroidStationBlockEntity.SLOT_REPAIR_STOCK, AndroidStationBlockEntity.SLOT_PERMIT, AndroidStationBlockEntity.SLOT_WEAPON};
     private static final String[] SIDE_GHOSTS = {"android_memory_blade", "android_kit", "android_factory_print_unit", "android_transfer_upgrade",
-            "android_production_upgrade", "android_repair_kit", "shield_permit"};
+            "android_production_upgrade", "android_repair_kit", "shield_permit", "android_weapon_module"};
     private static final String[] SIDE_NAMES = {"gui.singulo.android_station.memory", "gui.singulo.android_station.kit",
             "item.singulo.android_factory_print_unit", "gui.singulo.android_station.upgrade", "item.singulo.android_production_upgrade",
-            "gui.singulo.android_station.stock", "gui.singulo.android_station.permit"};
+            "gui.singulo.android_station.stock", "gui.singulo.android_station.permit", "gui.singulo.android_station.weapon"};
 
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {

@@ -1,0 +1,44 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 280,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": {
+        "item": "singulo:android_charger_2"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:collapsar_ingot"
+      },
+      "count": 2
+    },
+    {
+      "ingredient": {
+        "item": "singulo:smes_module"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "item": "singulo:exotic_matter"
+      },
+      "count": 2
+    }
+  ],
+  "shape": [
+    "     ",
+    " D D ",
+    " BAB ",
+    "  C  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:android_charger_3",
+    "count": 1
+  }
+}

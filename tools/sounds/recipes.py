@@ -1484,6 +1484,96 @@ def android_katana_iai_release(d, seed):
     return _smooth(reverb(mix(ring, slices, (shock, 0.08), (glow, 0.1)), 0.85, 0.3, 4000, 1.4))
 
 
+# ------------------------------------------------------------------- 放電型（エクレール）
+# 電気の音: はじける鋭い頭（zap）と、帯域を絞ったジリジリ（arc）、コイルの唸り。仕上げは _smooth で高い所を丸める。
+
+
+def _crack(seed, f0=7000, length=0.16, weight=1.0):
+    """放電のはじける「バチッ」: 下がる鋭い音を少しずつずらして重ね、短い衝撃を足す。"""
+    return mix(*[(zap(length, f0 - 900 * i, 400, seed + i) * (0.8 - 0.15 * i) * weight, 0.003 * i) for i in range(3)],
+               thump(180, 0.06, 0.5, seed) * 0.35 * weight)
+
+
+@recipe('android/spark_arc')
+def android_spark_arc(d, seed):
+    # 指先から放つ鋭い放電と、跳び移るたびの小さなはじけ（3回）、残るジリジリ
+    jumps = mix(*[(_crack(seed + 10 * i, 6000 - 600 * i, 0.12, 0.7 - 0.15 * i), 0.07 * i) for i in range(3)])
+    buzz_ = arc(0.4, seed, 90) * env([(0, 0), (0.02, 1), (0.4, 0)], 0.4) * 0.35
+    return _smooth(reverb(mix(_crack(seed, 7500, 0.18), (jumps, 0.06), (buzz_, 0.02)), 0.4, 0.2, 5000, 0.4), 8000)
+
+
+@recipe('android/spark_palm')
+def android_spark_palm(d, seed):
+    # 掌が当たる重い衝撃と、はじける放電
+    hit = mix(thump(90, 0.2, 0.6, seed) * 0.9, lowpass(pink(0.12, seed), 2500) * perc(0.12, 0.001, 0.04) * 0.5)
+    return _smooth(reverb(mix(hit, (_crack(seed + 1, 6500, 0.2, 1.1), 0.01)), 0.4, 0.2, 4500, 0.4), 8000)
+
+
+@recipe('android/spark_field')
+def android_spark_field(d, seed):
+    # 掌を床に当てて広がる電場: 低い唸りが立ち上がり、まわりでパチパチが散らばる
+    D = 1.2
+    hum_ = hum(100, D, (1, 2, 3), (1, 0.5, 0.3), 0.01, seed) * env([(0, 0), (0.08, 1), (0.6, 0.6), (D, 0)], D) * 0.5
+    spread = arc(D, seed, 60) * env([(0, 0), (0.1, 1), (D, 0)], D) * 0.35
+    return _smooth(reverb(mix(_crack(seed, 5000, 0.2, 0.8), (hum_, 0.02), (spread, 0.05)), 0.6, 0.3, 4000, 0.6), 7500)
+
+
+@recipe('android/spark_tenrai_charge', level=BOSS)
+def android_spark_tenrai_charge(d, seed):
+    # 1.8 秒（溜め 36 tick）: 唸りが上がりながら電荷が集まり、ジリジリが密になって、最後に一瞬静まる
+    D = 1.8
+    t = t_axis(D)
+    grow = np.clip(t / 1.7, 0, 1) ** 1.4
+    rise = riser(D, 70, 700, seed, 0.25) * 0.6
+    coil = chorus(sine(glide(220, 660, D, 1.3)) * 0.25 + saw(glide(110, 330, D, 1.3)) * 0.08, 3, 0.003, 5, seed) * grow
+    sizzle = arc(D, seed, 40 + 0) * grow * 0.45
+    snaps = mix(*[(_crack(seed + 20 + i, 5000 + 300 * i, 0.08, 0.3 + 0.1 * i), 0.4 + 0.25 * i) for i in range(5)])
+    body = mix(rise, coil, sizzle, snaps)
+    body *= np.concatenate([np.ones(int(1.65 * SR)), np.linspace(1, 0.35, len(body) - int(1.65 * SR))])
+    return _smooth(reverb(body, 0.6, 0.25, 4500, 0.5), 7500)
+
+
+@recipe('android/spark_tenrai_strike', level=BIG)
+def android_spark_tenrai_strike(d, seed):
+    # 天雷: 裂けるような鋭い落雷が何本も重なり、少し遅れて遠くまで転がる雷鳴
+    crack = mix(*[(_crack(seed + i, 9000 - 700 * i, 0.22, 1.0 - 0.1 * i), 0.006 * i) for i in range(5)],
+                highpass(white(0.1, seed), 2500) * perc(0.1, 0.0005, 0.02) * 1.0)
+    shock = boom(2.0, 42, seed, 0.8) * 1.0
+    thunder = lowpass(brown(3.8, seed + 2), glide(2000, 110, 3.8, 0.6)) * env([(0, 0), (0.1, 1), (0.9, 0.65), (3.8, 0)], 3.8) * 0.9
+    rumble = sub_drop(2.0, 90, 25) * 0.6
+    return reverb(mix(crack, shock, rumble, (thunder, 0.12)), 0.95, 0.3, 3000, 1.6)
+
+
+@recipe('android/spark_supply', level=-24)
+def android_spark_supply(d, seed):
+    # 仲間へ給電する、細く静かなジリッ
+    return _smooth(mix(arc(0.25, seed, 50) * env([(0, 0), (0.03, 1), (0.25, 0)], 0.25) * 0.5,
+                       sine(glide(900, 1400, 0.2)) * perc(0.2, 0.01, 0.1) * 0.15), 7000)
+
+
+@recipe('android/spark_link')
+def android_spark_link(d, seed):
+    # 仲間に電力を注ぎ足す: つながる「バチッ」と、上がっていく唸り
+    D = 0.8
+    hum_ = sine(glide(300, 900, D, 1.2)) * env([(0, 0), (0.05, 0.6), (D, 0)], D) * 0.3
+    return _smooth(reverb(mix(_crack(seed, 6000, 0.14, 0.8), (hum_, 0.02), (arc(D, seed, 40) * perc(D, 0.02, 0.4) * 0.3, 0.03)),
+                          0.5, 0.2, 4500, 0.4), 7500)
+
+
+@recipe('android/spark_play', level=-26)
+def android_spark_play(d, seed):
+    # 指先ではじける小さな火花
+    return _smooth(mix(_crack(seed, 5500, 0.06, 0.5), (_crack(seed + 1, 6200, 0.05, 0.35), 0.11)), 8000)
+
+
+@recipe('ergosphere_leviathan/memory_discharge', level=BOSS)
+def leviathan_memory_discharge(d, seed):
+    # 大蛇の残骸から放電が走り、結晶が残る: いくつもの放電と、澄んだ鈴の音
+    jumps = mix(*[(_crack(seed + 5 * i, 7000 - 500 * i, 0.16, 0.9 - 0.1 * i), 0.09 * i) for i in range(5)])
+    bell = mix((chime(1175, 1.2, seed) * 0.35, 0.5), (chime(1568, 1.4, seed + 1) * 0.3, 0.62))
+    return _smooth(reverb(mix(jumps, bell, (arc(0.8, seed, 50) * perc(0.8, 0.02, 0.5) * 0.3, 0.05)), 0.8, 0.3, 4500, 1.0), 8000)
+
+
 @recipe('android/ring_inflate')
 def android_ring_inflate(d, seed):
     pop = sine(glide(400, 900, 0.06)) * perc(0.06, 0.001, 0.03) * 0.5

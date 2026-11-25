@@ -94,7 +94,7 @@ def stage_of(name):
             '遺構の照明（紅）': 5, '番人の投影核': 3, '縮退核': 4, '精密アクチュエーター': 4, '残響の断章': 5, '重力の断章': 5, '地平線の断章': 5,
             '渦の断章': 5, '記録者の光輪': 5, '残光の翼': 5, '小型クリスタルメモリ（光刃型）': 2, '小型クリスタルメモリ（鞭型）': 2,
             '小型クリスタルメモリ（光剣型）': 2, '小型クリスタルメモリ（斧型）': 4, '小型クリスタルメモリ（ビット型）': 4,
-            '小型クリスタルメモリ（射撃型）': 4, 'ドローン用クリスタルメモリ': 2,
+            '小型クリスタルメモリ（射撃型）': 4, '小型クリスタルメモリ（放電型）': 5, 'ドローン用クリスタルメモリ': 2,
             'ドローン用クリスタルメモリ（ジェット型）': 3, 'ドローン用クリスタルメモリ（反重力型）': 4}.get(name, 1)
 
 
@@ -548,6 +548,13 @@ UI_LANG = {
     'message.singulo.fuel_cell.standby': ('待機中（蓄電がいっぱい）', 'Standing by (storage full)'),
     'tooltip.singulo.fluid_canister.empty': ('空（%s mBまで入る）', 'Empty (holds %s mB)'),
     'tooltip.singulo.fluid_canister.amount': ('%s %s / %s mB', '%s %s / %s mB'),
+    'item.singulo.facility_reconstructor.warning': ('警告：%s を再構築すると、(%s, %s, %s) ～ (%s, %s, %s) の地形・ブロック・建造物・収納が上書きされます。先にワールドをバックアップし、貴重品を移動してください。元に戻せません。続けるには30秒以内にこのアイテムで同じ起動ブロックをスニークしながら右クリックしてください。', 'Warning: rebuilding %s overwrites terrain, blocks, builds and inventories from (%s, %s, %s) to (%s, %s, %s). Back up the world and move valuables first. This cannot be undone. Sneak and right-click this same core with this item again within 30 seconds to continue.'),
+    'item.singulo.facility_reconstructor.disabled': ('マルチプレイでは施設の再構築が無効になっています。', 'Facility reconstruction is disabled in multiplayer.'),
+    'item.singulo.facility_reconstructor.permission': ('施設の再構築はシングルプレイのワールド所有者かサーバー管理者のみが実行できます。', 'Only the single-player world owner or a server operator can rebuild a facility.'),
+    'item.singulo.facility_reconstructor.unavailable': ('攻略済みの旧施設ではないか、すでに再構築済みか、対象範囲に未読み込みのチャンクがあります。', 'Not an eligible cleared older facility, already rebuilt, or some target chunks are not loaded.'),
+    'item.singulo.facility_reconstructor.occupied': ('対象範囲にほかのプレイヤーがいます。範囲外に出てから再試行してください。', 'Another player is within the affected area. Ask them to leave before continuing.'),
+    'item.singulo.facility_reconstructor.failed': ('再構築を完了できませんでした。現地を確認し、必要ならワールドのバックアップから復元してください。', 'Reconstruction did not complete. Check the site and restore the world backup if necessary.'),
+    'item.singulo.facility_reconstructor.complete': ('施設を再構築しました。この場所はもう再構築できません。', 'Facility rebuilt. This site cannot be rebuilt again.'),
     'item.singulo.fluid_canister.filled': ('液体キャニスター（%s）', 'Fluid Canister (%s)'),
     'tooltip.singulo.magnetic_bottle': ('残り %s / %s 回', '%s / %s uses left'),
     'message.singulo.sealed.need_key': ('%sが必要だ', 'Needs a %s'),
@@ -954,11 +961,14 @@ UI_LANG = {
     'gui.singulo.android.nickname.bit': ('ノクス', 'Nox'),
     'gui.singulo.android.nickname.gunner': ('シエル', 'Ciel'),
     'gui.singulo.android.nickname.katana': ('ルージュ', 'Rouge'),
+    'gui.singulo.android.nickname.spark': ('エクレール', 'Eclair'),
     'gui.singulo.android.rename': ('クリックで名前を変える', 'Click to rename'),
     'gui.singulo.android.dismantle': ('解体する（2回押す）', 'Dismantle (press twice)'),
     'gui.singulo.android.rename.reset': ('名前を元に戻す', 'Reset name'),
     'gui.singulo.android_station.upgrade': ('強化', 'Upgrade'),
     'gui.singulo.android_station.stock': ('補充', 'Refill'),
+    'gui.singulo.android_station.weapon': ('武装（印刷したアンドロイドに積む）', 'Weapon (fitted to the printed android)'),
+    'gui.singulo.portable_printer.weapon': ('武装（印刷したアンドロイドに積む）', 'Weapon (fitted to the printed android)'),
     'gui.singulo.android.dismantle.confirm': ('もう一度押すと解体します', 'Press again to dismantle'),
     'gui.singulo.android_station.link': ('リンク', 'Link'),
     'gui.singulo.android_station.status.11': ('近くに身寄りのないアンドロイドがいます', 'An android without a station is nearby'),
@@ -992,6 +1002,22 @@ UI_LANG = {
     'gui.singulo.android.say.charging_follow.0': ('ありがと、充電中♪', 'Thanks! Charging ♪'),
     'gui.singulo.android.say.charging_follow.1': ('そばにいると安心する', 'I feel safe near you'),
     'tooltip.singulo.android_armor_plate': ('護衛のアンドロイドの胸当て（防御 +8、防具強度 +2）', 'Chestplate for a guard android (+8 armor, +2 toughness)'),
+    'tooltip.singulo.android_weapon_module': ('武装モジュール: すべての技のダメージ +30%%（剣のエンチャントが効く）', 'Weapon module: all moves +30%% damage (sword enchantments apply)'),
+    'tooltip.singulo.android_weapon_module_2': ('武装モジュール: すべての技のダメージ +60%%（剣のエンチャントが効く）', 'Weapon module: all moves +60%% damage (sword enchantments apply)'),
+    'tooltip.singulo.android_weapon_module_3': ('武装モジュール: すべての技のダメージ +100%%（剣のエンチャントが効く）', 'Weapon module: all moves +100%% damage (sword enchantments apply)'),
+    'tooltip.singulo.heavy_strike_module': ('武装モジュール: 大技のダメージ ×2.2', 'Weapon module: finishing moves x2.2 damage'),
+    'tooltip.singulo.rapid_strike_module': ('武装モジュール: 技の待ち時間 ×0.75', 'Weapon module: wait between moves x0.75'),
+    'tooltip.singulo.drain_module': ('武装モジュール: 与えたダメージの1割だけ体力が戻る', 'Weapon module: heals a tenth of the damage dealt'),
+    'tooltip.singulo.piercing_module': ('武装モジュール: 相手の防具の守りを4割無視する', "Weapon module: ignores 40%% of the target's armor"),
+    'tooltip.singulo.frost_module': ('武装モジュール: 当てた相手を2秒鈍らせる', 'Weapon module: slows targets hit for 2 seconds'),
+    'tooltip.singulo.warden_breaker_module': ('武装モジュール: ボスと戦うようになり、ボスへのダメージ ×1.8',
+                                              'Weapon module: the android fights bosses, with x1.8 damage to them'),
+    'tooltip.singulo.android_weapon_module.slot': ('護衛のアンドロイドの武装モジュールの枠に1つ積む', "Fits a guard android's weapon module slot (one at a time)"),
+    'gui.singulo.android.weapon': ('武装', 'Weapon'),
+    'tooltip.singulo.android_armor_plate_2': ('護衛のアンドロイドの胸当て（防御 +10、防具強度 +4、ノックバック耐性 +0.1）',
+                                              'Chestplate for a guard android (+10 armor, +4 toughness, +0.1 knockback resistance)'),
+    'tooltip.singulo.android_armor_plate_3': ('護衛のアンドロイドの胸当て（防御 +12、防具強度 +6、ノックバック耐性 +0.25）',
+                                              'Chestplate for a guard android (+12 armor, +6 toughness, +0.25 knockback resistance)'),
     'tooltip.singulo.android_felling_upgrade': ('ダイヤの斧相当で木を切る。効率強化・幸運・シルクタッチを付けられる', 'Fells trees like a diamond axe. Takes Efficiency, Fortune and Silk Touch'),
     'tooltip.singulo.android_fishing_upgrade': ('範囲の水で釣りをする。宝釣り・入れ食いを付けられる', 'Fishes in an area of water. Takes Luck of the Sea and Lure'),
     'tooltip.singulo.android_farming_upgrade': ('土を耕して種・苗を植え、骨粉を与える', 'Tills soil, plants seeds and gives bone meal'),
@@ -1361,6 +1387,9 @@ UI_LANG = {
     'gui.singulo.android.plate': ('装甲', 'Plate'),
     'message.singulo.android_charger.charged': ('無線充電器に %1$s FE 充電した（%2$s / %3$s FE）', 'Charged %1$s FE into the wireless charger (%2$s / %3$s FE)'),
     'tooltip.singulo.android_charger.charges': ('アンドロイドの満充電 %s 回分', 'Full android charges: %s'),
+    'tooltip.singulo.android_charger.reach': ('%s ブロック先まで、%s 倍の速さで充電する', 'Charges from up to %s blocks at %sx speed'),
+    'tooltip.singulo.android_charger.top_up': ('%s ブロック以内の自分のアンドロイドの充電が半分を切ると、作業や戦闘を止めさせずに給電する',
+                                               'Tops up your androids within %s blocks below half power without interrupting them'),
     'gui.singulo.android_station.no_design': ('小型クリスタルメモリなし', 'No Compact Crystal Memory'),
     'gui.singulo.android_station.status.0': ('小型クリスタルメモリを入れてください', 'Insert a compact crystal memory'),
     'gui.singulo.android_station.status.1': ('アンドロイドキットがありません', 'No android kit'),
@@ -1512,6 +1541,7 @@ UI_LANG = {
     'entity.singulo.bit_android': ('ビット型アンドロイド「ノクス」', 'Bit Android "Nox"'),
     'entity.singulo.gunner_android': ('射撃型アンドロイド「シエル」', 'Gunner Android "Ciel"'),
     'entity.singulo.katana_android': ('刀型アンドロイド「ルージュ」', 'Katana Android "Rouge"'),
+    'entity.singulo.spark_android': ('放電型アンドロイド「エクレール」', 'Spark Android "Eclair"'),
     'entity.singulo.android_crescent': ('斬撃波', 'Crescent Slash'),
     'entity.singulo.android_laser': ('光柱', 'Light Pillar'),
     'entity.singulo.horizon_warden': ('ホライズン・ウォーデン', 'Horizon Warden'),
@@ -1573,6 +1603,9 @@ UI_LANG = {
     'gui.singulo.archivist.phase_2': ('覚えているか。記録はすべて、ここにある。', 'Do you remember? Every record is here.'),
     'gui.singulo.archivist.phase_3': ('光も記録も、いつかはこの暗がりに沈む。', 'Light and records alike sink into this dark in the end.'),
     'block.singulo.mixed_glass_slab': ('白黒ガラスの重ねハーフブロック', 'Stacked White and Black Glass Slabs'),
+    'block.singulo.mixed_panel_slab': ('パネルの重ねハーフブロック', 'Stacked Panel Slabs'),
+    'block.singulo.mixed_panel_glass_slab': ('ガラスとパネルの重ねハーフブロック', 'Stacked Glass and Panel Slabs'),
+    'block.singulo.mixed_collapsar_glass_slab': ('コラプサーガラスの重ねハーフブロック', 'Stacked Collapsar Glass Slabs'),
     'block.singulo.arena_hologram': ('ホログラムの床', 'Hologram Floor'),
     'item.singulo.afterglow_wings.tip_1': ('胴に着ける光の翼。エリトラのように滑空でき、壊れない', 'Wings of light worn on the chest. Glide like an elytra; they never break'),
     'item.singulo.afterglow_wings.tip_2': ('滑空中にスニーク: 羽ばたいて前へ加速する', 'Sneak while gliding: beat the wings to surge forward'),
@@ -1670,6 +1703,7 @@ UI_LANG = {
     'item.singulo.bit_android_spawn_egg': ('ビット型アンドロイドのスポーンエッグ', 'Bit Android Spawn Egg'),
     'item.singulo.gunner_android_spawn_egg': ('射撃型アンドロイドのスポーンエッグ', 'Gunner Android Spawn Egg'),
     'item.singulo.katana_android_spawn_egg': ('刀型アンドロイドのスポーンエッグ', 'Katana Android Spawn Egg'),
+    'item.singulo.spark_android_spawn_egg': ('放電型アンドロイドのスポーンエッグ', 'Spark Android Spawn Egg'),
     'gui.singulo.detector.result': ('重力波を検出: %s、%s', 'Gravitational waves detected: %s, %s'),
     'gui.singulo.detector.none': ('重力異常は見つからなかった', 'No gravity anomaly found'),
     'gui.singulo.detector.no_power': ('観測には %s FE が必要', 'An observation needs %s FE'),
@@ -2159,7 +2193,8 @@ def textures():
     import portable_printer
     save(portable_printer.entity_texture(), te / 'portable_printer.png')
     save(portable_printer.entity_texture(portable_printer.MK2), te / 'portable_printer_2.png')
-    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android', 'katana_android'):
+    for egg in ('blade_android', 'whip_android', 'saber_android', 'axe_android', 'bit_android', 'gunner_android', 'katana_android',
+                'spark_android'):
         write_json(ASSETS / 'models' / 'item' / f'{egg}_spawn_egg.json', {'parent': 'minecraft:item/template_spawn_egg'})
 
     # 遺構の建材: 同じ白いパネルが黄ばみ、ひび割れ、苔に覆われたもの
@@ -3278,6 +3313,16 @@ SOUNDS = {
     'android.katana_iai_charge': ('android/katana_iai_charge', '刀型が居合の構えを取る', 'Katana Android readies a draw', 32),
     'android.katana_iai_flash': ('android/katana_iai_flash', '二刀が閃く', 'Twin blades flash', 48),
     'android.katana_iai_release': ('android/katana_iai_release', '紅刀が響き、斬撃が走る', 'Blade rings, slashes erupt', 48),
+    # 放電型（0.23.0）
+    'android.spark_arc': ('android/spark_arc', '放電が走る', 'Arc crackles', 24),
+    'android.spark_palm': ('android/spark_palm', '掌底から放電がはじける', 'Palm discharge snaps', 16),
+    'android.spark_field': ('android/spark_field', '電場が張られる', 'Electric field hums', 16),
+    'android.spark_tenrai_charge': ('android/spark_tenrai_charge', '放電型が電荷を溜める', 'Spark Android gathers charge', 32),
+    'android.spark_tenrai_strike': ('android/spark_tenrai_strike', '天雷が落ちる', 'Lightning strikes down', 80),
+    'android.spark_supply': ('android/spark_supply', '放電型が仲間へ給電する', 'Spark Android shares power', 12),
+    'android.spark_link': ('android/spark_link', '放電型が電力を注ぎ足す', 'Spark Android lends charge', 16),
+    'android.spark_play': ('android/spark_play', '指先で火花がはじける', 'Fingertip sparks snap', 8),
+    'ergosphere_leviathan.memory_discharge': ('ergosphere_leviathan/memory_discharge', '残骸から放電が走る', 'Wreck discharges', 32),
     # 画面のボタンを押した音（バニラのボタンと同じく、字幕は出さない）
     'ui.click': ('ui/click', None, None, 16),
 }
@@ -3675,16 +3720,26 @@ def tags():
         if tag == 'bypasses_armor':
             values.insert(1, f'{MODID}:jet_beam')
         write_json(t / 'minecraft' / 'tags' / 'damage_type' / f'{tag}.json', {'values': values})
-    from building_variants import MIXED_SLAB
+    from building_variants import MIXED_SLAB, MIXED_PANEL_SLAB, MIXED_COLLAPSAR_SLAB, MIXED_PANEL_GLASS_SLAB
     mixed_slab = f'{MODID}:{MIXED_SLAB}'
-    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab]
+    mixed_panel = f'{MODID}:{MIXED_PANEL_SLAB}'
+    mixed_collapsar = f'{MODID}:{MIXED_COLLAPSAR_SLAB}'
+    mixed_panel_glass = f'{MODID}:{MIXED_PANEL_GLASS_SLAB}'
+    blocks = [mid(n) for n, v in MOD.items() if v[2] in BLOCK_KINDS] + [mixed_slab, mixed_panel, mixed_collapsar, mixed_panel_glass]
     write_json(t / 'minecraft' / 'tags' / 'block' / 'mineable' / 'pickaxe.json', {'values': blocks})
     diamond_only = ('welded_hatch',)                      # 溶接された蓋はダイヤのツルハシ以上でないと掘れない
     write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_iron_tool.json',
                {'values': [mid(n) for n, v in MOD.items() if v[0] not in diamond_only and (
                    v[2] == 'block' or v[2] in ('deco', 'deco_glass', 'gravity', 'lab') or v[0] in ('meteoric_iron_chunk', 'meteorite_crust', 'meteorite_core')
-                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)] + [mixed_slab]})
-    write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json', {'values': [f'{MODID}:{i}' for i in diamond_only]})
+                   or v[0].startswith('pristine_') or v[0] in __import__('building_variants').IRON_VARIANTS)]
+                + [mixed_slab, mixed_panel, mixed_collapsar, mixed_panel_glass]})
+    # コラプサー強化パネル（0.23.0）: ダイヤ以上のツルハシで掘り、ウィザーとエンダードラゴンに壊されない（重ねハーフブロックは Java で見る）
+    collapsar = (['collapsar_reinforced_panel', 'collapsar_reinforced_light_panel', 'collapsar_reinforced_glass', 'collapsar_star_glass']
+                 + sorted(__import__('building_variants').COLLAPSAR_VARIANTS))
+    write_json(t / 'minecraft' / 'tags' / 'block' / 'needs_diamond_tool.json',
+               {'values': [f'{MODID}:{i}' for i in diamond_only + tuple(collapsar)]})
+    for tag in ('wither_immune', 'dragon_immune'):
+        write_json(t / 'minecraft' / 'tags' / 'block' / f'{tag}.json', {'replace': False, 'values': [f'{MODID}:{i}' for i in collapsar]})
     # 単純ブロックのドロップ。中身を持ち運ぶブロックはブロックエンティティのデータ成分を写す
     copy_components = {'gravitational_containment_tank': [f'{MODID}:dark_matter', 'minecraft:block_entity_data'],
                        # 液体のドローン発着ポート: 2つのタンクの中身をアイテムへ写す（置き直すと戻る）
@@ -3751,6 +3806,13 @@ def avoiding(structure, rid):
     """地下の遺構の構造物を、ほかの大きな地下構造物を避けて置く構造物（singulo:avoiding）で包む。"""
     outer = {k: v for k, v in structure.items() if k in ('biomes', 'step', 'spawn_overrides', 'terrain_adaptation')}
     return {'type': f'{MODID}:avoiding', **outer, 'structure': structure, 'avoid': ruin_avoid(rid)}
+
+
+def graded(structure):
+    """地上の遺構の構造物を、置いたあとに周りの地面をならす構造物（singulo:graded）で包む。
+    beard_thin だけでは、斜面で建物の四隅やすき間（型紙で何も置かないマス）に地面が残り、盛り土のように見える。"""
+    outer = {k: v for k, v in structure.items() if k in ('biomes', 'step', 'spawn_overrides', 'terrain_adaptation')}
+    return {'type': f'{MODID}:graded', **outer, 'structure': structure}
 
 
 RUIN_DEPTH = {
@@ -3853,7 +3915,7 @@ def ruins_data():
             lo, hi = RUIN_DEPTH[rid]
             structure['start_height'] = {'type': 'minecraft:uniform',
                                          'min_inclusive': {'absolute': lo}, 'max_inclusive': {'absolute': hi}}
-        write_json(DATA / 'worldgen' / 'structure' / f'{rid}.json', structure if placement == 'surface' else avoiding(structure, rid))
+        write_json(DATA / 'worldgen' / 'structure' / f'{rid}.json', graded(structure) if placement == 'surface' else avoiding(structure, rid))
         write_json(DATA / 'worldgen' / 'structure_set' / f'{rid}.json', {
             'structures': [{'structure': f'{MODID}:{rid}', 'weight': 1}],
             'placement': {'type': 'minecraft:random_spread', 'spacing': spacing, 'separation': separation, 'salt': salt},
@@ -4084,7 +4146,7 @@ def thermal():
 # 未分類の通常アイテムだけを中間素材に置く。装置・建材・道具の追加時は必ず分類し、スポーンエッグは末尾。
 TAB_GROUPS = [
     ('案内と設定', [
-        'handbook', 'holo_projector', 'explorer_compass', 'meteor_compass',
+        'handbook', 'holo_projector', 'explorer_compass', 'meteor_compass', 'facility_reconstructor',
         'settings_card', 'relocation_wrench', 'decoded_record',
     ]),
     ('発電と蓄電', [
@@ -4152,9 +4214,11 @@ TAB_GROUPS = [
         'wormhole_port', 'wormhole_seam_upgrade',
     ]),
     ('アンドロイド', [
-        'android_station', 'android_kit', 'android_repair_kit', 'android_charger', 'portable_android_printer', 'portable_android_printer_2',
-        'android_armor_plate', 'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
-        'android_memory_axe', 'android_memory_bit', 'android_memory_gunner', 'android_memory_katana',
+        'android_station', 'android_kit', 'android_repair_kit', 'android_charger', 'android_charger_2', 'android_charger_3',
+        'portable_android_printer', 'portable_android_printer_2',
+        'android_armor_plate', 'android_armor_plate_2', 'android_armor_plate_3', 'android_weapon_module', 'android_weapon_module_2', 'android_weapon_module_3', 'heavy_strike_module', 'rapid_strike_module', 'drain_module', 'piercing_module', 'frost_module', 'warden_breaker_module',
+        'android_memory_blade', 'android_memory_whip', 'android_memory_saber',
+        'android_memory_axe', 'android_memory_bit', 'android_memory_gunner', 'android_memory_katana', 'android_memory_spark',
         'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack',
         'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench',
         'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
@@ -4220,8 +4284,8 @@ TAB_GROUPS = [
     ('中間素材', None),
     ('白い建材', [
         'white_panel', 'white_light_panel', 'white_glass_panel', 'white_star_glass_panel',
-        'white_sliding_door', 'black_reinforced_panel', 'black_reinforced_light_panel', 'black_reinforced_glass',
-        'black_star_glass',
+        'white_sliding_door', 'black_reinforced_panel', 'black_reinforced_light_panel', 'collapsar_reinforced_panel',
+        'collapsar_reinforced_light_panel', 'black_reinforced_glass', 'black_star_glass', 'collapsar_reinforced_glass', 'collapsar_star_glass',
         'bismuth_crystal_block', 'glowing_bismuth_crystal',
         'android_barrier_glass', 'android_barrier_glass_patterned', 'android_gate_glass',
         'android_gate_glass_patterned',
@@ -4274,7 +4338,8 @@ TAB_GROUPS = [
     ]),
     ('スポーンエッグ', [
         'blade_android_spawn_egg', 'whip_android_spawn_egg', 'saber_android_spawn_egg', 'axe_android_spawn_egg',
-        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'katana_android_spawn_egg', 'security_drone_spawn_egg',
+        'bit_android_spawn_egg', 'gunner_android_spawn_egg', 'katana_android_spawn_egg', 'spark_android_spawn_egg',
+        'security_drone_spawn_egg',
         # ボスのスポーンエッグはタブに出さない（/give でだけ渡す。Java の SinguloItems.HIDDEN）
     ]),
 ]

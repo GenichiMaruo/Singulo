@@ -54,6 +54,17 @@ const float SHADOW_PER_HORIZON = 2.598;
 const vec2 LO = vec2(0.0005);
 const vec2 HI = vec2(0.9995);
 
+// カメラからの奥行き（ブロック）→ 深度バッファの値（dist の逆）
+float depthOf(float d) {
+    float ndc = DepthParams.y / max(d, 1e-3) - DepthParams.x;
+    return clamp(ndc * 0.5 + 0.5, 0.0, 1.0);
+}
+
+// この画素の元の深度（コピーしたもの）。レンズが書く奥行きは、影と円盤の所以外はこれのまま
+float sceneDepth() {
+    return texelFetch(Sampler1, ivec2(gl_FragCoord.xy), 0).r;
+}
+
 // 深度バッファの値 → カメラからの奥行き（ブロック）
 float dist(vec2 uv) {
     if (UseDepth < 0.5) {
@@ -398,6 +409,7 @@ vec3 remnantBand() {
 void main() {
     if (Sphere.w < 0.0) {
         fragColor = vec4(remnantBand(), 1.0);
+        gl_FragDepth = sceneDepth();
         return;
     }
     float ring = 0.0;
@@ -435,4 +447,9 @@ void main() {
     // 降着円盤
     col = col * (1.0 - disk.a) + disk.rgb;
     fragColor = vec4(col, 1.0);
+    // 奥行き（透ける物を描く前に掛けるときだけ書かれる）: 黒い影と降着円盤の所は、ブラックホールの中心の奥行きにする。
+    // あとで描く、ブラックホールより奥のガラスなどが、影や円盤の上に出ないように。ほかの所は元の奥行きのまま
+    float z = sceneDepth();
+    float cover = max(clamp(dark, 0.0, 1.0), disk.a);
+    gl_FragDepth = cover > 0.5 && UseDepth > 0.5 ? min(z, depthOf(Sphere.x)) : z;
 }

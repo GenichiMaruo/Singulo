@@ -1,0 +1,112 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "glass": "white",
+        "glass_on_top": "false"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_glass_white_bottom"
+      }
+    },
+    {
+      "when": {
+        "glass": "black",
+        "glass_on_top": "false"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_glass_black_bottom"
+      }
+    },
+    {
+      "when": {
+        "glass": "collapsar",
+        "glass_on_top": "false"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_glass_collapsar_bottom"
+      }
+    },
+    {
+      "when": {
+        "panel": "white",
+        "glass_on_top": "true"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_panel_white_bottom"
+      }
+    },
+    {
+      "when": {
+        "panel": "black",
+        "glass_on_top": "true"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_panel_black_bottom"
+      }
+    },
+    {
+      "when": {
+        "panel": "collapsar",
+        "glass_on_top": "true"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_panel_collapsar_bottom"
+      }
+    },
+    {
+      "when": {
+        "glass": "white",
+        "glass_on_top": "true"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_glass_white_top"
+      }
+    },
+    {
+      "when": {
+        "glass": "black",
+        "glass_on_top": "true"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_glass_black_top"
+      }
+    },
+    {
+      "when": {
+        "glass": "collapsar",
+        "glass_on_top": "true"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_glass_collapsar_top"
+      }
+    },
+    {
+      "when": {
+        "panel": "white",
+        "glass_on_top": "false"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_panel_white_top"
+      }
+    },
+    {
+      "when": {
+        "panel": "black",
+        "glass_on_top": "false"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_panel_black_top"
+      }
+    },
+    {
+      "when": {
+        "panel": "collapsar",
+        "glass_on_top": "false"
+      },
+      "apply": {
+        "model": "singulo:block/mixed_panel_glass_slab_panel_collapsar_top"
+      }
+    }
+  ]
+}
