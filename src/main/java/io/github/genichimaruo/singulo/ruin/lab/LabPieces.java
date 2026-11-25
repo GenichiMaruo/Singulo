@@ -17,6 +17,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.Rotation;
@@ -187,6 +188,20 @@ public final class LabPieces {
             return templates.getOrCreate(id(name)).getBoundingBox(new StructurePlaceSettings().setRotation(r), origin(templates, name, min, r));
         }
 
+        public boolean isBossAnchor(net.minecraft.server.level.ServerLevel level, BlockPos anchor) {
+            return name.equals(LabLayout.BOSS) && singleBossBlock(level, SinguloBlocks.GUARDIAN_CORE.get()).filter(anchor::equals).isPresent();
+        }
+
+        public BlockPos bossCache(net.minecraft.server.level.ServerLevel level) {
+            return singleBossBlock(level, SinguloBlocks.RUIN_CACHE.get()).orElse(null);
+        }
+
+        private java.util.Optional<BlockPos> singleBossBlock(net.minecraft.server.level.ServerLevel level, Block block) {
+            return level.getStructureManager().get(id(name)).flatMap(template -> {
+                var markers = template.filterBlocks(pos, new StructurePlaceSettings().setRotation(rotation), block);
+                return markers.size() == 1 ? java.util.Optional.of(markers.get(0).pos()) : java.util.Optional.empty();
+            });
+        }
         public String name() {
             return name;
         }

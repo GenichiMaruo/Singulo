@@ -2024,6 +2024,44 @@ def precision_actuator():
     return outlined(f)
 
 
+def facility_reconstructor():
+    """施設再構築装置（0.23.0）: 黄ばんだ遺構パネルの筐体に銅の帯と角金具、正面にクリスタルメモリの六角の窓。
+    上の投影口の上に、段のある施設の形が半透明の光で浮かぶ（稜線は明るい）。
+    投影は輪郭線を付けずに後から重ねる（細い線が太らないように）。"""
+    panel, copper, steel = (226, 220, 198), (206, 126, 78), (70, 76, 90)
+    cyan = (110, 220, 255)
+
+    def f(d):
+        d.rectangle([3, 9, 12, 14], fill=rgba(panel))
+        d.line([(3, 9), (12, 9)], fill=rgba(copper))                    # 銅の帯
+        d.line([(3, 14), (12, 14)], fill=rgba(darken(panel, 0.25)))
+        for x in (3, 12):                                                # 角金具（アクチュエーターの継ぎ手）
+            d.point((x, 10), fill=rgba(darken(copper, 0.15)))
+            d.point((x, 13), fill=rgba(steel))
+        d.rectangle([6, 7, 9, 8], fill=rgba(steel))                      # 投影口
+        d.line([(7, 7), (8, 7)], fill=rgba(cyan))
+        # クリスタルメモリの窓
+        d.polygon([(7, 10), (8, 10), (9, 11), (9, 12), (8, 13), (7, 13), (6, 12), (6, 11)], fill=rgba(darken(cyan, 0.35)))
+        d.line([(7, 11), (8, 11)], fill=rgba(cyan))
+        d.point((7, 12), fill=rgba(lighten(cyan, 0.4)))
+        d.point((7, 10), fill=(255, 255, 255, 255))
+
+    im = outlined(f)
+    d = ImageDraw.Draw(im)
+    px = im.load()
+    # 投影: 施設の形（左の棟・中央の塔・右の棟）を半透明の光で満たし、稜線を明るく描く。投影口の上に浮かぶ
+    shape = [(3, 5), (3, 3), (5, 3), (5, 0), (10, 0), (10, 2), (12, 2), (12, 5)]
+    d.polygon(shape, fill=rgba(cyan, 90))
+    d.line(shape + [shape[0]], fill=rgba(lighten(cyan, 0.35), 235))
+    # 組み上がりかけの階の線（塔の中と右の棟）
+    for seg in (((6, 2), (9, 2)), ((11, 4), (11, 4)), ((4, 4), (4, 4))):
+        d.line(seg, fill=rgba(cyan, 170))
+    # 投影口から立ちのぼる光
+    for x in (7, 8):
+        px[x, 6] = rgba(cyan, 160)
+    return im
+
+
 def afterglow_wings():
     """残光の翼: 左右へ広げた一対の天使の翼（中央に寄せて描く）。前縁は中央の付け根から外上へ反り上がり、
     そこから白い風切羽が一枚ずつ下へ垂れる（羽根の先のあいだが透けて、扇のように見える）。羽根の先は淡い水色に光る。"""
@@ -2324,6 +2362,7 @@ ITEM_ART = {
     'magnetic_monopole': magnet,
     'crystal_memory': crystal_memory,
     'decoded_record': lambda: tablet(T1),
+    'facility_reconstructor': facility_reconstructor,
     'creative_catalyst': lambda: crystal_cluster((255, 120, 255), mark=(255, 255, 255)),
     'shield_permit': lambda: permit_card(),
     'empty_black_hole_vessel': lambda: vessel(None),

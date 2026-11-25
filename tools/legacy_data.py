@@ -52,7 +52,7 @@ def convert(path: Path, obj):
                 if count is not None and not count.get('conditions'):
                     pool['rolls'] = count['count']
                     functions.remove(count)
-    if 'recipes' in parts and (obj.get('type', '').startswith('minecraft:') or obj.get('type') == 'singulo:smes_upgrade'):
+    if 'recipes' in parts and (obj.get('type', '').startswith('minecraft:') or obj.get('type') in ('singulo:smes_upgrade', 'singulo:facility_reconstructor')):
         result = obj.get('result')
         if isinstance(result, dict) and 'id' in result: result['item'] = result.pop('id')
         if obj.get('type') == 'minecraft:stonecutting' and isinstance(result, dict):

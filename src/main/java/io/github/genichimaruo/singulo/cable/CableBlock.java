@@ -183,10 +183,21 @@ public class CableBlock extends BaseEntityBlock implements SimpleWaterloggedBloc
         return ConduitCover.occlusion(state);
     }
 
+    /** ブロック・ガラス入りのカバーは、はめ込んだブロックと同じに、ウィザーやエンダードラゴンに壊されない（コラプサー強化ブロックなど）。 */
+    @Override
+    public boolean canEntityDestroy(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.world.entity.Entity entity) {
+        return ConduitCover.canEntityDestroy(state, level, pos, entity, super.canEntityDestroy(state, level, pos, entity));
+    }
+
+    @Override
+    public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
+        return ConduitCover.inlaid(state) ? ConduitCover.lightEmission(state, level, pos) : super.getLightEmission(state, level, pos);
+    }
+
     @Override
     public net.minecraft.world.level.block.SoundType getSoundType(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos,
             @Nullable net.minecraft.world.entity.Entity entity) {
-        if (ConduitCover.of(state) == ConduitCover.State.BLOCK && level.getBlockEntity(pos) instanceof ConduitCover.Holder holder
+        if (ConduitCover.inlaid(state) && level.getBlockEntity(pos) instanceof ConduitCover.Holder holder
                 && holder.coverState() != null) {
             return holder.coverState().getSoundType(level, pos, entity);
         }

@@ -280,6 +280,10 @@ public class SaberAndroid extends RuinAndroid {
             getLookControl().setLookAt(target, 30, 30);
             nextMove--;
             cutCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextMove--;
+                cutCooldown--;
+            }
             boolean seen = hasLineOfSight(target);
             if (dist > 3.0 || !seen) {
                 if (stateTicks % 8 == 0 || getNavigation().isDone()) {

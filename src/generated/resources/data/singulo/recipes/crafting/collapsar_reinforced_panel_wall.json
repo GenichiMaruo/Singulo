@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "singulo:collapsar_reinforced_panel"
+    }
+  },
+  "result": {
+    "count": 6,
+    "item": "singulo:collapsar_reinforced_panel_wall"
+  }
+}

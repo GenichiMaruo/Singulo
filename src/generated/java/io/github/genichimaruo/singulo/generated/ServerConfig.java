@@ -7,6 +7,8 @@ public final class ServerConfig {
     private ServerConfig() {}
 
     // ---- ServerConfig ----
+    public static final ForgeConfigSpec.BooleanValue RECIPE_ENABLED;
+    public static final ForgeConfigSpec.ConfigValue<String> MULTIPLAYER_ACCESS;
     public static final ForgeConfigSpec.IntValue PUMP_START_FE;
     public static final ForgeConfigSpec.IntValue PUMP_FE_AT_HIGH_FLOW;
     public static final ForgeConfigSpec.DoubleValue PUMP_FE_PER_MB;
@@ -159,6 +161,8 @@ public final class ServerConfig {
     public static final ForgeConfigSpec SPEC;
 
     static {
+        ForgeConfigSpec.BooleanValue RECIPE_ENABLED_;
+        ForgeConfigSpec.ConfigValue<String> MULTIPLAYER_ACCESS_;
         ForgeConfigSpec.IntValue PUMP_START_FE_;
         ForgeConfigSpec.IntValue PUMP_FE_AT_HIGH_FLOW_;
         ForgeConfigSpec.DoubleValue PUMP_FE_PER_MB_;
@@ -309,6 +313,12 @@ public final class ServerConfig {
         ForgeConfigSpec.IntValue MAX_ANCHORS_PER_PLAYER_;
         ForgeConfigSpec.BooleanValue SHARE_WITH_TEAM_;
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
+        b.push("facilityReconstruction");
+        b.comment("施設再構築装置をクラフトできるか。既存の装置の使用可否には影響しない", "範囲: true / false");
+        RECIPE_ENABLED_ = b.define("recipeEnabled", true);
+        b.comment("マルチプレイ、LAN公開中の施設再構築装置の使用権限。管理者のみ、全員、全員禁止のいずれか", "範囲: \"admins_only\", \"everyone\", \"disabled\"");
+        MULTIPLAYER_ACCESS_ = b.defineInList("multiplayerAccess", "admins_only", java.util.Arrays.asList("admins_only", "everyone", "disabled"));
+        b.pop();
         b.push("transport");
         b.comment("電動液体ポンプが1 tickの最初の1 mBを搬出する電力（FE）", "範囲: 1〜2,147,483,647（整数）");
         PUMP_START_FE_ = b.defineInRange("pumpStartFe", 100, 1, 2147483647);
@@ -643,6 +653,8 @@ public final class ServerConfig {
         b.comment("持ち主と同じバニラのチーム（/team）の人も、アンドロイド・ドローン・作業指令台を使える（許可証で人を絞っていても、チームの人は登録しなくてよい）。ドローン発着ポートは持ち主とチームの人だけ", "範囲: true / false");
         SHARE_WITH_TEAM_ = b.define("shareWithTeam", true);
         b.pop();
+        RECIPE_ENABLED = RECIPE_ENABLED_;
+        MULTIPLAYER_ACCESS = MULTIPLAYER_ACCESS_;
         PUMP_START_FE = PUMP_START_FE_;
         PUMP_FE_AT_HIGH_FLOW = PUMP_FE_AT_HIGH_FLOW_;
         PUMP_FE_PER_MB = PUMP_FE_PER_MB_;

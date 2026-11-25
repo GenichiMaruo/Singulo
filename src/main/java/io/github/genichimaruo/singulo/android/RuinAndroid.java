@@ -128,6 +128,20 @@ public abstract class RuinAndroid extends Monster {
         return state >= STATE_SIT && state <= STATE_SWEEP;
     }
     public static final int FOLD_TICKS = 20;
+    /**
+     * 無線充電器から ticks tick 分を speed 倍の速さで受け取る（満タンを超える分は充電器から取らない）。増えた充電の量を返す。
+     */
+    int receiveWireless(net.minecraft.world.item.ItemStack charger, int ticks, int speed) {
+        int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
+        int missing = maxCharge() - charge();
+        if (rate <= 0 || missing <= 0) return 0;
+        long want = Math.min((long) CHARGER_FE_PER_TICK * ticks * speed, io.github.genichimaruo.singulo.compat.Legacy.ceilDiv((long) missing * CHARGER_FE_PER_TICK, rate));
+        int got = AndroidChargerItem.energy(charger).extractEnergy((int) want, false);
+        long added = Math.min(missing, (long) rate * got / CHARGER_FE_PER_TICK);
+        addCharge(added);
+        return (int) added;
+    }
+
     /** 無線充電器から1 tick にもらう電力（満充電 PER_ANDROID を 100 tick、5秒で）。 */
     static final int CHARGER_FE_PER_TICK = AndroidChargerItem.PER_ANDROID / 100;
 
@@ -305,7 +319,9 @@ public abstract class RuinAndroid extends Monster {
     public static final int SLOT_FELLING = PACK_START + PACK_SLOTS, SLOT_TANK = SLOT_FELLING + 1;
     /** 装飾の枠（{@link AndroidAccessoryItem#HEAD} などの番号の順。顔と腰は 0.18.0 でうしろに足した）。 */
     public static final int SLOT_DECOR = SLOT_TANK + 1, DECOR_SLOTS = AndroidAccessoryItem.PARTS;
-    public static final int INVENTORY_SIZE = SLOT_DECOR + DECOR_SLOTS;
+    /** 武装モジュールの枠（0.23.0。持ち物のいちばんうしろ）。積んだモジュールは利き手の装備に写す。 */
+    public static final int SLOT_WEAPON = SLOT_DECOR + DECOR_SLOTS;
+    public static final int INVENTORY_SIZE = SLOT_WEAPON + 1;
     /** タンクアップグレードのタンクの数と、1つの容量（mB）。1つのタンクには1種類の流体。 */
     public static final int TANKS = 2, TANK_CAPACITY = 32000;
     /** バッテリーアップグレードは2個まで。1個につき充電の満タンが半分（CHARGE_MAX / 2）ずつ増える。 */
@@ -477,9 +493,12 @@ public abstract class RuinAndroid extends Monster {
         this.moveControl = new AndroidPathing.Move(this);   // 透過ガラスの中で跳ねない
         setPathfindingMalus(net.minecraft.world.level.pathfinder.BlockPathTypes.WATER, 0);    // 水の中も自由に動ける
         setDropChance(net.minecraft.world.entity.EquipmentSlot.CHEST, 0);
+        setDropChance(net.minecraft.world.entity.EquipmentSlot.MAINHAND, 0);
         // 装甲板は胸当ての装備として働かせる（防御の値とエンチャントが効く）。アップグレードは見た目と充電の満タンに出す
         inventory.addListener(c -> {
             setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, inventory.getItem(SLOT_PLATE).copy());
+            // 武装モジュールは利き手の装備として持つ（剣のエンチャントのドロップ増加などが、ふつうの仕組みで効く）
+            setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, inventory.getItem(SLOT_WEAPON).copy());
             if (!level().isClientSide) {
                 net.minecraft.world.item.ItemStack battery = inventory.getItem(SLOT_BATTERY);
                 int previousBatteries = batteries();
@@ -1895,6 +1914,23 @@ public abstract class RuinAndroid extends Monster {
         return stack.getItem() instanceof AndroidArmorPlateItem;
     }
 
+    public static boolean isWeaponModule(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof AndroidWeaponModuleItem;
+    }
+
+    /** 積んでいる武装モジュールの種類（なければ null）。 */
+    @Nullable
+    public AndroidWeaponModuleItem.Kind weaponModule() {
+        return getMainHandItem().getItem() instanceof AndroidWeaponModuleItem m ? m.kind() : null;
+    }
+
+    /**
+     * 連撃モジュール: 技の待ち時間を3 tick に1回、余分に1つ減らす（待ち時間 ×0.75）。型ごとの戦いの目標が、待ち時間を減らす所で呼ぶ。
+     */
+    protected boolean rapidCooldown() {
+        return tickCount % 3 == 0 && weaponModule() == AndroidWeaponModuleItem.Kind.RAPID;
+    }
+
     /** 自己修理キットを1つ使って、体力を半分直す。使えたら true。 */
     private boolean useRepairKit(ServerLevel level) {
         if (repairCooldown > 0 || !isRepairKit(inventory.getItem(SLOT_REPAIR))) {
@@ -2055,6 +2091,7 @@ public abstract class RuinAndroid extends Monster {
             releaseInventory(level);
         }
         setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.item.ItemStack.EMPTY);
+        setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, net.minecraft.world.item.ItemStack.EMPTY);
         setTarget(null);
         getNavigation().stop();
         playSound(io.github.genichimaruo.singulo.registry.SinguloSounds.get("android.power_down"), 0.9F, 1.4F);
@@ -2483,7 +2520,15 @@ public abstract class RuinAndroid extends Monster {
 
     /** この護衛が戦う相手か（敵対モブと、許可証に載っていない人。範囲は見ない）。 */
     boolean hostile(LivingEntity e) {
-        return hostileToGuards(e) || intruder(e);
+        return hostileToGuards(e) || intruder(e) || bossHunter() && isBoss(e);
+    }
+
+    /**
+     * 対番人モジュールを積んだ護衛か。積んだ護衛だけがボス（取り巻きも含む）と戦う: ボスを狙い、技を当て、ボスの攻撃も受ける。
+     * ボスの側はアンドロイドを狙わない（{@link #onChangeTarget}）。積んでいない護衛は、これまでどおりボスと互いに敵対しない。
+     */
+    public boolean bossHunter() {
+        return guard && weaponModule() == AndroidWeaponModuleItem.Kind.WARDEN;
     }
 
     /**
@@ -2497,7 +2542,7 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         if (guardSide) {
-            return hostileToGuards(e) || owner instanceof RuinAndroid a && a.intruder(e);
+            return hostileToGuards(e) || owner instanceof RuinAndroid a && (a.intruder(e) || a.bossHunter() && isBoss(e));
         }
         return !RuinGuards.isGuard(e) && !(owner != null && owner.isAlliedTo(e));
     }
@@ -2535,13 +2580,13 @@ public abstract class RuinAndroid extends Monster {
     public static void onChangeTarget(net.minecraftforge.event.entity.living.LivingChangeTargetEvent event) {
         if (event.getNewTarget() instanceof RuinAndroid a && a.isGuard()
                 && (event.getEntity() instanceof net.minecraft.world.entity.animal.AbstractGolem
-                || event.getEntity() instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame())) {
+                || event.getEntity() instanceof net.minecraft.world.entity.TamableAnimal t && t.isTame() || isBoss(event.getEntity()))) {
             event.setCanceled(true);
         }
     }
 
-    /** この作品のボス（番人・ウォーデンなど）。護衛のアンドロイドとは互いに敵対しない。 */
-    static boolean isBoss(@Nullable Entity e) {
+    /** この作品のボス（番人・ウォーデンなど）。護衛のアンドロイドとは互いに敵対しない（対番人モジュールを積んだ護衛だけは戦う）。 */
+    public static boolean isBoss(@Nullable Entity e) {
         return e instanceof io.github.genichimaruo.singulo.ruin.RuinBoss || e instanceof io.github.genichimaruo.singulo.ruin.HorizonWarden;
     }
 
@@ -3311,12 +3356,12 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         Entity by = source.getEntity();
-        if (guard ? by instanceof Player p && !intruder(p) || by instanceof RuinAndroid a && a.isGuard() || isBoss(by)
+        if (guard ? by instanceof Player p && !intruder(p) || by instanceof RuinAndroid a && a.isGuard() || isBoss(by) && !bossHunter()
                 || by instanceof net.minecraft.world.entity.animal.AbstractGolem : RuinGuards.isGuard(by)) {
             return false;
         }
         // ボスの叩きつけ・投げ飛ばしの落下も受けない（落下のダメージには、誰の技かが付かないので、近くにボスがいるかで見る）
-        if (guard && source.is(net.minecraft.tags.DamageTypeTags.IS_FALL)
+        if (guard && !bossHunter() && source.is(net.minecraft.tags.DamageTypeTags.IS_FALL)
                 && !level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(48), RuinAndroid::isBoss).isEmpty()) {
             return false;
         }
@@ -4018,7 +4063,10 @@ public abstract class RuinAndroid extends Monster {
             }
             entityData.set(CHARGER_LINK, p.getId());
             double d = distanceTo(p);
-            if (d > 2.5) {
+            net.minecraft.world.item.ItemStack charger = AndroidChargerItem.find(p);
+            AndroidChargerItem.Tier tier = AndroidChargerItem.tierOf(charger);
+            // 上の段の充電器ほど、離れたまま充電できる（寄っていくのは届く所まで）
+            if (d > Math.max(2.5, tier.range - 1.5)) {
                 if (stateTicks % 5 == 0) {
                     getNavigation().moveTo(p, 1.15);
                 }
@@ -4026,13 +4074,8 @@ public abstract class RuinAndroid extends Monster {
                 getNavigation().stop();
                 getLookControl().setLookAt(p, 30, 30);
             }
-            if (d < 4) {
-                net.minecraft.world.item.ItemStack charger = AndroidChargerItem.find(p);
-                int rate = PackBalance.value(ServerConfig.PORTABLE_CHARGE_PER_TICK);
-                if (rate > 0 && charge() < maxCharge()) {
-                    int got = AndroidChargerItem.energy(charger).extractEnergy(CHARGER_FE_PER_TICK, false);
-                    addCharge((long) rate * got / CHARGER_FE_PER_TICK);
-                }
+            if (d < tier.range) {
+                receiveWireless(charger, 1, tier.speed);
                 if (stateTicks % 8 == 0) {
                     sparks(level, position().add(0, 1.0, 0), 2, 0.25);
                 }

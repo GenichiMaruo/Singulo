@@ -343,22 +343,33 @@ public record MachineRecipe(String station, int stage, int time, int energy, Lis
 
     public ItemStack assemble(List<ItemStack> inputs, @Nullable Plan plan) {
         ItemStack out = result.copy();
-        if (plan != null && out.is(SinguloItems.PORTABLE_ANDROID_PRINTER_2.get()) && out.getCount() == 1) {
+        var upgrade = plan == null || out.getCount() != 1 ? null : upgradeFrom(out.getItem());
+        if (upgrade != null) {
             for (int i = 0; i < inputs.size(); i++) {
                 ItemStack input = inputs.get(i);
-                if (plan.consume()[i] == 1 && input.is(SinguloItems.PORTABLE_ANDROID_PRINTER.get())) {
-                    // The Mk1's four slots are the first set in the Mk2. Copy the stored FE, including any excess.
-                    var contents = io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.contents(input);
-                    if (contents.stream().anyMatch(stack -> !stack.isEmpty()))
-                        io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.setContents(out, contents);
-                    int energy = SinguloComponents.getOrDefault(input, SinguloComponents.ENERGY.get(), 0);
-                    if (energy > 0) SinguloComponents.set(out, SinguloComponents.ENERGY.get(), energy);
-                    if (input.hasCustomHoverName()) out.setHoverName(input.getHoverName());
+                if (plan.consume()[i] == 1 && input.is(upgrade)) {
+                    // 前の世代の中身を引き継ぐ（印刷機の欄と電力、充電器の電力、装甲板のエンチャント・名前・修理の費用）
+                    if (input.hasTag()) out.setTag(input.getTag().copy());
+                    // 印刷機の武装モジュールの枠は組の数で番号が変わるので、写したあとで移す
+                    io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.moveWeaponsAfterUpgrade(out,
+                            io.github.genichimaruo.singulo.android.PortableAndroidPrinterItem.units(input));
                     break;
                 }
             }
         }
         return out;
+    }
+
+    /** 上位版を作るときに、材料の前の世代（from）から引き継ぐデータ。 */
+    private static net.minecraft.world.item.Item upgradeFrom(net.minecraft.world.item.Item item) {
+        if (item == SinguloItems.PORTABLE_ANDROID_PRINTER_2.get()) return SinguloItems.PORTABLE_ANDROID_PRINTER.get();
+        if (item == SinguloItems.ANDROID_CHARGER_2.get()) return SinguloItems.ANDROID_CHARGER.get();
+        if (item == SinguloItems.ANDROID_CHARGER_3.get()) return SinguloItems.ANDROID_CHARGER_2.get();
+        if (item == SinguloItems.ANDROID_ARMOR_PLATE_2.get()) return SinguloItems.ANDROID_ARMOR_PLATE.get();
+        if (item == SinguloItems.ANDROID_ARMOR_PLATE_3.get()) return SinguloItems.ANDROID_ARMOR_PLATE_2.get();
+        if (item == SinguloItems.ANDROID_WEAPON_MODULE_2.get()) return SinguloItems.ANDROID_WEAPON_MODULE.get();
+        if (item == SinguloItems.ANDROID_WEAPON_MODULE_3.get()) return SinguloItems.ANDROID_WEAPON_MODULE_2.get();
+        return null;
     }
 
     @Override

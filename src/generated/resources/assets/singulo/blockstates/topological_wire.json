@@ -89,7 +89,7 @@
     },
     {
       "when": {
-        "cover": "frame|block"
+        "cover": "frame|block|glass"
       },
       "apply": {
         "model": "singulo:block/cover_frame"

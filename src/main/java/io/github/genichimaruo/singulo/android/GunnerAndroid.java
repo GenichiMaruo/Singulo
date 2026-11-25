@@ -53,6 +53,38 @@ public class GunnerAndroid extends RuinAndroid {
     public static final int GESTURE_INSPECT = 22;
     private KatanaAndroid crossPartner;
     private int crossTargetId;
+    /** 電磁加速で電力を注ぎ足している放電型（溜めが短くなり、光線が強く、電光の色になる）。 */
+    private SparkAndroid booster;
+    private static final EntityDataAccessor<Boolean> BOOSTED = SynchedEntityData.defineId(GunnerAndroid.class, EntityDataSerializers.BOOLEAN);
+
+    /** 放電型の電磁加速を受けているか（クライアントでも見える）。 */
+    public boolean boosted() {
+        return entityData.get(BOOSTED);
+    }
+
+    /** 今のレールガンの溜めの長さ（電磁加速を受けていれば短い）。 */
+    public int railCharge() {
+        return boosted() ? RAIL_CHARGE - SparkAndroid.RAIL_BOOST_TICKS : RAIL_CHARGE;
+    }
+
+    boolean boostedBy(SparkAndroid spark) {
+        return booster == spark && boosted();
+    }
+
+    /**
+     * 放電型の電磁加速を受け入れる（レールガンを組み上げている間か、溜め始めて間もない間だけ）。
+     * ルージュとの交差照準は発射の時を合わせているので、その間は受けない。
+     */
+    boolean acceptBoost(SparkAndroid spark) {
+        int s = state();
+        if (booster != null || crossPartner != null || !isAlive() || !active() || getTarget() == null
+                || !(s == STATE_RAIL_ASSEMBLE || s == STATE_RAIL_CHARGE && stateTicks < RAIL_CHARGE - RAIL_LOCK - SparkAndroid.RAIL_BOOST_TICKS)) {
+            return false;
+        }
+        booster = spark;
+        entityData.set(BOOSTED, true);
+        return true;
+    }
     private int nextRail = 80;
 
     boolean idleForInspection() {
@@ -176,6 +208,7 @@ public class GunnerAndroid extends RuinAndroid {
         entityData.define(RAIL_FROM, new Vector3f());
         entityData.define(RAIL_TO, new Vector3f());
         entityData.define(AIM, new Vector3f());
+        entityData.define(BOOSTED, false);
     }
 
     @Override
@@ -376,7 +409,7 @@ public class GunnerAndroid extends RuinAndroid {
             AABB box = e.getBoundingBox().inflate(RAIL_RADIUS);
             if (!(box.contains(from) || box.clip(from, end).isPresent()) || !hit.add(e)) continue;
             if (crossPartner != null && e.getId() == crossTargetId) e.invulnerableTime = 0;
-            if (e.hurt(damageSources().mobAttack(this), RAIL_DAMAGE)) {
+            if (e.hurt(damageSources().mobAttack(this), boosted() ? RAIL_DAMAGE * SparkAndroid.RAIL_BOOST : RAIL_DAMAGE)) {
                 e.setDeltaMovement(e.getDeltaMovement().add(dir.x * 0.8, 0.25, dir.z * 0.8));
                 e.hurtMarked = true;
             }
@@ -446,6 +479,10 @@ public class GunnerAndroid extends RuinAndroid {
         super.tick();
         if (level() instanceof ServerLevel) {
             if (state() != STATE_RAIL_ASSEMBLE && state() != STATE_RAIL_CHARGE) crossPartner = null;
+            if (booster != null && (!railOut(state()) || state() == STATE_RAIL_STOW || !booster.isAlive())) {
+                booster = null;
+                entityData.set(BOOSTED, false);
+            }
             int motion = gesture();
             if (motion == GESTURE_INSPECT && !idleForInspection()) gesture(GESTURE_NONE, null);
             if (motion != GESTURE_NONE && (combat(state()) || (motion == GESTURE_RELOAD || motion == GESTURE_TWIRL)
@@ -591,14 +628,14 @@ public class GunnerAndroid extends RuinAndroid {
                     }
                 }
                 case STATE_RAIL_CHARGE -> {
-                    if (stateTicks < RAIL_CHARGE - RAIL_LOCK) {
+                    if (stateTicks < railCharge() - RAIL_LOCK) {
                         hold(target);
                         aimRail(target);
                     } else {
                         getNavigation().stop();         // 狙いを固めた: もう相手を追わない（横へ避けられる）
                     }
                     // コイルが灯る音と、狙いが固まる音は、ためる音（android.railgun_charge）に入っている
-                    if (stateTicks >= RAIL_CHARGE) {
+                    if (stateTicks >= railCharge()) {
                         if (crossPartner != null) {
                             KatanaAndroid partner = crossPartner;
                             int phase = partner.state();
@@ -670,6 +707,11 @@ public class GunnerAndroid extends RuinAndroid {
             nextBurst--;
             nextRail--;
             hopCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextBurst--;
+                nextRail--;
+                hopCooldown--;
+            }
             // 銃口から相手まで、間に障害物がないか（目では見えていても、柵などで撃てないなら撃たずに、撃てる場所へ動く）
             boolean seen = hasLineOfSight(target) && !blocked(level, muzzle(false), target.getBoundingBox().getCenter());
             if (dist < 3.2 && hopCooldown <= 0 && onGround() && !floating() && spend(COST_HOP)) {

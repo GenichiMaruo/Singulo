@@ -6,6 +6,7 @@ import io.github.genichimaruo.singulo.android.BladeAndroid;
 import io.github.genichimaruo.singulo.android.GunnerAndroid;
 import io.github.genichimaruo.singulo.android.KatanaAndroid;
 import io.github.genichimaruo.singulo.android.RuinAndroid;
+import io.github.genichimaruo.singulo.android.SparkAndroid;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -34,6 +35,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     public static final ModelLayerLocation BIT_LAYER = new ModelLayerLocation(Singulo.id("bit_android"), "main");
     public static final ModelLayerLocation GUNNER_LAYER = new ModelLayerLocation(Singulo.id("gunner_android"), "main");
     public static final ModelLayerLocation KATANA_LAYER = new ModelLayerLocation(Singulo.id("katana_android"), "main");
+    public static final ModelLayerLocation SPARK_LAYER = new ModelLayerLocation(Singulo.id("spark_android"), "main");
 
     final ModelPart root;
     final ModelPart hips;
@@ -87,6 +89,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     final ModelPart thrusterL;
     final ModelPart thrusterR;
     /** バッテリーアップグレードの数だけ、腰の後ろ（スカートの上）に付くバッテリーパック。 */
+    /** 放電型の腰の機械の取り付け位置（腰の後ろ。ほかの型は null）。機械・籠手・ケーブルは描画で出す。 */
+    final ModelPart sparkUnit;
     final ModelPart batteryL;
     final ModelPart batteryR;
 
@@ -130,6 +134,7 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         this.strapR = torso.getChild("strap_r");
         this.thrusterL = torso.getChild("thruster_l");
         this.thrusterR = torso.getChild("thruster_r");
+        this.sparkUnit = hips.hasChild("spark_unit") ? hips.getChild("spark_unit") : null;
         this.batteryL = skirtBack.getChild("battery_l");
         this.batteryR = skirtBack.getChild("battery_r");
     }
@@ -253,6 +258,10 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             torso.addOrReplaceChild("back_saya", CubeListBuilder.create(),
                     PartPose.offsetAndRotation(3.8F, -8.2F, 4.5F, 3 * Mth.DEG_TO_RAD, 0, 42 * Mth.DEG_TO_RAD));
         }
+        if (variant == AndroidRenderer.Variant.SPARK) {
+            // 腰の機械（背中の腰に背負う蓄電・発電の機械）の取り付け位置。+Z が外側（後ろ）
+            hips.addOrReplaceChild("spark_unit", CubeListBuilder.create(), PartPose.offset(0, -2.6F, 2.15F));
+        }
         if (variant == AndroidRenderer.Variant.BIT) {
             // 短剣の握り（手から前へ）
             forearmR.addOrReplaceChild("dagger_grip", CubeListBuilder.create(), PartPose.offsetAndRotation(0, 4.4F, -0.2F, -Mth.HALF_PI, 0, 0));
@@ -359,6 +368,33 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         pose.translate(0, 5 / 16F, 0);
     }
 
+    /** 上腕までの変形を pose に積む（装甲板のエネルギーシールドを描くため）。 */
+    void toArm(PoseStack pose, boolean left) {
+        toTorso(pose);
+        (left ? armL : armR).translateAndRotate(pose);
+    }
+
+    /** 太ももまでの変形を pose に積む（装甲板のエネルギーシールドを描くため）。 */
+    void toLeg(PoseStack pose, boolean left) {
+        root.translateAndRotate(pose);
+        (left ? legL : legR).translateAndRotate(pose);
+    }
+
+    /** 右の前腕までの変形を pose に積む（放電型の右の籠手を描くため）。 */
+    void toRightForearm(PoseStack pose) {
+        root.translateAndRotate(pose);
+        hips.translateAndRotate(pose);
+        torso.translateAndRotate(pose);
+        armR.translateAndRotate(pose);
+        forearmR.translateAndRotate(pose);
+    }
+
+    /** 放電型の腰の機械までの変形を pose に積む（+Z が外側）。 */
+    void toSparkUnit(PoseStack pose) {
+        toHips(pose);
+        sparkUnit.translateAndRotate(pose);
+    }
+
     /** 左の前腕までの変形を pose に積む（刀型が左手に持つ、背中の紅い刀を描くため）。 */
     void toLeftForearm(PoseStack pose) {
         root.translateAndRotate(pose);
@@ -448,6 +484,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
     /** 区切り from から to へ移るときのつなぎの長さ（tick）。 */
     private static int blendTicks(int from, int to) {
         int a = from >> 6, b = to >> 6;
+        if (a == SparkAndroid.STATE_TENRAI_CHARGE && b == SparkAndroid.STATE_TENRAI_STRIKE) {
+            return 0;               // 振り下ろしは溜めの最終姿勢から始まり、2 tick 目に落雷する
+        }
+        if (a != b && (b == SparkAndroid.STATE_ARC || b == SparkAndroid.STATE_PALM || b == SparkAndroid.STATE_FIELD)) {
+            return 3;               // 放電遊びの中断もつなぎ、接触の時刻より前に技の姿勢へ移る
+        }
         if (a == KatanaAndroid.STATE_MAINTENANCE && b == KatanaAndroid.STATE_DRAW) {
             return 3;               // 手入れの途中で接敵したら、腰に寄せていた上体から抜刀につなぐ
         }
@@ -587,8 +629,9 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
                 instanceof io.github.genichimaruo.singulo.android.AndroidAccessoryItem acc
                 && (acc.style().equals("beret") || acc.style().equals("witch_hat") || acc.style().equals("straw_hat")));
         int batteries = android.batteries();
-        batteryL.visible = batteries >= 1;
-        batteryR.visible = batteries >= 2;
+        // 放電型は、追加のバッテリーを腰の機械に収める（機械の蓄電セルが灯る: 描画の側）
+        batteryL.visible = batteries >= 1 && sparkUnit == null;
+        batteryR.visible = batteries >= 2 && sparkUnit == null;
         // 物を作っている間は、手の武器をしまう（両手を使う。射撃型の小型銃は腰に差す: 描画の側）
         boolean armed = !android.weaponStowed();
         for (ModelPart grip : new ModelPart[]{whipHandle, hilt, axeGrip, daggerGrip, gunGrip, katanaGrip, katanaGripL}) {
@@ -700,6 +743,12 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             case KatanaAndroid.STATE_IAI_VICTORY -> iaiVictory(t, age);
             case KatanaAndroid.STATE_MAINTENANCE -> maintainKatana(t);
             case KatanaAndroid.STATE_VICTORY -> victorySalute(t);
+            case SparkAndroid.STATE_ARC -> sparkArc(t);
+            case SparkAndroid.STATE_PALM -> sparkPalm(t);
+            case SparkAndroid.STATE_FIELD -> sparkField(t);
+            case SparkAndroid.STATE_TENRAI_CHARGE -> tenraiCharge(t, age);
+            case SparkAndroid.STATE_TENRAI_STRIKE -> tenraiStrike(t, age);
+            case SparkAndroid.STATE_PLAY -> sparkPlay(t, age);
             default -> {
                 if (axeGrip != null && axeOneHanded(android)) {
                     // 片手持ち: 右手だけで柄を握り、斧を前上がりに担ぐ。左手は歩きに合わせて楽に振る
@@ -749,7 +798,8 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
             head.xRot -= tilt;
         }
         if (state != KatanaAndroid.STATE_VICTORY && state != KatanaAndroid.STATE_IAI_VICTORY && state != KatanaAndroid.STATE_MAINTENANCE
-                && !(android instanceof GunnerAndroid && GunnerAndroid.combat(state))) {
+                && !(android instanceof GunnerAndroid && GunnerAndroid.combat(state))
+                && !SparkAndroid.combat(state)) {
             gestureOverlay(android, pt);
         }
         if (android.napping()) {
@@ -1205,6 +1255,121 @@ public class AndroidModel extends HierarchicalModel<RuinAndroid> {
         legL.xRot = Mth.lerp(k, legL.xRot, -0.35F);
         legR.xRot = Mth.lerp(k, legR.xRot, 0.3F);
         shinL.xRot = Mth.lerp(k, shinL.xRot, 0.3F);
+    }
+
+    // ------------------------------------------------------------------ 放電型の動き
+
+    /** アーク: 右腕を相手へまっすぐ伸ばし、指先から放つ。左手は腰の機械の方へ引く。 */
+    private void sparkArc(float t) {
+        int arc = SparkAndroid.ARC;
+        float k = ease(t / 3) * (1 - ease((t - (arc - 4)) / 4));
+        float kick = Mth.clamp(1 - Math.abs(t - SparkAndroid.ARC_FIRE) / 2, 0, 1);
+        float pitch = head.xRot;
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.55F + pitch - 0.15F * kick);
+        armR.yRot = Mth.lerp(k, armR.yRot, -0.12F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.05F);
+        armL.xRot = Mth.lerp(k, armL.xRot, 0.35F);
+        armL.zRot = Mth.lerp(k, armL.zRot, -0.25F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, -0.6F);
+        torso.yRot += 0.18F * k;
+        head.yRot -= 0.18F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.25F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.2F);
+    }
+
+    /** 掌底放電: 左足を踏み込み、左の掌を前へ突き出す。 */
+    private void sparkPalm(float t) {
+        int hit = SparkAndroid.PALM_HIT;
+        float k = ease(t / hit) * (1 - ease((t - 8) / 4));
+        armL.xRot = Mth.lerp(k, armL.xRot, -1.5F);
+        armL.yRot = Mth.lerp(k, armL.yRot, 0.15F);
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, 0);
+        armR.xRot = Mth.lerp(k, armR.xRot, 0.4F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.9F);
+        torso.yRot -= 0.3F * k;
+        torso.xRot += 0.12F * k;
+        head.yRot += 0.3F * k;
+        legL.xRot = Mth.lerp(k, legL.xRot, -0.55F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 0.3F);
+        legR.xRot = Mth.lerp(k, legR.xRot, 0.35F);
+        hips.y += 0.6F * k;
+    }
+
+    /** 電場: 片膝を落とし、右の掌を床へ当てる。 */
+    private void sparkField(float t) {
+        int field = SparkAndroid.FIELD;
+        float k = ease(t / 5) * (1 - ease((t - (field - 4)) / 4));
+        torso.xRot = Mth.lerp(k, torso.xRot, 1.29F);
+        head.xRot -= 0.88F * k;
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.24F);
+        armR.zRot = Mth.lerp(k, armR.zRot, 0.07F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -0.08F);
+        armL.xRot = Mth.lerp(k, armL.xRot, 0.2F);
+        armL.zRot = Mth.lerp(k, armL.zRot, -0.35F);
+        float standingDepth = Math.max(soleDepth(legL, shinL), soleDepth(legR, shinR));
+        legL.xRot = Mth.lerp(k, legL.xRot, -1.64F);
+        shinL.xRot = Mth.lerp(k, shinL.xRot, 2.42F);
+        legR.xRot = Mth.lerp(k, legR.xRot, -1.03F);
+        shinR.xRot = Mth.lerp(k, shinR.xRot, 2.59F);
+        // 太腿と脛は各6画素。床に近い方の足を支点に、別々の親を持つ腰と脚を一緒に下ろす。
+        float drop = Mth.lerp(k, standingDepth, 12) - Math.max(soleDepth(legL, shinL), soleDepth(legR, shinR));
+        hips.y += drop;
+        legL.y += drop;
+        legR.y += drop;
+        skirtFront.xRot -= 0.95F * k;
+        skirtBack.xRot += 0.55F * k;
+        skirtTail.xRot += 1.0F * k;
+    }
+
+    private static float soleDepth(ModelPart thigh, ModelPart shin) {
+        float angle = thigh.xRot + shin.xRot;
+        return 6 * Mth.cos(thigh.xRot) + 6 * Math.max(0, Mth.cos(angle)) + 1.45F * Math.abs(Mth.sin(angle));
+    }
+
+    /** 天雷の溜め: 両腕を頭上へ掲げ、上を見上げる。溜まるほど髪が逆立ち、腕が小さく震える。 */
+    private void tenraiCharge(float t, float age) {
+        int charge = SparkAndroid.TENRAI_CHARGE;
+        float k = ease(t / 8);
+        float c = Mth.clamp(t / charge, 0, 1);
+        tenraiPose(k, 0, c, age);
+    }
+
+    private void tenraiPose(float k, float down, float c, float age) {
+        float tremble = Mth.sin(age * 2.7F) * 0.03F * c;
+        armR.xRot = Mth.lerp(k, armR.xRot, Mth.lerp(down, -2.85F + tremble, -1.35F));
+        armL.xRot = Mth.lerp(k, armL.xRot, Mth.lerp(down, -2.85F - tremble, -1.35F));
+        // 掲げたときも両方の電極を髪の外に出す。
+        armR.zRot = Mth.lerp(k, armR.zRot, Mth.lerp(down, -0.27F, -0.1F));
+        armL.zRot = Mth.lerp(k, armL.zRot, Mth.lerp(down, 0.27F, 0.1F));
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, Mth.lerp(down, -0.15F, -0.1F));
+        forearmL.xRot = Mth.lerp(k, forearmL.xRot, Mth.lerp(down, -0.15F, -0.1F));
+        torso.xRot += Mth.lerp(down, -0.12F, 0.15F) * k;
+        head.xRot = Mth.lerp(k * (1 - down), head.xRot, -0.55F);
+        hips.y += Mth.lerp(down, 0.4F, 0.8F) * k;
+        hairFlare(c * 1.3F, age);
+        backHair.xRot += 0.25F * c;
+        skirtFront.xRot -= 0.15F * c;
+        skirtBack.xRot += 0.2F * c;
+    }
+
+    /** 天雷を落とす: 掲げた両腕を前へ振り下ろして相手を指し、髪が落ち着くまで構えを残す。 */
+    private void tenraiStrike(float t, float age) {
+        float down = ease(t / SparkAndroid.STRIKE_HIT);
+        float hold = 1 - ease((t - (SparkAndroid.TENRAI_STRIKE - 6)) / 6);
+        // 振り下ろしは、頭・髪・腰と腕の震えまで溜めの最終姿勢から引き継ぐ。
+        tenraiPose(hold, down, 1 - ease(t / 10), age);
+    }
+
+    /** 待機中の放電遊び: 右手を顔の前へ上げ、指先の間ではじける火花を眺める。 */
+    private void sparkPlay(float t, float age) {
+        float k = ease(t / 8) * (1 - ease((t - (SparkAndroid.PLAY - 10)) / 10));
+        float flick = Mth.sin(age * 0.9F) * 0.04F;
+        armR.xRot = Mth.lerp(k, armR.xRot, -1.0F);
+        armR.yRot = Mth.lerp(k, armR.yRot, 0.35F);
+        forearmR.xRot = Mth.lerp(k, forearmR.xRot, -1.55F + flick);
+        head.yRot = Mth.lerp(k, head.yRot, -0.25F);
+        head.xRot = Mth.lerp(k, head.xRot, 0.12F);
+        head.zRot += 0.08F * k;
     }
 
     /** レールガンを溜めている間、髪がふわっと浮いて広がる（c: 0〜1）。毛先は小さく揺れる。 */

@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "singulo:collapsar_reinforced_panel",
+    "singulo:collapsar_reinforced_light_panel",
+    "singulo:collapsar_reinforced_glass",
+    "singulo:collapsar_star_glass",
+    "singulo:collapsar_reinforced_glass_slab",
+    "singulo:collapsar_reinforced_glass_stairs",
+    "singulo:collapsar_reinforced_panel_slab",
+    "singulo:collapsar_reinforced_panel_stairs",
+    "singulo:collapsar_reinforced_panel_wall"
+  ]
+}

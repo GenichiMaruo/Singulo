@@ -141,6 +141,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
     public void setCoverState(@Nullable BlockState state) {
         coverState = state;
         setChanged();
+        ConduitCover.updateLight(level, worldPosition, state);
     }
 
     @Override
@@ -154,6 +155,7 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
         BlockState before = coverState;
         coverState = ConduitCover.load(tag);
         if (before != coverState && level != null && level.isClientSide) {
+            ConduitCover.updateLight(level, worldPosition, coverState);
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
         }
@@ -227,6 +229,10 @@ public class CableBlockEntity extends BlockEntity implements ConduitCover.Holder
     @Override
     public void onLoad() {
         super.onLoad();
+        // 光るブロックの明るさを書き直す（0.23.0 より前にはめ込んだ物も光るように）
+        if (coverState != null) {
+            ConduitCover.updateLight(level, worldPosition, coverState);
+        }
         if (level != null && !level.isClientSide) {
             invalidateNetwork();
             for (Direction direction : Direction.values()) {

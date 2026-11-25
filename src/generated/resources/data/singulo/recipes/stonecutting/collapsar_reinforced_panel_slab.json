@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "singulo:collapsar_reinforced_panel"
+  },
+  "result": "singulo:collapsar_reinforced_panel_slab",
+  "count": 2
+}

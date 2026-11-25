@@ -72,7 +72,7 @@ public final class LensingReviewHarness {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void stage(RenderLevelStageEvent event) throws Exception {
         if (!prepared || complete || event.getStage() != RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) return;
         var field = GravitationalLensing.class.getDeclaredField("SOURCES");
