@@ -6,6 +6,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 /**
  * アンドロイド用武装モジュール。護衛のアンドロイドの武装モジュールの枠に1つ積むと、すべての技に効く（{@link AndroidWeaponModules}）。
@@ -69,6 +72,18 @@ public class AndroidWeaponModuleItem extends Item {
 
     public Kind kind() {
         return kind;
+    }
+
+    // 1.21 attaches amplifiers to the sword item tag; legacy enchanting uses this stack hook instead.
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return kind.amplifier() && enchantment.category == EnchantmentCategory.WEAPON;
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return kind.amplifier() && EnchantmentHelper.getEnchantments(book).keySet().stream()
+                .allMatch(enchantment -> canApplyAtEnchantingTable(stack, enchantment));
     }
 
     @Override

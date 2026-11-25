@@ -52,7 +52,7 @@ public final class AndroidWeaponModules {
         if (kind.amplifier()) {
             amount = amount + EnchantmentHelper.getDamageBonus(stack, target.getMobType());
         }
-        if (kind == Kind.PIERCE) {
+        if (kind == Kind.PIERCE && !event.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR)) {
             float armor = target.getArmorValue();
             float toughness = (float) target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS);
             float reduced = net.minecraft.world.damagesource.CombatRules.getDamageAfterAbsorb(amount, armor, toughness);

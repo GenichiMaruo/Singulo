@@ -66,6 +66,16 @@ public final class WeaponModuleGameTests {
     public static void moduleSlotMirrorsMainHand(GameTestHelper helper) {
         ItemStack amp = new ItemStack(SinguloItems.ANDROID_WEAPON_MODULE.get());
         var looting = Enchantments.MOB_LOOTING;
+        var book = net.minecraft.world.item.EnchantedBookItem.createForEnchantment(
+                new net.minecraft.world.item.enchantment.EnchantmentInstance(looting, 3));
+        helper.assertTrue(amp.canApplyAtEnchantingTable(looting) && amp.isBookEnchantable(book),
+                "Legacy amplifiers must accept sword enchantments at the table and from a book");
+        helper.assertTrue(!new ItemStack(SinguloItems.DRAIN_MODULE.get()).canApplyAtEnchantingTable(looting),
+                "Specialized modules must not accept amplifier enchantments");
+        var table = EnchantmentHelper.selectEnchantment(net.minecraft.util.RandomSource.create(42), amp, 30, false);
+        helper.assertTrue(!table.isEmpty() && table.stream().allMatch(e -> e.enchantment.category
+                        == net.minecraft.world.item.enchantment.EnchantmentCategory.WEAPON),
+                "Legacy enchanting table must offer weapon enchantments for the amplifier");
         amp.enchant(looting, 3);
         SparkAndroid s = guard(helper, amp);
         helper.assertTrue(s.getItemBySlot(EquipmentSlot.MAINHAND).is(amp.getItem()), "武装モジュールが利き手の装備に写らない");
