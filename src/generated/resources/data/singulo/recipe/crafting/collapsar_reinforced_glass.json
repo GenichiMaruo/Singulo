@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "GCG",
+    "GGG"
+  ],
+  "key": {
+    "G": "singulo:black_reinforced_glass",
+    "C": "singulo:collapsar_ingot"
+  },
+  "result": {
+    "id": "singulo:collapsar_reinforced_glass",
+    "count": 8
+  }
+}

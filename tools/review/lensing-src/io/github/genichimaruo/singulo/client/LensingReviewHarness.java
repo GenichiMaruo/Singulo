@@ -72,9 +72,9 @@ public final class LensingReviewHarness {
         }
     }
 
-    // Both opaque and translucent block-entity features have been submitted; lensing runs later at AfterLevel.
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void stage(RenderLevelStageEvent.AfterTranslucentFeatures event) throws Exception {
+    // Inspect registered sources before the opaque-phase lens consumes them.
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void stage(RenderLevelStageEvent.AfterOpaqueFeatures event) throws Exception {
         if (!prepared || complete) return;
         var field = GravitationalLensing.class.getDeclaredField("SOURCES");
         field.setAccessible(true);

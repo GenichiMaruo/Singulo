@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LLL",
+    "LYL",
+    "LLL"
+  ],
+  "key": {
+    "L": "singulo:collapsar_reinforced_panel",
+    "Y": "#c:dusts/glowstone"
+  },
+  "result": {
+    "id": "singulo:collapsar_reinforced_light_panel",
+    "count": 8
+  }
+}

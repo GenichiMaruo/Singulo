@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
  * 右に印刷ボタン、下に充電残量のゲージ（重ねると電力と、あと何体印刷できるか）。印刷できないときは、ボタンを押せず理由をツールチップに出す。
  */
 public class PortablePrinterScreen extends FramedScreen<PortablePrinterMenu> {
-    private static final int PRINT_X = 116, PRINT_Y = 24, PRINT_W = 52, PRINT_H = 20;
+    private static final int PRINT_X = 126, PRINT_Y = 24, PRINT_W = 44, PRINT_H = 20;
     private static final int BAR_X = 8, BAR_W = 160;
     private static final String[] GHOSTS = {"android_memory_blade", "android_kit", "android_repair_kit", "android_armor_plate"};
     private static final String[] SLOT_TIPS = {"gui.singulo.portable_printer.memory", "gui.singulo.portable_printer.kit",
@@ -110,6 +110,10 @@ public class PortablePrinterScreen extends FramedScreen<PortablePrinterMenu> {
                 ghostSlot(g, leftPos + SLOT_X[s], topPos + ry, slot, item(GHOSTS[s]));
                 area(SLOT_X[s], ry, 16, 16, slot.hasItem() ? List.of() : List.of(Component.translatable(SLOT_TIPS[s])));
             }
+            var weapon = menu.slots.get(PortableAndroidPrinterItem.weaponSlot(menu.units(), u));
+            ghostSlot(g, leftPos + PortablePrinterMenu.WEAPON_X, topPos + ry, weapon, item("android_weapon_module"));
+            area(PortablePrinterMenu.WEAPON_X, ry, 16, 16, weapon.hasItem() ? List.of()
+                    : List.of(Component.translatable("gui.singulo.portable_printer.weapon")));
             if (many) {
                 selector(g, u, ry, u == target, u == menu.next(), mouseX, mouseY);
             }

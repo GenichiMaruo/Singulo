@@ -26,12 +26,28 @@ DIAGRAMS = {
     'android_work_console': 'BEB/BAB/CDC',
     'android_station': 'EDE/BAB/CDC',
     'android_charger': 'DAD/BCB/DAD',
+    # Upgraded chargers: the previous charger in the middle, link elements or field emitters above, storage below.
+    'android_charger_2': 'B.B/CAC/D.D',
+    'android_charger_3': 'D.D/BAB/C',
     'android_factory_print_unit': 'BCB/AAA/DCD',
     'portable_android_printer': 'A/CDC/BADAB/EAE',
     'portable_android_printer_2': 'EBE/DCACD/E.E',
     # The four tool upgrades share a mount: tool above, steel around the coil, circuit below.
     'android_kit': 'E/A.A/BCB/ADA/D',
     'android_armor_plate': 'ABA/ABCBA/ABA',
+    # Upgraded plates: the previous plate is the core; new plating over the corners or shoulders, coils or collapsar at the sides.
+    'android_armor_plate_2': 'B.B/CAC/BDB',
+    'android_armor_plate_3': 'C.C/BAB/D',
+    # Weapon modules: the amplifier core in the middle (or the previous amplifier), coils at the sides, circuit or catalyst parts below.
+    'android_weapon_module': 'A.A/BCB/D.D',
+    'android_weapon_module_2': 'B.B/CAC/D',
+    'android_weapon_module_3': 'C.C/BAB/D',
+    'heavy_strike_module': 'B.B/A/C',
+    'rapid_strike_module': 'CAC/B',
+    'drain_module': 'B.B/A/C',
+    'piercing_module': 'B/CAC/B',
+    'frost_module': 'B.B/A/C',
+    'warden_breaker_module': 'B.B/A/C',
     'android_backpack_upgrade': 'B.B/CAC/D',
     'android_reinforced_backpack_upgrade': 'C.C/BAB/CDC',
     'android_large_backpack_upgrade': 'CBC/DAD/CBC',

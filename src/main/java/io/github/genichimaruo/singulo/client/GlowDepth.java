@@ -103,6 +103,17 @@ final class GlowDepth {
     /** 固体と白い光だけの奥行き（ジェットはこれと比べる）と、ジェットを描く間に取っておく今の奥行き。 */
     @Nullable
     private static TextureTarget solidDepth;
+    /** solidDepth がこのフレームに写したものか（写していなければ前のフレームの古い奥行き）。 */
+    private static boolean solidDepthFresh;
+
+    /**
+     * 透ける物（ガラス・水など）を描く前の、固体だけの奥行き（このフレームに写していなければ null）。重力レンズが、手前の物に
+     * 隠れるかを見るのに使う。
+     */
+    @Nullable
+    static RenderTarget solidDepthThisFrame() {
+        return solidDepthFresh ? solidDepth : null;
+    }
     @Nullable
     private static TextureTarget laterDepth;
 
@@ -335,7 +346,8 @@ final class GlowDepth {
     static void onRenderStage(RenderLevelStageEvent event) {
         if (event instanceof RenderLevelStageEvent.AfterSky) {
             active = true;
-        } else if (event instanceof RenderLevelStageEvent.AfterTranslucentFeatures) {
+            solidDepthFresh = false;
+        } else if (event instanceof RenderLevelStageEvent.AfterOpaqueFeatures) {
             active = false;
             // 固体をすべて描いてから、光を奥から順に描き、最後に深度を書く
             net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
@@ -351,10 +363,11 @@ final class GlowDepth {
                 SOURCE.endBatch();
                 GLAZED_SOURCE.endBatch();
             } finally { modelView.popMatrix(); }
-            if (anyPending()) {
+            if (anyPending() || GravitationalLensing.hasSources()) {
                 RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
                 solidDepth = sized(solidDepth, main);
                 copyDepth(main, solidDepth);
+                solidDepthFresh = true;
             }
         }
     }
@@ -398,7 +411,7 @@ final class GlowDepth {
 
     private static void flush(RenderLevelStageEvent event, MultiBufferSource.BufferSource source) {
         RenderTarget main = net.minecraft.client.Minecraft.getInstance().getMainRenderTarget();
-        if (solidDepth == null) {
+        if (!solidDepthFresh || solidDepth == null) {
             source.endBatch();
             return;
         }

@@ -53,7 +53,9 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
     public static final int SLOT_RULES = SLOT_ROUTE + ROUTE_SLOTS;
     /** 工場式印刷ユニット（印刷の時間と電力が半分、修理が2倍速）。古い保存と番号がずれないよう、最後に置く。 */
     public static final int SLOT_PRINT_UNIT = SLOT_RULES + io.github.genichimaruo.singulo.android.work.PathRule.SLOTS;
-    public static final int SLOTS = SLOT_PRINT_UNIT + 1;
+    /** 武装モジュール（0.23.0）: 印刷したアンドロイドのうち、まだ積んでいないものに積む。古い保存と番号がずれないよう、最後に置く。 */
+    public static final int SLOT_WEAPON = SLOT_PRINT_UNIT + 1;
+    public static final int SLOTS = SLOT_WEAPON + 1;
     /** 巡回の各地点で立ち止まる時間の選び方（秒）。 */
     public static final int[] DWELL_SECONDS = {0, 3, 5, 10, 20};
     /** 警報のレッドストーン信号を出す時間。 */
@@ -100,6 +102,9 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot == SLOT_PRINT_UNIT) {
                 return isPrintUnit(stack);
+            }
+            if (slot == SLOT_WEAPON) {
+                return RuinAndroid.isWeaponModule(stack);
             }
             return switch (slot) {
                 case SLOT_MEMORY -> memoryKind(stack) != null;
@@ -479,6 +484,16 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
     }
 
     /** ストックから、アンドロイドの自己修理キットを1スタックまで補充する。 */
+    /** 武装モジュールの枠のモジュールを、まだ積んでいないアンドロイドに積む。積んだら true。 */
+    boolean equipWeapon(RuinAndroid android) {
+        ItemStack module = items.getStackInSlot(SLOT_WEAPON);
+        if (!RuinAndroid.isWeaponModule(module) || !android.inventory().getItem(RuinAndroid.SLOT_WEAPON).isEmpty()) {
+            return false;
+        }
+        android.inventory().setItem(RuinAndroid.SLOT_WEAPON, items.extractItem(SLOT_WEAPON, 1, false));
+        return true;
+    }
+
     public void refill(RuinAndroid android) {
         ItemStack stock = items.getStackInSlot(SLOT_REPAIR_STOCK);
         if (stock.isEmpty()) {
@@ -712,6 +727,7 @@ public class AndroidStationBlockEntity extends io.github.genichimaruo.singulo.co
             }
         }
         refill(a);
+        equipWeapon(a);
         a.setCharge(a.maxCharge());
         if (keptConsole[unit] != null) {
             a.assignWork(keptConsole[unit], keptOrder[unit]);

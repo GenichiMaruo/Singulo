@@ -142,6 +142,7 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
     public void setCoverState(@Nullable BlockState state) {
         coverState = state;
         setChanged();
+        ConduitCover.updateLight(level, worldPosition, state);
     }
 
     @Override
@@ -155,6 +156,7 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
         BlockState before = coverState;
         coverState = ConduitCover.load(tag, registries);
         if (before != coverState && level != null && level.isClientSide()) {
+            ConduitCover.updateLight(level, worldPosition, coverState);
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
         }
@@ -228,6 +230,10 @@ public class CableBlockEntity extends io.github.genichimaruo.singulo.compat.Lega
     @Override
     public void onLoad() {
         super.onLoad();
+        // 光るブロックの明るさを書き直す（0.23.0 より前にはめ込んだ物も光るように）
+        if (coverState != null) {
+            ConduitCover.updateLight(level, worldPosition, coverState);
+        }
         if (level != null && !level.isClientSide()) {
             invalidateNetwork();
             for (Direction direction : Direction.values()) {

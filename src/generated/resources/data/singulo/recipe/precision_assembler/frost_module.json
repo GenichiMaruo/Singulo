@@ -1,0 +1,32 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:android_weapon_module",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:helium_cartridge",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:cold_atoms",
+      "count": 1
+    }
+  ],
+  "shape": [
+    "     ",
+    " B B ",
+    "  A  ",
+    "  C  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:frost_module",
+    "count": 1
+  }
+}

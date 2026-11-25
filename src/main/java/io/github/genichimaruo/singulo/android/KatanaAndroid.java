@@ -64,6 +64,19 @@ public class KatanaAndroid extends RuinAndroid {
     public static final int STATE_MAINTENANCE = 80;
     private GunnerAndroid inspectionCiel;
     private GunnerAndroid crossCiel;
+    /** 紅一閃の刀に電荷を与えている放電型（遅延斬撃が強くなり、斬撃に放電が走る）。 */
+    private SparkAndroid sparkCharger;
+
+    boolean sparkChargedBy(SparkAndroid spark) {
+        return sparkCharger == spark;
+    }
+
+    /** 放電型の電荷を受け入れる（紅一閃の構えの前半だけ。1回の紅一閃に1人まで）。 */
+    boolean acceptSparkCharge(SparkAndroid spark) {
+        if (sparkCharger != null || !isAlive() || !active() || state() != STATE_IAI_STANCE || stateTicks > IAI_STANCE - IAI_LOCK) return false;
+        sparkCharger = spark;
+        return true;
+    }
 
     private java.util.List<GunnerAndroid> nearbyGunners(ServerLevel level, int range) {
         if (!isGuard() || owner() == null) return java.util.List.of();
@@ -432,6 +445,14 @@ public class KatanaAndroid extends RuinAndroid {
                 hits++;
             }
         }
+        if (sparkCharger != null) {
+            // 電荷を帯びた刀: 通り道に放電が走る
+            int steps = Mth.clamp((int) (a.distanceTo(b) * 2), 1, 32);
+            for (int i = 0; i <= steps; i++) {
+                Vec3 at = a.lerp(b, (double) i / steps);
+                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, 0.12, 0.2, 0.12, 0.15);
+            }
+        }
         return hits;
     }
 
@@ -441,10 +462,13 @@ public class KatanaAndroid extends RuinAndroid {
         for (int id : marked) {
             if (level.getEntity(id) instanceof LivingEntity e && e.isAlive() && e.distanceToSqr(this) < 24 * 24) {
                 e.invulnerableTime = 0;
-                if (e.hurtOrSimulate(damageSources().mobAttack(this), IAI_DAMAGE)) {
+                if (e.hurtOrSimulate(damageSources().mobAttack(this), sparkCharger != null ? IAI_DAMAGE + SparkAndroid.BLADE_BONUS : IAI_DAMAGE)) {
                     hits++;
                 }
                 Vec3 c = e.getBoundingBox().getCenter();
+                if (sparkCharger != null) {
+                    level.sendParticles(ParticleTypes.ELECTRIC_SPARK, c.x, c.y, c.z, 24, 0.35, 0.6, 0.35, 0.6);
+                }
                 level.sendParticles(ParticleTypes.SWEEP_ATTACK, c.x, c.y, c.z, 2, 0.3, 0.3, 0.3, 0);
                 level.sendParticles(ParticleTypes.CRIT, c.x, c.y, c.z, 14, 0.35, 0.5, 0.35, 0.4);
                 sparks(level, c, 16, 0.45);
@@ -542,6 +566,7 @@ public class KatanaAndroid extends RuinAndroid {
             int s = state();
             LivingEntity foe = getTarget();
             if (s != STATE_IAI_STANCE) crossCiel = null;
+            if (sparkCharger != null && s != STATE_IAI_STANCE && s != STATE_IAI_FLASH && s != STATE_IAI_ZANSHIN) sparkCharger = null;
             boolean threat = foe != null && foe.isAlive();
             if (victoryPending) {
                 if (threat || !isAlive() || !drawn() || !active() || isWorking() || (s != STATE_IDLE && !combat(s))) {
@@ -858,6 +883,11 @@ public class KatanaAndroid extends RuinAndroid {
             nextMove--;
             nextIai--;
             cutCooldown--;
+            if (rapidCooldown()) {   // 連撃モジュール: 待ち時間 ×0.75
+                nextMove--;
+                nextIai--;
+                cutCooldown--;
+            }
             boolean seen = hasLineOfSight(target);
             if (dist > 2.4 || !seen) {
                 if (stateTicks % 8 == 0 || getNavigation().isDone()) {

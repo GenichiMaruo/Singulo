@@ -1,0 +1,36 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 5,
+  "time": 280,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:android_weapon_module_2",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:collapsar_ingot",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:exotic_matter",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:jet_condensate",
+      "count": 1
+    }
+  ],
+  "shape": [
+    "     ",
+    " C C ",
+    " BAB ",
+    "  D  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:android_weapon_module_3",
+    "count": 1
+  }
+}

@@ -11,6 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.StringRepresentable;
@@ -43,10 +44,14 @@ import net.neoforged.neoforge.model.data.ModelProperty;
  *   <li>移設レンチ（装置の移設モード）でスニークして右クリックすると、ブロック → 枠の順に1つずつ外す。壊すと両方を落とす。</li>
  * </ul>
  * はめ込めるのは、すき間のない不透明な1ブロック（向きがあってもよい）で、ブロックエンティティのない物だけ。
+ * 0.23.0: ガラス（1ブロックいっぱいの透けるブロック）もはめ込める（{@link State#GLASS}）。そのときは枠と中のケーブル・パイプが見えたまま、
+ * 枠の内側にガラスの板が入る。光は通し、当たり判定は枠だけのときと同じ中空の箱。
  */
 public final class ConduitCover {
     public enum State implements StringRepresentable {
-        NONE("none"), FRAME("frame"), BLOCK("block");
+        NONE("none"), FRAME("frame"), BLOCK("block"),
+        /** ガラス入り（0.23.0）: 枠と中のケーブル・パイプを描いたまま、枠の内側にガラスをはめる。光を通し、隣を隠さない。 */
+        GLASS("glass");
 
         private final String name;
 
@@ -83,6 +88,36 @@ public final class ConduitCover {
         return state.hasProperty(PROPERTY) ? state.getValue(PROPERTY) : State.NONE;
     }
 
+    /**
+     * はめ込んだブロックの明るさを、チャンクの補助の明るさ（NeoForge の {@code AuxiliaryLightManager}）に書く（0.23.0）。
+     * ブロックエンティティは光の計算の別スレッドから読めないので、明るさはここに置く（チャンクと一緒に保存され、クライアントにも送られる）。
+     * 値が変わると光を計算し直す。外したとき（inlay が null）は消す。
+     */
+    public static void updateLight(@Nullable Level level, BlockPos pos, @Nullable BlockState inlay) {
+        if (level == null) {
+            return;
+        }
+        var lights = level.getAuxLightManager(pos);
+        if (lights != null) {
+            lights.setLightAt(pos, inlay == null ? 0 : inlay.getLightEmission());
+        }
+    }
+
+    /** ブロック・ガラス入りのカバーの明るさ（はめ込んだブロックの明るさ。光るブロックなら光る）。入っていなければ 0。 */
+    public static int lightEmission(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos) {
+        if (!inlaid(state)) {
+            return 0;
+        }
+        var lights = level.getAuxLightManager(pos);
+        return lights == null ? 0 : lights.getLightAt(pos);
+    }
+
+    /** ブロックかガラスが入っているか（入っていれば、壊す速さ・音・爆発への強さは、はめ込んだブロックのもの）。 */
+    public static boolean inlaid(BlockState state) {
+        State cover = of(state);
+        return cover == State.BLOCK || cover == State.GLASS;
+    }
+
     /** 枠かブロックがあれば1ブロックいっぱい（なければ shape のまま）。 */
     public static VoxelShape shape(BlockState state, VoxelShape shape) {
         return of(state) == State.NONE ? shape : Shapes.block();
@@ -98,7 +133,7 @@ public final class ConduitCover {
      */
     public static VoxelShape collision(BlockState state, VoxelShape shape) {
         return switch (of(state)) {
-            case FRAME -> HOLLOW;
+            case FRAME, GLASS -> HOLLOW;        // ガラス入りも中空の箱（ガラスの板とケーブルが、隣の明るさで黒く描かれないよう）
             case BLOCK -> Shapes.block();
             case NONE -> shape;
         };
@@ -109,20 +144,45 @@ public final class ConduitCover {
         return of(state) == State.BLOCK ? Shapes.block() : Shapes.empty();
     }
 
-    /** 光を通すか: ブロック入りのときだけ通さない（枠だけ・カバーなしは、ガラスのように通す）。 */
+    /** 光を通すか: ブロック入りのときだけ通さない（枠だけ・ガラス入り・カバーなしは、ガラスのように通す）。 */
     public static boolean passesLight(BlockState state) {
         return of(state) != State.BLOCK;
     }
 
     /** はめ込めるブロックの状態か（すき間のない不透明な1ブロック。向きはあってよい。ブロックエンティティ・ケーブル・水に浸かった物は除く）。 */
     public static boolean allowed(@Nullable BlockState s) {
-        if (s == null || s.isAir() || isConduit(s.getBlock()) || s.hasBlockEntity()
-                || s.hasProperty(BlockStateProperties.WATERLOGGED) && s.getValue(BlockStateProperties.WATERLOGGED)) {
+        if (!plain(s)) {
             return false;
         }
         var level = EmptyBlockGetter.INSTANCE;
-        return s.getRenderShape() == RenderShape.MODEL && s.canOcclude()
-                && s.isSolidRender() && s.isCollisionShapeFullBlock(level, BlockPos.ZERO);
+        return s.canOcclude() && s.isSolidRender() && s.isCollisionShapeFullBlock(level, BlockPos.ZERO);
+    }
+
+    /**
+     * はめ込めるガラスか（0.23.0）: 1ブロックいっぱいの透けるブロック（バニラのガラス・色付きガラス・遮光ガラス、この作品のガラス）。
+     * 板ガラス・ガラスの階段やハーフブロックは、すき間があるので使えない。
+     */
+    public static boolean glass(@Nullable BlockState s) {
+        if (!plain(s) || !(s.getBlock() instanceof net.minecraft.world.level.block.TransparentBlock || s.is(net.neoforged.neoforge.common.Tags.Blocks.GLASS_BLOCKS))) {
+            return false;
+        }
+        return s.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+    }
+
+    /** はめ込める（ブロックかガラス）か。 */
+    public static boolean accepts(@Nullable BlockState s) {
+        return allowed(s) || glass(s);
+    }
+
+    /** ブロックエンティティ・ケーブル・水に浸かった物・モデルのない物ではないか。 */
+    private static boolean plain(@Nullable BlockState s) {
+        return s != null && !s.isAir() && !isConduit(s.getBlock()) && !s.hasBlockEntity() && s.getRenderShape() == RenderShape.MODEL
+                && !(s.hasProperty(BlockStateProperties.WATERLOGGED) && s.getValue(BlockStateProperties.WATERLOGGED));
+    }
+
+    /** はめ込んだブロックに合うカバーの状態（ガラスならガラス入り、ほかはブロック入り）。 */
+    public static State stateFor(BlockState inlay) {
+        return allowed(inlay) ? State.BLOCK : State.GLASS;
     }
 
     /** ブロックエンティティに保存する。 */
@@ -163,7 +223,7 @@ public final class ConduitCover {
                 return io.github.genichimaruo.singulo.compat.Interactions.sidedSuccess(level.isClientSide());       // はめ込み中（次の tick にブロック入りになる）
             }
             BlockState inlay = item.getBlock().getStateForPlacement(new BlockPlaceContext(player, hand, stack, hit));
-            if (!allowed(inlay)) {
+            if (!accepts(inlay)) {
                 if (!level.isClientSide()) {
                     player.sendOverlayMessage(Component.translatable("message.singulo.cover.not_allowed", stack.getHoverName()));
                 }
@@ -192,7 +252,27 @@ public final class ConduitCover {
     /** はめ込み（use）の次の tick: はめ込んだブロックがあれば、ブロック入りの状態にする。 */
     public static void settle(BlockState state, Level level, BlockPos pos) {
         if (of(state) == State.FRAME && level.getBlockEntity(pos) instanceof Holder holder && holder.coverState() != null) {
-            level.setBlock(pos, state.setValue(PROPERTY, State.BLOCK), Block.UPDATE_ALL);
+            level.setBlock(pos, state.setValue(PROPERTY, stateFor(holder.coverState())), Block.UPDATE_ALL);
+        }
+    }
+
+    /**
+     * はめ込んだブロックを外せないか（0.23.0）: 掘るのに道具の要るブロック（黒曜石・コラプサー強化パネルなど）は、それを掘れる道具を
+     * 持っていないと外せない（移設レンチも、その道具ではないので外せない）。創造モードと、道具の要らないブロック・枠だけは外せる。
+     */
+    public static boolean locked(Level level, BlockPos pos, @Nullable Player player) {
+        if (player != null && player.getAbilities().instabuild || !(level.getBlockEntity(pos) instanceof Holder holder)) {
+            return false;
+        }
+        BlockState inlay = holder.coverState();
+        return inlay != null && inlay.requiresCorrectToolForDrops() && (player == null || !player.hasCorrectToolForDrops(inlay, level, pos));
+    }
+
+    /** 外せないことを行動バーで知らせる（サーバーだけ）。 */
+    public static void tellLocked(Level level, BlockPos pos, Player player) {
+        if (!level.isClientSide() && player instanceof ServerPlayer sp && level.getBlockEntity(pos) instanceof Holder holder && holder.coverState() != null) {
+            sp.sendOverlayMessage(Component.translatable("message.singulo.cover.needs_tool",
+                    holder.coverState().getBlock().getName()));
         }
     }
 
@@ -203,7 +283,7 @@ public final class ConduitCover {
         if (cover != State.NONE && level.getBlockEntity(pos) instanceof Holder holder && holder.coverState() != null) {
             BlockState inlay = holder.coverState();
             holder.setCoverState(null);
-            if (cover == State.BLOCK) {
+            if (cover == State.BLOCK || cover == State.GLASS) {
                 level.setBlock(pos, state.setValue(PROPERTY, State.FRAME), Block.UPDATE_ALL);
             } else {
                 level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
@@ -228,7 +308,7 @@ public final class ConduitCover {
      * 壊す速さ: ブロック入りなら、はめ込んだブロックを掘る速さ（石ならツルハシで速い）。枠だけ・カバーなし・撤去モードのレンチは base のまま。
      */
     public static float destroyProgress(BlockState state, Player player, net.minecraft.world.level.BlockGetter level, BlockPos pos, float base) {
-        if (of(state) == State.BLOCK && !removesWholeConduit(player) && level.getBlockEntity(pos) instanceof Holder holder
+        if (inlaid(state) && !removesWholeConduit(player) && level.getBlockEntity(pos) instanceof Holder holder
                 && holder.coverState() != null) {
             return holder.coverState().getDestroyProgress(player, level, pos);
         }
@@ -238,8 +318,21 @@ public final class ConduitCover {
     /** 爆発への強さ: ブロック入りなら、はめ込んだブロックと同じ（黒曜石なら黒曜石と同じに耐える）。ほかは base のまま。 */
     public static float explosionResistance(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
                                             net.minecraft.world.level.Explosion explosion, float base) {
-        if (of(state) == State.BLOCK && level.getBlockEntity(pos) instanceof Holder holder && holder.coverState() != null) {
+        if (inlaid(state) && level.getBlockEntity(pos) instanceof Holder holder && holder.coverState() != null) {
             return holder.coverState().getExplosionResistance(level, pos, explosion);
+        }
+        return base;
+    }
+
+    /**
+     * ウィザー（体当たり・頭蓋骨）やエンダードラゴンなどの生き物に壊されるか（0.23.0）: ブロック・ガラス入りなら、はめ込んだブロックも
+     * 壊されるときだけ（コラプサー強化パネル・ガラスや黒曜石のような耐性も、カバーごと持つ）。ほかは base のまま。
+     * 青いウィザーの頭蓋骨が爆発への強さを下げるかも、この答えで決まる。
+     */
+    public static boolean canEntityDestroy(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+                                           net.minecraft.world.entity.Entity entity, boolean base) {
+        if (inlaid(state) && level.getBlockEntity(pos) instanceof Holder holder && holder.coverState() != null) {
+            return base && holder.coverState().canEntityDestroy(level, pos, entity);
         }
         return base;
     }
@@ -249,7 +342,14 @@ public final class ConduitCover {
      * 創造モードでは落とさない）。外したら true（ケーブルは壊さない）。撤去モードのレンチでは外さず、ケーブルごと壊す（カバーも戻る）。
      */
     public static boolean breakCover(BlockState state, Level level, BlockPos pos, Player player) {
-        if (of(state) == State.NONE || removesWholeConduit(player)) {
+        if (of(state) == State.NONE) {
+            return false;
+        }
+        if (locked(level, pos, player)) {                      // 適した道具でなければ、何も外さない（撤去モードのレンチでも）
+            tellLocked(level, pos, player);
+            return true;
+        }
+        if (removesWholeConduit(player)) {
             return false;
         }
         if (!level.isClientSide()) {

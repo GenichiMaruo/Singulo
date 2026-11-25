@@ -111,6 +111,71 @@ public final class MachineResultGameTests {
         h.succeed();
     }
 
+    /** 精密組立台で一段ずつ作る上位版を、材料の前の世代から取り出す（出力の枠が空くまで組立台を動かす）。 */
+    private static ItemStack assembleUpgrade(GameTestHelper h, String result, ItemStack... inputs) {
+        var machine = place(h, MachineType.PRECISION_ASSEMBLER, 1);
+        io.github.genichimaruo.singulo.test.harness.AssemblyFixture.place(h, machine, result,
+                java.util.Arrays.stream(inputs).map(ItemStack::copy).toArray(ItemStack[]::new));
+        int out = machine.type().outputSlot();
+        for (int i = 0; i < 600 && machine.items().getStackInSlot(out).isEmpty(); i++) {
+            machine.energy().setEnergy(machine.energy().getMaxEnergyStored());
+            tick(h, machine);
+        }
+        ItemStack made = machine.automationItems().extractItem(out, 1, false);
+        h.destroyBlock(new BlockPos(1, 1, 1));
+        return made;
+    }
+
+    /** 装甲板の上位版は、材料の装甲板のエンチャントと名前を引き継ぐ（Mk1 → Mk2 → Mk3）。 */
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void armorPlateUpgradesKeepEnchantments(GameTestHelper h) {
+        var enchantments = h.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT);
+        ItemStack mk1 = stack("android_armor_plate", 1);
+        mk1.enchant(enchantments.getOrThrow(net.minecraft.world.item.enchantment.Enchantments.PROTECTION), 4);
+        mk1.enchant(enchantments.getOrThrow(net.minecraft.world.item.enchantment.Enchantments.THORNS), 2);
+        mk1.set(DataComponents.CUSTOM_NAME, Component.literal("Guard plate"));
+        ItemStack mk2 = assembleUpgrade(h, "android_armor_plate_2", mk1, stack("nihonium_plate", 4), stack("superconducting_coil", 2),
+                stack("entangled_element", 1));
+        h.assertTrue(mk2.is(stack("android_armor_plate_2", 1).getItem()), "Mk2 の装甲板ができない: " + mk2);
+        h.assertTrue(mk2.getEnchantments().equals(mk1.getEnchantments()) && mk2.getHoverName().equals(mk1.getHoverName()),
+                "Mk2 がエンチャントか名前を引き継がない");
+        ItemStack mk3 = assembleUpgrade(h, "android_armor_plate_3", mk2, stack("collapsar_ingot", 2), stack("collapsar_lining", 2),
+                stack("degenerate_nucleus", 1));
+        h.assertTrue(mk3.is(stack("android_armor_plate_3", 1).getItem()), "Mk3 の装甲板ができない: " + mk3);
+        h.assertTrue(mk3.getEnchantments().equals(mk1.getEnchantments()) && mk3.getHoverName().equals(mk1.getHoverName()),
+                "Mk3 がエンチャントか名前を引き継がない");
+        h.assertTrue(mk3.isPrimaryItemFor(enchantments.getOrThrow(net.minecraft.world.item.enchantment.Enchantments.PROTECTION))
+                || mk3.supportsEnchantment(enchantments.getOrThrow(net.minecraft.world.item.enchantment.Enchantments.PROTECTION)),
+                "Mk3 に防具のエンチャントを付けられない");
+        h.succeed();
+    }
+
+    /** 出力増幅器の上位版は、材料の増幅器の剣のエンチャントを引き継ぐ。 */
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void amplifierUpgradeKeepsEnchantments(GameTestHelper h) {
+        var enchantments = h.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT);
+        ItemStack mk1 = stack("android_weapon_module", 1);
+        mk1.enchant(enchantments.getOrThrow(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS), 5);
+        mk1.enchant(enchantments.getOrThrow(net.minecraft.world.item.enchantment.Enchantments.LOOTING), 3);
+        ItemStack mk2 = assembleUpgrade(h, "android_weapon_module_2", mk1, stack("entangled_element", 2), stack("nihonium_plate", 2),
+                stack("quantum_computing_module", 1));
+        h.assertTrue(mk2.is(stack("android_weapon_module_2", 1).getItem()) && mk2.getEnchantments().equals(mk1.getEnchantments()),
+                "出力増幅器 Mk2 がエンチャントを引き継がない: " + mk2);
+        h.succeed();
+    }
+
+    /** 無線充電器の上位版は、材料の充電器の電力を引き継ぐ。 */
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void chargerUpgradeKeepsStoredPower(GameTestHelper h) {
+        ItemStack mk1 = stack("android_charger", 1);
+        mk1.set(SinguloComponents.ENERGY.get(), 123_456);
+        ItemStack mk2 = assembleUpgrade(h, "android_charger_2", mk1, stack("entangled_element", 2), stack("superconducting_coil", 2),
+                stack("nihonium_plate", 2));
+        h.assertTrue(mk2.is(stack("android_charger_2", 1).getItem()) && mk2.getOrDefault(SinguloComponents.ENERGY.get(), 0) == 123_456,
+                "Mk2 の充電器が電力を引き継がない: " + mk2.getOrDefault(SinguloComponents.ENERGY.get(), 0));
+        h.succeed();
+    }
+
     @GameTest(template = "empty")
     public static void incubatorKeepsPurityAndIngredientsUntilOutputFits(GameTestHelper h) {
         var machine = place(h, MachineType.TIME_CRYSTAL_INCUBATOR, 1);

@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "singulo:android_armor_plate"
+    "singulo:android_armor_plate",
+    "singulo:android_armor_plate_2",
+    "singulo:android_armor_plate_3"
   ]
 }

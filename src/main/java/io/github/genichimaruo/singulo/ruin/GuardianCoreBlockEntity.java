@@ -148,12 +148,33 @@ public class GuardianCoreBlockEntity extends io.github.genichimaruo.singulo.comp
         return access;
     }
 
+    /** 覚えた製造ラインの位置（読み取り専用。減らすときは {@link #keepPropsWithin}）。 */
     public List<BlockPos> lines() {
-        return linePos;
+        return java.util.Collections.unmodifiableList(linePos);
     }
 
+    /** 覚えたコンベアの位置（読み取り専用。減らすときは {@link #keepPropsWithin}）。 */
     public List<BlockPos> conveyors() {
-        return conveyorPos;
+        return java.util.Collections.unmodifiableList(conveyorPos);
+    }
+
+    /**
+     * 覚えた製造ライン・コンベアのうち、inside に入るものだけを残す。位置と元の形は同じ番号で対応しているので、
+     * 一緒に取り除く（位置だけを減らすと、直すときに別のブロックの形で置いてしまう）。
+     */
+    public void keepPropsWithin(java.util.function.Predicate<BlockPos> inside) {
+        retain(linePos, lineState, inside);
+        retain(conveyorPos, conveyorState, inside);
+        setChanged();
+    }
+
+    private static void retain(List<BlockPos> pos, List<BlockState> states, java.util.function.Predicate<BlockPos> inside) {
+        for (int i = pos.size() - 1; i >= 0; i--) {
+            if (!inside.test(pos.get(i))) {
+                pos.remove(i);
+                states.remove(i);
+            }
+        }
     }
 
     /** その位置の製造ラインの、元の形（覚えていなければ null）。 */

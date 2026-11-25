@@ -1,0 +1,36 @@
+{
+  "type": "singulo:machine",
+  "station": "precision_assembler",
+  "stage": 3,
+  "time": 200,
+  "energy": 100,
+  "ingredients": [
+    {
+      "ingredient": "singulo:android_weapon_module",
+      "count": 1
+    },
+    {
+      "ingredient": "singulo:entangled_element",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:nihonium_plate",
+      "count": 2
+    },
+    {
+      "ingredient": "singulo:quantum_computing_module",
+      "count": 1
+    }
+  ],
+  "shape": [
+    "     ",
+    " B B ",
+    " CAC ",
+    "  D  ",
+    "     "
+  ],
+  "result": {
+    "id": "singulo:android_weapon_module_2",
+    "count": 1
+  }
+}

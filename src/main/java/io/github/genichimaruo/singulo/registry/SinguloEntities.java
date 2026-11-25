@@ -122,6 +122,10 @@ public final class SinguloEntities {
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.KatanaAndroid>> KATANA_ANDROID = REGISTER.register(
             "katana_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.KatanaAndroid::new, MobCategory.MONSTER)
                     .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, Singulo.id("katana_android"))));
+    /** 放電型アンドロイド「エクレール」（覚醒したエルゴ球の大蛇の隠し報酬のメモリから印刷する）。 */
+    public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.SparkAndroid>> SPARK_ANDROID = REGISTER.register(
+            "spark_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.SparkAndroid::new, MobCategory.MONSTER)
+                    .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, Singulo.id("spark_android"))));
     public static final Supplier<EntityType<io.github.genichimaruo.singulo.android.SaberAndroid>> SABER_ANDROID = REGISTER.register(
             "saber_android", () -> EntityType.Builder.of(io.github.genichimaruo.singulo.android.SaberAndroid::new, MobCategory.MONSTER)
                     .sized(0.55F, 1.65F).eyeHeight(1.46F).clientTrackingRange(10).build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, Singulo.id("saber_android"))));
@@ -144,6 +148,7 @@ public final class SinguloEntities {
         event.put(BIT_ANDROID.get(), io.github.genichimaruo.singulo.android.BitAndroid.createAttributes().build());
         event.put(GUNNER_ANDROID.get(), io.github.genichimaruo.singulo.android.GunnerAndroid.createAttributes().build());
         event.put(KATANA_ANDROID.get(), io.github.genichimaruo.singulo.android.KatanaAndroid.createAttributes().build());
+        event.put(SPARK_ANDROID.get(), io.github.genichimaruo.singulo.android.SparkAndroid.createAttributes().build());
         event.put(SECURITY_DRONE.get(), SecurityDrone.createAttributes().build());
         event.put(CARGO_DRONE.get(), io.github.genichimaruo.singulo.drone.CargoDrone.createAttributes().build());
         event.put(HORIZON_WARDEN.get(), HorizonWarden.createAttributes().build());

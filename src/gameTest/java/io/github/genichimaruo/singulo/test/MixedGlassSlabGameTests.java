@@ -85,7 +85,8 @@ public final class MixedGlassSlabGameTests {
                 h.assertTrue(drops.size() == 2 && drops.stream().allMatch(s -> s.getCount() == 1)
                         && drops.stream().anyMatch(s -> s.is(first.getBlock().asItem()))
                         && drops.stream().anyMatch(s -> s.is(second.getBlock().asItem())), "Mining did not return one of each slab");
-                h.assertTrue(result.skipRendering(result, Direction.EAST) && !result.skipRendering(mixed(!blackOnTop), Direction.EAST)
+                // 0.23.0: 違う種類のガラスどうしも同じガラスのように扱うので、白黒を入れ替えた重ねハーフブロックとの間も描かない
+                h.assertTrue(result.skipRendering(result, Direction.EAST) && result.skipRendering(mixed(!blackOnTop), Direction.EAST)
                         && result.skipRendering(MixedGlassSlab.half(result, true).setValue(SlabBlock.TYPE, SlabType.BOTTOM), Direction.UP),
                         "Same-material contact faces did not match the two layers");
             }

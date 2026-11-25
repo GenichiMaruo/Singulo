@@ -5,7 +5,6 @@ import io.github.genichimaruo.singulo.Singulo;
 import io.github.genichimaruo.singulo.cosmic.CosmicChamberBlockEntity;
 import io.github.genichimaruo.singulo.multiblock.Blueprints;
 import java.nio.file.*;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.core.BlockPos;
@@ -30,11 +29,6 @@ public final class OcclusionReviewHarness {
     private static volatile boolean prepared;
     private static boolean requested,captured;
     private static NativeImage before;
-    private static Boolean activeTransparency;
-    @SubscribeEvent public static void observePipeline(RenderLevelStageEvent.AfterTranslucentFeatures e) {
-        // Framegraph attachments are released before AfterLevel in 26.1; observe while alive.
-        activeTransparency=Minecraft.getInstance().levelRenderer.getTranslucentTarget()!=null;
-    }
     @SubscribeEvent public static void tick(ClientTickEvent.Post e) {
         var mc=Minecraft.getInstance();
         if (++ticks>4000) throw new AssertionError("Occlusion timed out "+stage);
@@ -71,16 +65,15 @@ public final class OcclusionReviewHarness {
         player.setGameMode(GameType.SPECTATOR);player.teleportTo(level,10.5,103,3.5,java.util.Set.of(),90,0,false);
         prepared=true;
     }
-    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void before(RenderLevelStageEvent.AfterLevel e)throws Exception{
+    @SubscribeEvent(priority=EventPriority.NORMAL) public static void before(RenderLevelStageEvent.AfterOpaqueFeatures e)throws Exception{
         if(!prepared||wait<100||captured)return;
-        var f=GravitationalLensing.class.getDeclaredField("SOURCES");f.setAccessible(true);int n=((List<?>)f.get(null)).size();
-        if(n<1)throw new AssertionError("Spindle lens source not registered");
-        if ((activeTransparency==null || activeTransparency != (MODES[stage/3]==net.minecraft.client.GraphicsPreset.FABULOUS))) {
+        if(!GravitationalLensing.hasSources())throw new AssertionError("Spindle lens source not registered");
+        if (((Minecraft.getInstance().levelRenderer.getTranslucentTarget()!=null) != (MODES[stage/3]==net.minecraft.client.GraphicsPreset.FABULOUS))) {
             throw new AssertionError("Requested graphics pipeline not active");
         }
         before=ReviewScreenshot.take(Minecraft.getInstance().getMainRenderTarget());
     }
-    @SubscribeEvent(priority=EventPriority.LOWEST) public static void after(RenderLevelStageEvent.AfterLevel e)throws Exception{
+    @SubscribeEvent(priority=EventPriority.LOWEST) public static void after(RenderLevelStageEvent.AfterOpaqueFeatures e)throws Exception{
         if(before==null)return;
         var mc=Minecraft.getInstance();var out=Path.of(System.getProperty("singulo.occlusionOutput"));Files.createDirectories(out);
         try(var after=ReviewScreenshot.take(mc.getMainRenderTarget())){
