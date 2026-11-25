@@ -240,7 +240,7 @@ public final class FacilityReconstructionGameTests {
         try {
             config.set(true);
             var recipe = level.getServer().getRecipeManager().getRecipeFor(type, input, level).orElseThrow();
-            helper.assertTrue(recipe.id().equals(Singulo.id("facility_reconstructor"))
+            helper.assertTrue(recipe.id().identifier().equals(Singulo.id("facility_reconstructor"))
                     && recipe.value().assemble(input).is(SinguloItems.FACILITY_RECONSTRUCTOR.get()),
                     "Configured recipe did not craft the expected device");
             config.set(false);
