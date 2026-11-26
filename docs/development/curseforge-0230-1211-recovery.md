@@ -1,0 +1,9 @@
+# One approved recovery only: Singulo 0.23.0 for Minecraft 1.21.1 NeoForge
+
+This is not a general publishing path. It is scoped to the existing immutable v0.23.0 tag, the original failed run 45651013778, CI artifact 15036544463 and one fixed CurseForge file in project 1734662. The original permanent guard remains intact and blocks the original publisher. No old guard, digest or workflow is edited.
+
+Before dispatch, the owner or an operator authorized by the owner must check the Singulo Files tab through the authenticated project-owner CurseForge Author Dashboard, with all statuses visible, including files under review or processing. The exact file must be absent. The public-list check in CI is a second check; it cannot see those states. The assertion and UTC time are explicit dispatch inputs and fail closed after 20 minutes. The recovery requires the owner GitHub account and will never run on a rerun or any other branch.
+
+The recovery proves the exact original publisher step was skipped, validates the old intent receipt and immutable refs, and promotes the same tested JAR without rebuilding. It records an asset-free release draft first; if that step is uncertain or fails, no recovery lock or CurseForge request is made and any draft remains for review. A draft never grants upload. Only then does it atomically create a new fixed recovery reservation. This is a separate immutable ref, not an adoption or deletion of the old publication lock. There is no automatic recovery or retry from any ambiguous response. The program won’t follow a redirect with credentials.
+
+This can report that CurseForge accepted the file, not that it is public. After acceptance, independently check the listed Minecraft/loader, public status, and anonymous CDN SHA-256. Keep both refs and the GitHub and CurseForge receipts. A failure after acceptance needs audit reconciliation, never a new upload. Do not use this workflow for any other file, project, or version.
