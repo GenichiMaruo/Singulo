@@ -15,8 +15,9 @@ public final class SinguloCapabilities {
     private SinguloCapabilities() {}
 
     public static void register(RegisterCapabilitiesEvent event) {
-        for (var type : SinguloBlockEntities.REGISTER.getEntries()) {
-            event.registerBlockEntity(MachineReports.CAPABILITY, type.get(),
+        for (var entry : SinguloBlockEntities.REGISTER.getEntries()) {
+            BlockEntityType<?> type = entry.get();
+            event.registerBlockEntity(MachineReports.CAPABILITY, type,
                     (be, context) -> be instanceof MachineReport.Source source ? source : null);
         }
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, SinguloBlockEntities.COSMIC_CHAMBER.get(),

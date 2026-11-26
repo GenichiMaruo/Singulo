@@ -3366,11 +3366,6 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         stepOption = ProcedureStep.defaultOption(stepKind);
     }
 
-    /**
-     * 手順を足す: 場所は作業位置カード A（採掘なら B があれば、A と B で囲った範囲）、物は見本の欄（採掘で空なら、カードの完成品）。
-     * 足せなければ、その理由。
-     */
-    @Nullable
     /** 同じ種類の別の物も使うかを、全部の欄でまとめて切り替える（作業台モード。全部オンなら全部オフ、そうでなければ全部オン）。 */
     public void toggleVariants() {
         variantMask = variantMask == ALL_VARIANTS ? 0 : ALL_VARIANTS;
@@ -3488,6 +3483,11 @@ public class WorkConsoleBlockEntity extends BlockEntity implements AbstractMachi
         }
     }
 
+    /**
+     * 手順を足す: 場所は作業位置カード A（採掘なら B があれば、A と B で囲った範囲）、物は見本の欄（採掘で空なら、カードの完成品）。
+     * 足せなければ、その理由。
+     */
+    @Nullable
     public Component addStep() {
         if (procSteps.size() >= RecipeData.MAX_STEPS) {
             return Component.translatable("gui.singulo.recipe_encoder.step.full");
