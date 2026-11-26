@@ -17,6 +17,12 @@
 
 確認は `ExtrasGameTests.microBlackHoleResistsExternalRemoval`。
 
-## Jade・WTHIT で小さなブラックホールの名前を出さない
+## Jade・WTHIT で現象の実体の名前を出さない
 
-小さなブラックホールは実体として作っているが、見た目は現象なので、Jade・WTHIT で見たときに実体の名前（`micro_black_hole_entity`）の表示を出さない。Jade は `hideTarget`、WTHIT は `blacklist` に実体の種類を登録する（`compat/jade/SinguloJadePlugin`、`compat/wthit/SinguloWthitPlugin`）。
+次の実体は実装の都合で実体にしているが、見た目は現象なので、Jade・WTHIT で見たときに実体の名前の表示を出さない。
+
+- `micro_black_hole_entity`: ブラックホール爆弾の小さなブラックホール。
+- `warden_singularity`: ホライズン・ウォーデンの小型の特異点。
+- `infalling_block`: リアクターの炉心に吸い込まれていくブロック。
+
+一覧は `SinguloEntities.hiddenFromTooltips()` にまとめ、Jade は `hideTarget`、WTHIT は `blacklist` に登録する（`compat/jade/SinguloJadePlugin`、`compat/wthit/SinguloWthitPlugin`）。

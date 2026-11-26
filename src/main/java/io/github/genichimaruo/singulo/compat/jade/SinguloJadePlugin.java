@@ -34,8 +34,8 @@ public final class SinguloJadePlugin implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerBlockComponent(Client.INSTANCE, Block.class);
-        // ブラックホール爆弾の小さなブラックホールは現象なので、実体の名前を出さない
-        registration.hideTarget(io.github.genichimaruo.singulo.registry.SinguloEntities.MICRO_BLACK_HOLE.get());
+        // 小さなブラックホール・特異点・吸い込まれるブロックは現象なので、実体の名前を出さない
+        io.github.genichimaruo.singulo.registry.SinguloEntities.hiddenFromTooltips().forEach(registration::hideTarget);
     }
 
     /** サーバー: 報告を作って送る。装置かマルチブロックの部品のときだけ頼まれる。 */
