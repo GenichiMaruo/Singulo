@@ -76,7 +76,7 @@ bash ./gradlew --no-configuration-cache -I tools/review/jei.gradle runClient
 
 容量アップグレードの検査は`CapacityUpgradeGameTests`と`AssemblerPowerGameTests`で、通常容量・受電上限、Mk1〜Mk3、旧インベントリ移行、交換・取り外し時の余剰電力、実レシピの連続製作を確認する。上記JEIクライアント検査では専用枠と速度枠の同時装着を3段階×5言語で撮影する（`SINGULO_CAPACITY_GUI_COMPLETE`、`screenshots/capacity-mk*-*.png`）。
 
-- 新しいGameTestは`src/gameTest/java/`内の`*GameTests.java`へ置く。既存の`src/main/java/**/GameTests.java`もGradleの`gameTest`ソースセットに振り分け、製品JARには含めない。
+- GameTestは`src/gameTest/java/`内の`*GameTests.java`へ置く。Gradleはテストと共通ヘルパーを`gameTest`ソースセットでコンパイルし、製品JARには含めない。
 - `@GameTestHolder`と`@PrefixGameTestTemplate(false)`を付け、メソッド名は全クラスで重複させない。新しい名前空間を作るときは、Gradleと検査ツールの既定一覧を更新する。
 - 期待する件数を変更するときは、追加・削除した検証内容をレビューする。件数だけ合わせて成功扱いにしない。
 - 試行回数を増やして失敗を隠さない。乱数は固定する。世界の時刻、設定、レシピを一時変更したら、失敗時にも復元する。

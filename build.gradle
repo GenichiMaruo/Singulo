@@ -14,16 +14,13 @@ sourceSets.main.java.srcDir('src/generated/java')
 // Compile integration fixtures separately: never ship test classes in the mod JAR.
 sourceSets {
     gameTest {
-        java.srcDir('src/main/java')
-        java.srcDir('src/gameTest/java')
         // Narrow local reruns compile/register only these classes; full CI uses no filter.
         def selected = providers.gradleProperty('testClasses').getOrElse('').split(',').findAll { !it.isBlank() }
         if (selected.any { !(it ==~ /[A-Za-z][A-Za-z0-9]*GameTests/) }) {
             throw new GradleException('testClasses expects comma-separated GameTests class names')
         }
         for (name in selected) {
-            if (fileTree('src/main/java').matching { include "**/${name}.java" }.isEmpty()
-                    && fileTree('src/gameTest/java').matching { include "**/${name}.java" }.isEmpty()) {
+            if (fileTree('src/gameTest/java').matching { include "**/${name}.java" }.isEmpty()) {
                 throw new GradleException("Unknown GameTest class: ${name}")
             }
         }

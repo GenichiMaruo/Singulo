@@ -19,7 +19,7 @@ public final class ShapeCache {
     private record Entry(long checked, Blueprints.Kind kind, @Nullable Shapes.Found found) {}
 
     private static final Map<BlockPos, Entry> CACHE = new LinkedHashMap<>(16, 0.75F, true) {
-        @Override protected boolean removeEldestEntry(Map.Entry<BlockPos, Entry> eldest) { return size() > 4096; }
+        @Override protected boolean removeEldestEntry(Map.Entry<BlockPos, ShapeCache.Entry> eldest) { return size() > 4096; }
     };
     private static WeakReference<Level> lastLevel = new WeakReference<>(null);
 

@@ -8,6 +8,7 @@ import io.github.genichimaruo.singulo.registry.SinguloComponents;
 import io.github.genichimaruo.singulo.registry.SinguloEntities;
 import io.github.genichimaruo.singulo.registry.SinguloFluids;
 import io.github.genichimaruo.singulo.registry.SinguloMenus;
+import io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -197,10 +198,10 @@ public final class SinguloClient {
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.PENROSE_REACTOR.get(),
                 PenroseReactorRenderer::new);
         event.registerBlockEntityRenderer(io.github.genichimaruo.singulo.registry.SinguloBlockEntities.SEAL_CONSOLE.get(),
-                ctx -> new net.minecraft.client.renderer.blockentity.BlockEntityRenderer<>() {
+                ctx -> new net.minecraft.client.renderer.blockentity.BlockEntityRenderer<SealConsoleBlockEntity>() {
                     // 重力異常点: 封印コンソールの上の空間がゆがんで見える。ボスが現れると縮んで消え、倒されると戻る
                     @Override
-                    public void render(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be, float pt,
+                    public void render(SealConsoleBlockEntity be, float pt,
                                        com.mojang.blaze3d.vertex.PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buf,
                                        int light, int overlay) {
                         if (be.getLevel() == null) {
@@ -214,12 +215,12 @@ public final class SinguloClient {
                     }
 
                     @Override
-                    public boolean shouldRenderOffScreen(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be) {
+                    public boolean shouldRenderOffScreen(SealConsoleBlockEntity be) {
                         return true;
                     }
 
                     @Override
-                    public net.minecraft.world.phys.AABB getRenderBoundingBox(io.github.genichimaruo.singulo.ruin.SealConsoleBlockEntity be) {
+                    public net.minecraft.world.phys.AABB getRenderBoundingBox(SealConsoleBlockEntity be) {
                         // 異常点（コンソールの3.5ブロック上）の歪みが画面にかかる間は描く
                         return new net.minecraft.world.phys.AABB(be.getBlockPos()).expandTowards(0, 4, 0).inflate(6);
                     }

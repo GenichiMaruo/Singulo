@@ -18,7 +18,7 @@ Minecraft 1.21.1 / NeoForge / Java 21。作業対象のブランチと`gradle.pr
 | 翻訳 | 英日原稿と`tools/locales/`。`source`も一致させる |
 | 実際の加工補正 | `src/main/java/.../recipe/RecipeTweaks.java`。ティア・寿命・設定補正を含む |
 | 機械の枠と能力 | `machine/`、`multiblock/`、`reactor/`などの実装 |
-| 検査 | 新規は`src/gameTest/java/`。旧`*GameTests.java`も別ソースセットでコンパイル |
+| GameTest | `src/gameTest/java/` |
 
 `src/generated/`は生成物。直接修正せず、生成元を変更して以下を実行する。
 

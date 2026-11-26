@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+# Minecraft and NeoForge expose many API values without nullness annotations.
+org.eclipse.jdt.core.compiler.problem.nullUncheckedConversion=ignore

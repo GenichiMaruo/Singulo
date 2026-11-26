@@ -1,0 +1,5 @@
+{
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.settings.url": ".vscode/java.prefs",
+  "java.configuration.updateBuildConfiguration": "automatic"
+}
