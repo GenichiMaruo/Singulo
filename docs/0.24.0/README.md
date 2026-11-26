@@ -24,5 +24,7 @@
 - `micro_black_hole_entity`: ブラックホール爆弾の小さなブラックホール。
 - `warden_singularity`: ホライズン・ウォーデンの小型の特異点。
 - `infalling_block`: リアクターの炉心に吸い込まれていくブロック。
+- `android_crescent`: 光剣型アンドロイドの斬撃波。
+- `android_laser`: アンドロイドが床から立てる光の柱。
 
 一覧は `SinguloEntities.hiddenFromTooltips()` にまとめ、Jade は `hideTarget`、WTHIT は `blacklist` に登録する（`compat/jade/SinguloJadePlugin`、`compat/wthit/SinguloWthitPlugin`）。

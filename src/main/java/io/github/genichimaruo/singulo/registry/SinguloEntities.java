@@ -142,7 +142,8 @@ public final class SinguloEntities {
 
     /** 実体として作っているが見た目は現象なので、Jade・WTHIT で名前を出さないもの。 */
     public static java.util.List<EntityType<?>> hiddenFromTooltips() {
-        return java.util.List.of(MICRO_BLACK_HOLE.get(), WARDEN_SINGULARITY.get(), INFALLING_BLOCK.get());
+        return java.util.List.of(MICRO_BLACK_HOLE.get(), WARDEN_SINGULARITY.get(), INFALLING_BLOCK.get(),
+                ANDROID_CRESCENT.get(), ANDROID_LASER.get());
     }
 
     public static void registerAttributes(EntityAttributeCreationEvent event) {
