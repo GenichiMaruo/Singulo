@@ -35,6 +35,25 @@ class DistributionTests(unittest.TestCase):
                 b'[[dependencies.singulo]]\nmodId="minecraft"\nversionRange="[1.20.1]"\n',
             'example/Main.class': b'\xca\xfe\xba\xbe' + struct.pack('>HH', 0, 61)}
 
+
+        keys = {
+            'MixedGlassExplosionMixin': {
+                'explode': 'Lnet/minecraft/world/level/Explosion;m_46061_()V',
+                'Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;':
+                    'Lnet/minecraft/world/level/Level;m_8055_(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;',
+                'Lnet/minecraft/world/level/ExplosionDamageCalculator;shouldBlockExplode(Lnet/minecraft/world/level/Explosion;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)Z':
+                    'Lnet/minecraft/world/level/ExplosionDamageCalculator;m_6714_(Lnet/minecraft/world/level/Explosion;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)Z',
+            },
+            'AndroidWeaponTerrainMixin': {
+                'renderLevel': 'Lnet/minecraft/client/renderer/LevelRenderer;m_109599_(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V',
+                'Lnet/minecraft/client/renderer/LevelRenderer;renderChunkLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/PoseStack;DDDLorg/joml/Matrix4f;)V':
+                    'Lnet/minecraft/client/renderer/LevelRenderer;m_172993_(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/PoseStack;DDDLorg/joml/Matrix4f;)V',
+            },
+        }
+        mappings = {f'io/github/genichimaruo/singulo/mixin/{name}': entries for name, entries in keys.items()}
+        self.entries['singulo.refmap.json'] = json.dumps({'mappings': mappings, 'data': {'searge': mappings}})
+
+
     def write_report(self):
         (self.root / 'reports/gametest/results.json').write_text(json.dumps(self.report))
 
@@ -45,6 +64,20 @@ class DistributionTests(unittest.TestCase):
             release.validate(self.root, 'neoforge', self.name)
 
     def test_valid_java17_distribution(self): self.check()
+
+
+    def test_missing_refmap_blocks_distribution(self):
+        del self.entries['singulo.refmap.json']
+        with self.assertRaisesRegex(RuntimeError, 'missing a readable singulo.refmap'):
+            self.check()
+
+    def test_missing_srg_target_blocks_distribution(self):
+        refmap = json.loads(self.entries['singulo.refmap.json'])
+        del refmap['data']['searge']['io/github/genichimaruo/singulo/mixin/MixedGlassExplosionMixin']['explode']
+        self.entries['singulo.refmap.json'] = json.dumps(refmap)
+        with self.assertRaisesRegex(RuntimeError, 'Missing searge refmap target: MixedGlassExplosionMixin explode'):
+            self.check()
+
 
     def test_test_or_review_code_never_ships(self):
         for name in ['example/FooGameTests.class', 'example/FooGameTests$1.class',

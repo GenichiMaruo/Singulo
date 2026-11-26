@@ -25,7 +25,10 @@ MIXIN_TARGETS = {
 
 
 def check_required_mixin_mappings(jar):
-    refmap = json.loads(jar.read('singulo.refmap.json'))
+    try:
+        refmap = json.loads(jar.read('singulo.refmap.json'))
+    except (KeyError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise RuntimeError('Production JAR is missing a readable singulo.refmap.json') from error
     for namespace, mappings in (('default', refmap.get('mappings', {})),
                                 ('searge', refmap.get('data', {}).get('searge', {}))):
         for mixin, targets in MIXIN_TARGETS.items():
