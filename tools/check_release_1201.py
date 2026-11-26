@@ -1,5 +1,6 @@
 """Validate a production 1.20.1 JAR and its exact nonempty GameTest completion."""
 import argparse
+import json
 from pathlib import Path
 import re
 import struct
@@ -8,6 +9,31 @@ import zipfile
 from check_gametests import check, inventory, DEFAULT_NAMESPACES
 
 COUNTS = {'forge': 1051, 'neoforge': 1051}
+
+
+MIXIN_TARGETS = {
+    'MixedGlassExplosionMixin': {
+        'explode': 'm_46061_',
+        'Level;getBlockState(': 'm_8055_',
+        'ExplosionDamageCalculator;shouldBlockExplode(': 'm_6714_',
+    },
+    'AndroidWeaponTerrainMixin': {
+        'renderLevel': 'm_109599_',
+        'LevelRenderer;renderChunkLayer(': 'm_172993_',
+    },
+}
+
+
+def check_required_mixin_mappings(jar):
+    refmap = json.loads(jar.read('singulo.refmap.json'))
+    for namespace, mappings in (('default', refmap.get('mappings', {})),
+                                ('searge', refmap.get('data', {}).get('searge', {}))):
+        for mixin, targets in MIXIN_TARGETS.items():
+            entries = mappings.get(f'io/github/genichimaruo/singulo/mixin/{mixin}', {})
+            for selector, srg in targets.items():
+                if not any((key == selector or selector in key)
+                           and f';{srg}(' in value for key, value in entries.items()):
+                    raise RuntimeError(f'Missing {namespace} refmap target: {mixin} {selector} -> {srg}')
 
 
 def validate(root, loader, name=None, source=None):
@@ -31,6 +57,7 @@ def validate(root, loader, name=None, source=None):
         name = f"{properties['mod_name']}-{properties['mod_version']}-1.20.1{suffix}.jar"
     path = root / 'libs' / name
     with zipfile.ZipFile(path) as jar:
+        check_required_mixin_mappings(jar)
         names = jar.namelist()
         if len(names) != len(set(names)) or any('ReviewHarness' in n or re.search(r'(?:GameTests(?:\$[^/]*)?|TestBuild|\w*Review(?:\$[^/]*)?)\.class$', n) or '/test/harness/' in n for n in names):
             raise RuntimeError('Duplicate entries or development GUI code in production JAR')

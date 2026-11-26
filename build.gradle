@@ -263,6 +263,7 @@ mixin {
 dependencies {
     // Both 1.20.1 loaders use the Forge namespace and need the nested runtime for the ray mixins.
     compileOnly 'io.github.llamalad7:mixinextras-common:0.5.4'
+    annotationProcessor 'io.github.llamalad7:mixinextras-common:0.5.4'
     implementation 'io.github.llamalad7:mixinextras-forge:0.5.4'
     jarJar('io.github.llamalad7:mixinextras-forge:0.5.4') {
         version {
