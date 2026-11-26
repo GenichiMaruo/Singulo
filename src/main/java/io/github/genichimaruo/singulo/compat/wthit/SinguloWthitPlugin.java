@@ -36,6 +36,8 @@ public final class SinguloWthitPlugin {
         public void register(ICommonRegistrar registrar) {
             registrar.featureConfig(UID, true);
             registrar.blockData(Data.INSTANCE, BlockEntity.class);
+            // ブラックホール爆弾の小さなブラックホールは現象なので、実体の名前を出さない
+            registrar.blacklist(io.github.genichimaruo.singulo.registry.SinguloEntities.MICRO_BLACK_HOLE.get());
         }
     }
 

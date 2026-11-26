@@ -16,3 +16,7 @@
 チャンクの解放・ワールドの終了（`UNLOADED_TO_CHUNK` など）では、これまでどおり保存されずに消える。見張りの一覧はワールドを閉じたときとサーバーを止めたときに捨てる。
 
 確認は `ExtrasGameTests.microBlackHoleResistsExternalRemoval`。
+
+## Jade・WTHIT で小さなブラックホールの名前を出さない
+
+小さなブラックホールは実体として作っているが、見た目は現象なので、Jade・WTHIT で見たときに実体の名前（`micro_black_hole_entity`）の表示を出さない。Jade は `hideTarget`、WTHIT は `blacklist` に実体の種類を登録する（`compat/jade/SinguloJadePlugin`、`compat/wthit/SinguloWthitPlugin`）。
