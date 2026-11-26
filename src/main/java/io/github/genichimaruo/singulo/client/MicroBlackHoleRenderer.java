@@ -17,7 +17,7 @@ public class MicroBlackHoleRenderer extends EntityRenderer<MicroBlackHole> {
     @Override
     public void render(MicroBlackHole hole, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         float horizon = hole.horizon(partialTick);
-        float time = hole.tickCount + partialTick;
+        float time = hole.age() + partialTick;
         pose.pushPose();
         PenroseReactorRenderer.renderHole(pose, buffers, horizon, 0.7F, time * 3, hole.getPosition(partialTick), horizon * 8);
         pose.popPose();

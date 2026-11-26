@@ -4,6 +4,8 @@ import io.github.genichimaruo.singulo.machine.ShieldTowerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -16,6 +18,10 @@ import net.minecraft.world.phys.Vec3;
 /**
  * ブラックホール爆弾が開く、小さなブラックホール（6秒ほどで蒸発する）。まわりのものを強く引き寄せ、地平線に触れたものを消し、
  * 近くのブロックと液体を次々に飲み込む（シールドの守りの中のブロックは飲み込まない）。最後は閃光と衝撃を出して消える。
+ * <p>
+ * 寿命が尽きるまでは、/kill やほかの mod の実体の消去（kill・discard）では消えない。消去を拒めない方法
+ * （setRemoved を直に呼ぶなど）で消されたら、同じ場所に同じ年齢で開き直す（{@link #guard}）。
+ * チャンクの解放やワールドの終了では、これまでどおり保存されずに消える。
  */
 public class MicroBlackHole extends Entity {
     public static final int LIFE = 120;
@@ -25,14 +31,27 @@ public class MicroBlackHole extends Entity {
     /** 1 tick に飲み込むブロックの数。 */
     static final int EAT_PER_TICK = 4;
 
+    /** 開き直したときに引き継いだ年齢（クライアントの見た目も続きから描くため同期する）。 */
+    private static final EntityDataAccessor<Integer> AGE_OFFSET = SynchedEntityData.defineId(MicroBlackHole.class, EntityDataSerializers.INT);
+    /** 見張っている（サーバーの）小さなブラックホール。 */
+    private static final java.util.Set<MicroBlackHole> WATCHED = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+
+    /** 寿命が尽きて自分で閉じるところ（このときだけ消去を受け入れる）。 */
+    private boolean closing;
+
     public MicroBlackHole(EntityType<? extends MicroBlackHole> type, Level level) {
         super(type, level);
         noPhysics = true;
     }
 
+    /** 開いてからの tick 数（開き直しても続きから数える）。 */
+    public int age() {
+        return tickCount + entityData.get(AGE_OFFSET);
+    }
+
     /** 地平線の半径（生まれてすぐ大きくなり、最後に縮んで消える）。 */
     public float horizon(float partialTick) {
-        float t = tickCount + partialTick;
+        float t = age() + partialTick;
         float grow = Math.min(1F, t / 10F);
         float fade = Math.min(1F, Math.max(0F, (LIFE - t) / 20F));
         return 0.08F + (MAX_HORIZON - 0.08F) * grow * fade;
@@ -49,6 +68,8 @@ public class MicroBlackHole extends Entity {
             return;
         }
         ServerLevel level = (ServerLevel) level();
+        WATCHED.add(this);
+        int age = age();
         Vec3 c = position();
         double horizon = horizon(0);
         for (Entity e : level.getEntitiesOfClass(Entity.class, new AABB(BlockPos.containing(c)).inflate(PULL_RADIUS),
@@ -65,7 +86,7 @@ public class MicroBlackHole extends Entity {
             }
         }
         // 近くのブロックと液体を、近いものから毎 tick いくつか飲み込む
-        if (tickCount >= 3 && tickCount < LIFE - 15 && !ShieldTowerBlockEntity.shielded(level, c, 4)) {
+        if (age >= 3 && age < LIFE - 15 && !ShieldTowerBlockEntity.shielded(level, c, 4)) {
             BlockPos at = BlockPos.containing(c);
             int r = (int) Math.ceil(EAT_RADIUS);
             java.util.List<BlockPos> near = new java.util.ArrayList<>();
@@ -83,12 +104,81 @@ public class MicroBlackHole extends Entity {
                 swallow(level, near.get(i));
             }
         }
-        if (tickCount >= LIFE) {
+        if (age >= LIFE) {
             level.sendParticles(ParticleTypes.FLASH, c.x, c.y, c.z, 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.END_ROD, c.x, c.y, c.z, 40, 0.2, 0.2, 0.2, 0.35);
             level.explode(this, c.x, c.y, c.z, 2.5F, Level.ExplosionInteraction.NONE);
+            closing = true;
+            WATCHED.remove(this);
             discard();
         }
+    }
+
+    /** 寿命の前の消去（/kill・ほかの mod の kill / discard）は受け入れない。チャンクの解放などはそのまま通す。 */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (!closing && !level().isClientSide && (reason == RemovalReason.KILLED || reason == RemovalReason.DISCARDED)) {
+            return;
+        }
+        super.remove(reason);
+    }
+
+    @Override
+    public void kill() {
+        if (closing) {
+            super.kill();
+        }
+    }
+
+    @Override
+    public boolean isInvulnerableTo(net.minecraft.world.damagesource.DamageSource source) {
+        return true;
+    }
+
+    @Override
+    public boolean isAttackable() {
+        return false;
+    }
+
+    @Override
+    public boolean canChangeDimensions(Level from, Level to) {
+        return false;
+    }
+
+    /**
+     * 毎 tick の終わりに、消去を拒めない方法で寿命の前に消された小さなブラックホールを、同じ場所に同じ年齢で開き直す。
+     * チャンクの解放・ワールドの終了で消えたものと、寿命で閉じたものは見張りをやめる。
+     */
+    public static void guard() {
+        if (WATCHED.isEmpty()) {
+            return;
+        }
+        java.util.List<MicroBlackHole> reopen = new java.util.ArrayList<>();
+        for (var it = WATCHED.iterator(); it.hasNext(); ) {
+            MicroBlackHole hole = it.next();
+            if (!hole.isRemoved()) {
+                continue;
+            }
+            it.remove();
+            RemovalReason reason = hole.getRemovalReason();
+            if (!hole.closing && (reason == RemovalReason.KILLED || reason == RemovalReason.DISCARDED)
+                    && hole.level() instanceof ServerLevel level && level.isPositionEntityTicking(hole.blockPosition())) {
+                reopen.add(hole);
+            }
+        }
+        for (MicroBlackHole old : reopen) {
+            MicroBlackHole hole = new MicroBlackHole(io.github.genichimaruo.singulo.registry.SinguloEntities.MICRO_BLACK_HOLE.get(), old.level());
+            hole.entityData.set(AGE_OFFSET, old.age());
+            hole.setPos(old.position());
+            if (old.level().addFreshEntity(hole)) {
+                WATCHED.add(hole);
+            }
+        }
+    }
+
+    /** ワールドを閉じたとき（null ならサーバーを止めたとき）に見張りを捨てる。 */
+    public static void forgetLevel(@javax.annotation.Nullable Level level) {
+        WATCHED.removeIf(h -> level == null || h.level() == level);
     }
 
     /** ブロックを飲み込む。液体は消し、水に浸かったブロックは水を抜いてから飲み込む。 */
@@ -112,6 +202,7 @@ public class MicroBlackHole extends Entity {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(AGE_OFFSET, 0);
     }
 
     @Override

@@ -39,6 +39,7 @@ public final class RuntimeLifecycle {
         FormationEffect.forgetLevel(level);
         ArenaShield.forgetLevel(level);
         BossCombatLog.forgetLevel(level);
+        io.github.genichimaruo.singulo.reactor.MicroBlackHole.forgetLevel(level);
     }
 
     @SubscribeEvent
@@ -65,6 +66,7 @@ public final class RuntimeLifecycle {
         MachineRecipeIndex.clear();
         RecipeSelection.clear();
         RecipeTweaks.invalidate();
+        io.github.genichimaruo.singulo.reactor.MicroBlackHole.forgetLevel(null);
     }
 
     @SubscribeEvent
@@ -74,5 +76,8 @@ public final class RuntimeLifecycle {
     }
 
     @SubscribeEvent
-    public static void tick(ServerTickEvent.Post event) { BossCombatLog.onServerTick(event); }
+    public static void tick(ServerTickEvent.Post event) {
+        BossCombatLog.onServerTick(event);
+        io.github.genichimaruo.singulo.reactor.MicroBlackHole.guard();
+    }
 }

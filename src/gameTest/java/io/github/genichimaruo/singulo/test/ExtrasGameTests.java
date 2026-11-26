@@ -46,6 +46,32 @@ public final class ExtrasGameTests {
         });
     }
 
+    /** 小さなブラックホールは、寿命の前に kill・discard・setRemoved で消そうとしても消えず、寿命で閉じる。 */
+    @GameTest(template = EMPTY, timeoutTicks = MicroBlackHole.LIFE + 40)
+    public static void microBlackHoleResistsExternalRemoval(GameTestHelper helper) {
+        Vec3 at = helper.absoluteVec(new Vec3(4, 3, 4));
+        MicroBlackHole hole = new MicroBlackHole(SinguloEntities.MICRO_BLACK_HOLE.get(), helper.getLevel());
+        hole.setPos(at);
+        helper.getLevel().addFreshEntity(hole);
+        java.util.function.Supplier<java.util.List<MicroBlackHole>> holes = () -> helper.getLevel()
+                .getEntitiesOfClass(MicroBlackHole.class, new net.minecraft.world.phys.AABB(at, at).inflate(1));
+        helper.runAtTickTime(10, () -> {
+            hole.kill();
+            hole.discard();
+            helper.assertFalse(hole.isRemoved(), "kill・discard で消えた");
+            hole.setRemoved(net.minecraft.world.entity.Entity.RemovalReason.KILLED);
+        });
+        helper.runAtTickTime(13, () -> {
+            var now = holes.get();
+            helper.assertTrue(now.size() == 1, "setRemoved のあと開き直さない: " + now.size());
+            helper.assertTrue(now.get(0).age() >= 10, "開き直すと年齢が戻る: " + now.get(0).age());
+        });
+        helper.runAtTickTime(MicroBlackHole.LIFE + 10, () -> {
+            helper.assertTrue(holes.get().isEmpty(), "寿命が尽きても消えない");
+            helper.succeed();
+        });
+    }
+
     /** 野良ブラックホールは、質量が小さくなると蒸発しきって消える。 */
     @GameTest(template = EMPTY, timeoutTicks = 40)
     public static void rogueBlackHoleEvaporates(GameTestHelper helper) {

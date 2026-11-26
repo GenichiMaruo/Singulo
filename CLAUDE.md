@@ -19,3 +19,4 @@ Start with [docs/README.md](docs/README.md) and [docs/development/README.md](doc
 - [0.21.0 machine status, factory monitor and galaxy traits](docs/0.21.0/README.md).
 - [0.22.0 katana android](docs/0.22.0/README.md).
 - [0.23.0 surface ruin grading, facility reconstructor and spark android](docs/0.23.0/README.md).
+- [0.24.0 removal-proof black hole bomb holes](docs/0.24.0/README.md).
