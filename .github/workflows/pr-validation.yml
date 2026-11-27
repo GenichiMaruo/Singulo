@@ -53,6 +53,7 @@ jobs:
         run: |
           xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/android-weapon.gradle runClient
           grep -q 'SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE 24' build/android-weapon-review/logs/latest.log
+          grep -q 'AndroidWeaponTerrainMixin applied: terrain draws' build/android-weapon-review/logs/latest.log
           test "$(ls build/android-weapon-review/screenshots/*.png | wc -l)" -eq 24
       - name: Prepare disposable GUI review world
         run: python3 tools/review/prepare_gui.py
@@ -217,6 +218,8 @@ jobs:
         run: |
           xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/android-weapon.gradle runClient -PwithSodium -PweaponReviewDirectory=android-weapon-review-sodium
           grep -q 'SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE 24' build/android-weapon-review-sodium/logs/latest.log
+          # The optional terrain wrap must still apply next to Sodium.
+          grep -q 'AndroidWeaponTerrainMixin applied: terrain draws' build/android-weapon-review-sodium/logs/latest.log
           test "$(ls build/android-weapon-review-sodium/screenshots/*.png | wc -l)" -eq 24
       - name: Record unsupported optional integration scope
         run: |
