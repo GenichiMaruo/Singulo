@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.genichimaruo.singulo.client.AndroidWeaponLight;
+import io.github.genichimaruo.singulo.client.WeaponTerrainHook;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix4f;
@@ -12,11 +13,16 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(LevelRenderer.class)
 abstract class AndroidWeaponTerrainMixin {
-    /** Keep the normal terrain draw, including a replacement chunk renderer, inside the selected target. */
-    @WrapOperation(method = "renderLevel", at = @At(value = "INVOKE", target =
+    /**
+     * Keep the normal terrain draw, including a replacement chunk renderer, inside the selected target.
+     * Optional: if another mod changes renderLevel so this matches nothing, the game still starts;
+     * WeaponTerrainHook never sees a wrapped draw, warns once and AndroidWeaponLight keeps vanilla buffers.
+     */
+    @WrapOperation(method = "renderLevel", require = 0, at = @At(value = "INVOKE", target =
             "Lnet/minecraft/client/renderer/LevelRenderer;renderChunkLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/PoseStack;DDDLorg/joml/Matrix4f;)V"))
     private void singulo$weaponTerrain(LevelRenderer renderer, RenderType type, PoseStack pose, double x, double y, double z,
                                        Matrix4f projection, Operation<Void> original) {
+        WeaponTerrainHook.onTerrainDraw();
         boolean capturing = type == RenderType.translucent() && AndroidWeaponLight.beginTerrain();
         try {
             original.call(renderer, type, pose, x, y, z, projection);
