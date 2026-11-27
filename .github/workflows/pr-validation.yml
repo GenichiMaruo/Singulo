@@ -222,7 +222,7 @@ jobs:
 
   renderer-lighting:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       LOADER: forge
       JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=2
