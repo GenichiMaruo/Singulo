@@ -12,7 +12,6 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
  */
 public final class WeaponTerrainHook {
     private static boolean wrappedThisFrame;
-    private static boolean judgePreviousFrame;
     private static boolean reported;
 
     private WeaponTerrainHook() {}
@@ -28,9 +27,9 @@ public final class WeaponTerrainHook {
     }
 
     static void onRenderStage(RenderLevelStageEvent event) {
-        // AFTER_SKY is dispatched every frame, before the first terrain layer.
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) return;
-        if (judgePreviousFrame && !reported) {
+        // Reset after the entire world render, including frames where rendering the sky is skipped.
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+        if (!reported && !GravitationalLensing.shaderPackInUse()) {
             reported = true;
             if (wrappedThisFrame) {
                 Singulo.LOGGER.info("AndroidWeaponTerrainMixin applied: terrain draws in LevelRenderer.renderLevel are wrapped");
@@ -40,8 +39,6 @@ public final class WeaponTerrainHook {
                         + "and weapons are drawn normally.");
             }
         }
-        // Shader packs replace the terrain pipeline and already bypass the weapon batch.
-        judgePreviousFrame = !GravitationalLensing.shaderPackInUse();
         wrappedThisFrame = false;
     }
 }
