@@ -67,6 +67,7 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, (net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterOpaqueFeatures e) -> GlowDepth.onRenderStage(e));
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOW, (net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterOpaqueFeatures e) -> GravitationalLensing.beforeTranslucent(e));
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterTranslucentFeatures e) -> GlowDepth.onRenderStage(e));
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterTranslucentBlocks e) -> WeaponTerrainHook.afterTranslucentBlocks());
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(WorldGeometry::extract);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::extract);
