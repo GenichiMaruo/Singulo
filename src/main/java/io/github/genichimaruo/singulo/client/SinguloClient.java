@@ -59,6 +59,7 @@ public final class SinguloClient {
         MinecraftForge.EVENT_BUS.addListener(SinguloClient::sizeTooltip);
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(GlowDepth::onRenderStage);
+        MinecraftForge.EVENT_BUS.addListener(WeaponTerrainHook::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         MinecraftForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         MinecraftForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
