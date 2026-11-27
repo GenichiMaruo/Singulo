@@ -61,6 +61,7 @@ public final class SinguloClient {
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, GlowDepth::onRenderStage);
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOW, GravitationalLensing::beforeTranslucent);
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGHEST, AndroidWeaponLight::onRenderStage);
+        NeoForge.EVENT_BUS.addListener(WeaponTerrainHook::onRenderStage);
         NeoForge.EVENT_BUS.addListener(GravitationalLensing::onRenderGui);
         NeoForge.EVENT_BUS.addListener(HologramRenderer::onRenderStage);
         NeoForge.EVENT_BUS.addListener(SurveyRenderer::onRenderStage);
