@@ -115,6 +115,8 @@ jobs:
           test "$(grep -c 'SINGULO_PONDER_LIGHTING_COMPLETE borrowed-level 256-pixels nested-scope exception-cleanup' build/$LOADER/ponder-review/logs/latest.log)" -eq 2
           grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE create:mechanical_press' build/$LOADER/ponder-review/logs/latest.log
           grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE create:chute' build/$LOADER/ponder-review/logs/latest.log
+          # The optional terrain wrap must still apply next to Embeddium and Oculus.
+          grep -q 'AndroidWeaponTerrainMixin applied: terrain draws' build/$LOADER/ponder-review/logs/latest.log
           python3 tools/review/check_ponder_png.py build/$LOADER/ponder-review/screenshots/ponder.png
           python3 tools/review/check_ponder_png.py build/$LOADER/ponder-review/screenshots/ponder-chute.png --scene create:chute
       - name: Verify fifteen gravitational lenses on a real software-rendered client
@@ -181,6 +183,7 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x800x24" timeout --kill-after=30s 420s bash ./gradlew -Ploader="$LOADER" --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/android-weapon.gradle -PweaponGraphics=fancy,fabulous runClient
           review="build/$LOADER/android-weapon-review"
           grep -q 'SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE 24' "$review/logs/latest.log"
+          grep -q 'AndroidWeaponTerrainMixin applied: terrain draws' "$review/logs/latest.log"
           test "$(find "$review/screenshots" -name 'fancy-*.png' | wc -l)" -eq 12
           test "$(find "$review/screenshots" -name 'fabulous-*.png' | wc -l)" -eq 12
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

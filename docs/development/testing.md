@@ -92,6 +92,8 @@ Forgeの既存CIジョブで全レシピ配置・実転送・ポップアップ�
 
 `python3 tools/review/prepare_ponder.py --loader forge`の後、`bash gradlew -Ploader=forge --no-configuration-cache -I tools/review/ponder.gradle -PwithEmbeddium -PwithOculus -PwithAlexsCaves runClient`で実際のCreate 6.0.8 / Ponder 1.0.91を起動する。NeoForgeは`--loader neoforge`と`-Ploader=neoforge`を指定する。Create単体は3つの追加modフラグを外す。
 
+同じクライアントの`latest.log`に`AndroidWeaponTerrainMixin applied: terrain draws in LevelRenderer.renderLevel are wrapped`があることも確認する（ワールドの最初の描画で1回出る。Android武器の描画検査でも同じ行を確認する）。このMixinは`require = 0`で、他modが`LevelRenderer.renderLevel`を変えて包めなかった場合も起動を止めない。その場合は`AndroidWeaponTerrainMixin is not active`の警告を1回出し、Fast/Fancyの武器透過だけを無効にして通常のバッファで描く。適用の有無はMixinExtrasが設定プラグインの`postApply`より後に注入するため、実行時に包んだ地形描画が呼ばれたかで判定する。開発クライアントでは開発名のまま一致し、refmapの欠落（0.23.0の起動クラッシュ）を検出できないため、本番名（`m_109599_`・`m_172993_`）の対応は`tools/check_release_1201.py`の配布JAR検査で確認する。
+
 プレスとシュートの各画面について、自然光0・パネル光15の実ワールドを準備してから、通常サイズのライトマップ、全256画素のプレビューとNoonバンクの一致、GPU補間、仮想Levelの分離、入れ子・例外時の状態復元を確認する。`SINGULO_PONDER_LIGHTING_COMPLETE`は2回、`SINGULO_PONDER_CAPTURE_COMPLETE`は各アイテム1回が必要。`check_ponder_png.py`で台座の画素も検査する。CIはForgeの既存ジョブ内でシェーダーパックなしの検査を行い、ジョブ数を増やさない。
 
 Alex’s Cavesの更新置換との競合は、`rayleigh.gradle`の`-PwithEmbeddium -PwithAlexsCaves`でも検査する。このケースではDistant Horizonsを入れない（ACが同modの存在時に独自ライトマップ処理を無効化するため）。夜間・雨天・電源切替の4枚を`check_rayleigh_png.py`で比較する。
