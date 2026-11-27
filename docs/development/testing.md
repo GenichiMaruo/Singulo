@@ -60,6 +60,12 @@ GUIの自動操作は`tools/review/`に置く。機械の固定データによ�
 
 PNGはPillowで読み取る。旧デコーダーとの全RGB値の一致を確認している。撮影数や検査範囲を変更するときは、CI、画素検証、公開用の証跡確認、その単体テストを一緒に更新する。
 
+### Android武器の透過
+
+`bash gradlew --no-configuration-cache -I tools/review/android-weapon.gradle runClient`（Sodiumありは`-PwithSodium -PweaponReviewDirectory=android-weapon-review-sodium`）で、Fancy・Fabulousのガラス越しの武器24枚を撮影する。`latest.log`に`SINGULO_ANDROID_WEAPON_REVIEW_COMPLETE 24`と、`AndroidWeaponTerrainMixin applied: terrain draws in LevelRenderer.addMainPass are wrapped`（ワールドの最初の描画で1回出る）の両方が必要。
+
+`AndroidWeaponTerrainMixin`はコンパイラが生成するラムダ`lambda$addMainPass$0`を対象にするため`require = 0`にしている。他modやゲームの更新で包めなくなっても起動は止めず、`AndroidWeaponTerrainMixin is not active`の警告を1回出し、Fast/Fancyの武器透過だけを無効にして通常のバッファで描く。適用の有無はMixinExtrasが設定プラグインの`postApply`より後に注入するため、実行時に包んだ地形描画が呼ばれたかで判定する。`AfterSky`は溶岩・粉雪の中や空のない次元で発行されないので、判定とリセットは`AfterTranslucentBlocks`で行う。武器を含むエンティティはそのフレームの描画パスより前に抽出されるため、武器の振り分けは前のフレームの結果を使う（最初の1フレームは通常のバッファで描く）。
+
 ## JEIの配置・素材転送の検査
 
 JEIの配置・素材転送だけを確認する場合は、`prepare_gui.py`と同様に`build/gametest/world`を`build/jei-review/saves/Review`へ複製し、`build/jei-review/options.txt`に`guiScale:2`を指定して、次を実行する。

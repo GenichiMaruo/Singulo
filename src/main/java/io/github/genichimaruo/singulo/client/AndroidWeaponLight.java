@@ -79,7 +79,9 @@ public final class AndroidWeaponLight {
     }
 
     static MultiBufferSource worldBuffers(MultiBufferSource original) {
-        if (!GlowDepth.inWorld() || AndroidRenderer.inGui || GravitationalLensing.shaderPackInUse()) return original;
+        if (!GlowDepth.inWorld() || AndroidRenderer.inGui || GravitationalLensing.shaderPackInUse()
+                // Fast/Fancy batches are drawn only from the terrain wrap; without it, keep vanilla buffers.
+                || !Minecraft.useShaderTransparency() && !WeaponTerrainHook.active()) return original;
         return type -> {
             RenderType layer;
             if (type == BLADE) layer = LAYER_BLADE;
