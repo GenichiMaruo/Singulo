@@ -12,7 +12,6 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
  */
 public final class WeaponTerrainHook {
     private static boolean wrappedThisFrame;
-    private static boolean judgePreviousFrame;
     private static boolean reported;
 
     private WeaponTerrainHook() {}
@@ -28,8 +27,8 @@ public final class WeaponTerrainHook {
     }
 
     static void onRenderStage(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) return;
-        if (judgePreviousFrame && !reported) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+        if (!reported && !GravitationalLensing.shaderPackInUse()) {
             reported = true;
             if (wrappedThisFrame) {
                 Singulo.LOGGER.info("AndroidWeaponTerrainMixin applied: terrain draws in LevelRenderer.renderLevel are wrapped");
@@ -39,8 +38,6 @@ public final class WeaponTerrainHook {
                         + "and weapons are drawn normally.");
             }
         }
-        // Shader packs replace the terrain pipeline and already bypass the weapon batch.
-        judgePreviousFrame = !GravitationalLensing.shaderPackInUse();
         wrappedThisFrame = false;
     }
 }
