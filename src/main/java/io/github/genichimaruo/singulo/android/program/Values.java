@@ -74,6 +74,9 @@ public final class Values {
     /** モブ（世界の生き物を指す。UUID で探し直す）。 */
     public record Mob(java.util.UUID uuid, String type) {}
 
+    /** ほかのアンドロイドからの知らせ（receive() の結果）。topic・data・pos（送ったアンドロイドがいた場所）・sender（その名前）。 */
+    public record Message(String topic, Object data, Pos pos, String sender) {}
+
     /** range(start, stop, step)。 */
     public record Range(long start, long stop, long step) {
         long size() {
@@ -124,6 +127,9 @@ public final class Values {
         }
         if (v instanceof Mob) {
             return "mob";
+        }
+        if (v instanceof Message) {
+            return "message";
         }
         return "?";
     }
@@ -197,6 +203,9 @@ public final class Values {
         }
         if (v instanceof Mob m) {
             return "<mob " + m.type() + ">";
+        }
+        if (v instanceof Message m) {
+            return "<message " + m.topic() + ">";
         }
         return String.valueOf(v);
     }

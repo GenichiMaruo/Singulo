@@ -17120,8 +17120,8 @@
     "translation": "프로그램으로 움직이기"
   },
   "guide.singulo.androids.program.body": {
-    "source": "Use a Program Card in hand to write what an android does in a Python-like language. Set the Android Assembly Station mode to Code, put the card in the left slot of the lower row and Work Location Cards in the upper row, and the androids of the station follow the program. Places are called by the anvil name of each Work Location Card or p1 to p8 (pos(x, y, z) also works, within 64 blocks of the station).\nYou can use variables, if / elif / else, while, for i in range(n), def and return, lists and strings. Indent with four spaces (the Tab key adds them). A # starts a comment.\nActions: go(p), take(p, item, n), put(p, item, n), use(p), mine(p) (needs a Mining Upgrade), wait(seconds) and home(). Items are written as \"coal\" or \"minecraft:iron_ingot\", tags as \"#c:ingots\".\nQueries: count(item), count_at(p, item), free_slots(), block(p), redstone(p), is_day(), time(), charge() and health(). say(...) sends a message to the owner.\nFighting: mobs(p, r) lists the mobs within r blocks of p (nearest first), and you can read .name, .type, .health, .alive, .baby, .named and .pos of a mob. Narrow the list with a third argument such as [\"hostile\", \"!creeper\"] (\"hostile\", \"animal\", \"all\", IDs like \"zombie\", tags like \"#minecraft:undead\", and ! in front to exclude). matches(m, filter) checks one mob. attack(m, p, r) fights until the mob dies or leaves r blocks around p. With auto_fight(False) it no longer seeks enemies or fights back on its own and only fights attack targets (recharging and repairs work as usual).\nExample: inside while True:, if count_at(\"furnace\", \"iron_ingot\") is more than 0, take(\"furnace\", \"iron_ingot\") and put(\"chest\"), then wait(5).\nErrors show the line and reason at the bottom of the editor and on the station (errors while running are also sent to the owner). Each tick runs a limited number of steps, so an endless loop never stops the server. The program pauses to fight or recharge and then carries on. It starts over when the world is reopened, when the card or places change, or with Restart on the station.",
-    "translation": "프로그램 카드를 손에 들고 사용하면 Python과 비슷한 문법으로 안드로이드의 행동을 작성할 수 있습니다. 조립 스테이션의 행동 방식을 \"코드\"로 하고, 아래 줄 왼쪽 칸에 카드를, 위 줄에 작업 위치 카드를 넣으면 스테이션의 안드로이드가 그대로 움직입니다. 장소는 작업 위치 카드에 모루로 붙인 이름이나 p1~p8로 부릅니다(pos(x, y, z)도 가능, 스테이션에서 64블록 이내).\n쓸 수 있는 것: 변수, if / elif / else, while, for i in range(n), def와 return, 리스트, 문자열. 들여쓰기는 공백 4칸(Tab 키로 입력)입니다. #부터 줄 끝까지는 주석입니다.\n행동: go(p) 가기, take(p, 아이템, 개수) 꺼내기, put(p, 아이템, 개수) 넣기, use(p) 사용, mine(p) 캐기(채굴 업그레이드 필요), wait(초) 기다리기, home() 돌아가기. 아이템은 \"coal\"이나 \"minecraft:iron_ingot\", 태그는 \"#c:ingots\"처럼 씁니다.\n조사: count(아이템), count_at(p, 아이템), free_slots(), block(p), redstone(p), is_day(), time(), charge(), health(). say(...)로 주인에게 메시지를 보낼 수 있습니다.\n싸우기: mobs(p, r)로 p에서 r블록 안의 몹 목록(가까운 순)을 얻고, 몹의 .name, .type, .health, .alive, .baby, .named, .pos를 읽을 수 있습니다. mobs(p, r, [\"hostile\", \"!creeper\"])처럼 3번째 인수로 좁힐 수 있습니다(\"hostile\", \"animal\", \"all\", \"zombie\" 같은 ID, \"#minecraft:undead\" 같은 태그, 앞에 !를 붙이면 제외). matches(m, 조건)으로 한 마리를 확인할 수 있습니다. attack(m, p, r)은 상대가 쓰러지거나 p에서 r블록 밖으로 나갈 때까지 싸웁니다. auto_fight(False)로 하면 스스로 적을 찾거나 맞고 반격하지 않고 attack의 상대와만 싸웁니다(충전·수리는 평소대로).\n예: while True: 블록 안에서 count_at(\"furnace\", \"iron_ingot\")이 0보다 크면 take(\"furnace\", \"iron_ingot\")와 put(\"chest\")를 하고 wait(5).\n오류가 있으면 작성 화면 아래와 스테이션에 줄과 이유가 표시됩니다(실행 중 오류는 주인에게도 알립니다). 1틱에 실행하는 단계 수에는 상한이 있어 끝나지 않는 반복도 서버를 멈추지 않습니다. 싸우거나 충전하는 동안 멈추고, 끝나면 이어서 움직입니다. 월드를 다시 열거나 카드·장소를 바꾸면, 또는 스테이션의 \"다시 실행\"으로 처음부터 시작합니다."
+    "source": "Use a Program Card in hand to write what an android does in a Python-like language. Set the Android Assembly Station mode to Code, put the card in the left slot of the lower row and Work Location Cards in the upper row, and the androids of the station follow the program. Places are called by the anvil name of each Work Location Card or p1 to p8 (pos(x, y, z) also works, within 64 blocks of the station).\nYou can use variables, if / elif / else, while, for i in range(n), def and return, lists and strings. Indent with four spaces (the Tab key adds them). A # starts a comment.\nActions: go(p), take(p, item, n), put(p, item, n), use(p), mine(p) (needs a Mining Upgrade), wait(seconds) and home(). Items are written as \"coal\" or \"minecraft:iron_ingot\", tags as \"#c:ingots\".\nQueries: count(item), count_at(p, item), free_slots(), block(p), redstone(p), is_day(), time(), charge() and health(). say(...) sends a message to the owner.\nFighting: mobs(p, r) lists the mobs within r blocks of p (nearest first), and you can read .name, .type, .health, .alive, .baby, .named and .pos of a mob. Narrow the list with a third argument such as [\"hostile\", \"!creeper\"] (\"hostile\", \"animal\", \"all\", IDs like \"zombie\", tags like \"#minecraft:undead\", and ! in front to exclude). matches(m, filter) checks one mob. attack(m, p, r) fights until the mob dies or leaves r blocks around p. With auto_fight(False) it no longer seeks enemies or fights back on its own and only fights attack targets (recharging and repairs work as usual).\nTeamwork: send(\"enemy\", m, 32) sends a message to teammate androids running code within 32 blocks (same owner or members). The receiver takes one with msg = receive(\"enemy\") (None if there is none) and reads msg.data (the value sent), msg.pos (where the sender was) and msg.sender. lever(p, True) turns a lever on and lever(p, False) turns it off; checking mobs and pressing a button with use(p) works as an alarm.\nExample: inside while True:, if count_at(\"furnace\", \"iron_ingot\") is more than 0, take(\"furnace\", \"iron_ingot\") and put(\"chest\"), then wait(5).\nErrors show the line and reason at the bottom of the editor and on the station (errors while running are also sent to the owner). Each tick runs a limited number of steps, so an endless loop never stops the server. The program pauses to fight or recharge and then carries on. It starts over when the world is reopened, when the card or places change, or with Restart on the station.",
+    "translation": "프로그램 카드를 손에 들고 사용하면 Python과 비슷한 문법으로 안드로이드의 행동을 작성할 수 있습니다. 조립 스테이션의 행동 방식을 \"코드\"로 하고, 아래 줄 왼쪽 칸에 카드를, 위 줄에 작업 위치 카드를 넣으면 스테이션의 안드로이드가 그대로 움직입니다. 장소는 작업 위치 카드에 모루로 붙인 이름이나 p1~p8로 부릅니다(pos(x, y, z)도 가능, 스테이션에서 64블록 이내).\n쓸 수 있는 것: 변수, if / elif / else, while, for i in range(n), def와 return, 리스트, 문자열. 들여쓰기는 공백 4칸(Tab 키로 입력)입니다. #부터 줄 끝까지는 주석입니다.\n행동: go(p) 가기, take(p, 아이템, 개수) 꺼내기, put(p, 아이템, 개수) 넣기, use(p) 사용, mine(p) 캐기(채굴 업그레이드 필요), wait(초) 기다리기, home() 돌아가기. 아이템은 \"coal\"이나 \"minecraft:iron_ingot\", 태그는 \"#c:ingots\"처럼 씁니다.\n조사: count(아이템), count_at(p, 아이템), free_slots(), block(p), redstone(p), is_day(), time(), charge(), health(). say(...)로 주인에게 메시지를 보낼 수 있습니다.\n싸우기: mobs(p, r)로 p에서 r블록 안의 몹 목록(가까운 순)을 얻고, 몹의 .name, .type, .health, .alive, .baby, .named, .pos를 읽을 수 있습니다. mobs(p, r, [\"hostile\", \"!creeper\"])처럼 3번째 인수로 좁힐 수 있습니다(\"hostile\", \"animal\", \"all\", \"zombie\" 같은 ID, \"#minecraft:undead\" 같은 태그, 앞에 !를 붙이면 제외). matches(m, 조건)으로 한 마리를 확인할 수 있습니다. attack(m, p, r)은 상대가 쓰러지거나 p에서 r블록 밖으로 나갈 때까지 싸웁니다. auto_fight(False)로 하면 스스로 적을 찾거나 맞고 반격하지 않고 attack의 상대와만 싸웁니다(충전·수리는 평소대로).\n동료와 움직이기: send(\"enemy\", m, 32)로 32블록 안의 동료 안드로이드(같은 주인 또는 멤버, 코드로 움직이는 것)에게 메시지를 보내고, 받는 쪽은 msg = receive(\"enemy\")로 하나 꺼내(없으면 None) msg.data(보낸 값), msg.pos(보낸 안드로이드의 위치), msg.sender를 읽습니다. lever(p, True)로 레버를 켜고 lever(p, False)로 끕니다. mobs를 확인하고 use(p)로 버튼을 누르면 적이 왔을 때의 신호가 됩니다.\n예: while True: 블록 안에서 count_at(\"furnace\", \"iron_ingot\")이 0보다 크면 take(\"furnace\", \"iron_ingot\")와 put(\"chest\")를 하고 wait(5).\n오류가 있으면 작성 화면 아래와 스테이션에 줄과 이유가 표시됩니다(실행 중 오류는 주인에게도 알립니다). 1틱에 실행하는 단계 수에는 상한이 있어 끝나지 않는 반복도 서버를 멈추지 않습니다. 싸우거나 충전하는 동안 멈추고, 끝나면 이어서 움직입니다. 월드를 다시 열거나 카드·장소를 바꾸면, 또는 스테이션의 \"다시 실행\"으로 처음부터 시작합니다."
   },
   "gui.singulo.program.tab.functions": {
     "source": "Functions",
@@ -17318,5 +17318,45 @@
   "program.singulo.error.bad_filter": {
     "source": "Unknown filter %s (use \"hostile\", \"animal\", \"all\", a mob ID or \"#tag\", with ! in front to exclude)",
     "translation": "알 수 없는 조건 %s(\"hostile\", \"animal\", \"all\", 몹 ID, \"#태그\"를 쓰고, 앞에 !를 붙이면 제외)"
+  },
+  "program.singulo.fn.lever": {
+    "source": "Set a lever on (True) or off (False). Does not walk there if it already is",
+    "translation": "레버를 on(True면 켜기, False면 끄기)으로 합니다. 이미 그 상태면 걸어가지 않습니다"
+  },
+  "program.singulo.fn.send": {
+    "source": "Send a message to teammate androids running code within r blocks (16 if omitted, up to 64; same owner or members). Returns how many got it",
+    "translation": "r블록(생략하면 16, 최대 64) 안의 동료 안드로이드(같은 주인 또는 멤버, 코드로 움직이는 것)에게 메시지를 보냅니다. 받은 수"
+  },
+  "program.singulo.fn.receive": {
+    "source": "Take one received message (any topic if omitted), or None. Read .topic, .data, .pos and .sender",
+    "translation": "받은 메시지를 하나 꺼냅니다(topic을 생략하면 아무거나). 없으면 None. .topic, .data, .pos, .sender를 읽을 수 있습니다"
+  },
+  "program.singulo.error.not_lever": {
+    "source": "%s is not a lever",
+    "translation": "%s은(는) 레버가 아닙니다"
+  },
+  "program.singulo.error.bad_topic": {
+    "source": "Message topic %s must be 1 to 32 characters",
+    "translation": "메시지 이름 %s은(는) 1~32자로 하세요"
+  },
+  "program.singulo.error.cannot_send": {
+    "source": "Cannot send %s (numbers, text, booleans, None, places, mobs and lists of them)",
+    "translation": "%s은(는) 보낼 수 없습니다(숫자, 문자, 참거짓, None, 장소, 몹과 그 리스트)"
+  },
+  "gui.singulo.program.snippet.team.title": {
+    "source": "Guard as a team",
+    "translation": "동료와 지키기"
+  },
+  "gui.singulo.program.snippet.team.desc": {
+    "source": "Tells nearby teammates when it spots an enemy and fights it; on a message it goes to help defeat the enemy near the sender",
+    "translation": "적을 발견하면 근처 동료에게 알리고 싸웁니다. 메시지를 받으면 보낸 안드로이드 근처의 적을 쓰러뜨리러 갑니다"
+  },
+  "gui.singulo.program.snippet.alarm.title": {
+    "source": "Lever when enemies come",
+    "translation": "적이 오면 레버"
+  },
+  "gui.singulo.program.snippet.alarm.desc": {
+    "source": "Turns the lever at p2 on while hostile mobs are within 10 blocks of p1, and off when they are gone",
+    "translation": "p1에서 10블록 안에 적대 몹이 있는 동안 p2의 레버를 켜고, 없어지면 끕니다"
   }
 }

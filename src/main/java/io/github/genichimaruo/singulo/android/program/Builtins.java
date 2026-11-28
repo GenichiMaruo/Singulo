@@ -163,6 +163,24 @@ final class Builtins {
     // ------------------------------------------------------------------ メソッド・属性
 
     static Object attribute(Object v, String name) {
+        if (v instanceof Values.Message m) {
+            switch (name) {
+                case "topic" -> {
+                    return m.topic();
+                }
+                case "data" -> {
+                    return m.data();
+                }
+                case "pos" -> {
+                    return m.pos();
+                }
+                case "sender" -> {
+                    return m.sender();
+                }
+                default -> {
+                }
+            }
+        }
         if (v instanceof Pos p) {
             switch (name) {
                 case "x" -> {

@@ -39,8 +39,12 @@ public final class AndroidProgramCombatGameTests {
     }
 
     private static RuinAndroid guard(GameTestHelper h, String program) {
-        h.setBlock(POST, Blocks.STONE);
-        BlockPos home = POST.east(2);
+        return guard(h, program, java.util.UUID.randomUUID(), POST, POST.east(2));
+    }
+
+    /** 持ち主・持ち場・ステーションの場所を決めて（仲間のアンドロイドを並べるとき）。 */
+    private static RuinAndroid guard(GameTestHelper h, String program, java.util.UUID owner, BlockPos post, BlockPos home) {
+        h.setBlock(post, Blocks.STONE);
         h.setBlock(home, io.github.genichimaruo.singulo.registry.SinguloBlocks.ANDROID_STATION.get());
         AndroidStationBlockEntity station = h.getBlockEntity(home);
         station.press(AndroidStationBlockEntity.BUTTON_MODE_PROGRAM);
@@ -48,13 +52,13 @@ public final class AndroidProgramCombatGameTests {
         io.github.genichimaruo.singulo.android.program.ProgramCardItem.setSource(card, program);
         station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_PROGRAM, card);
         net.minecraft.world.item.ItemStack place = new net.minecraft.world.item.ItemStack(io.github.genichimaruo.singulo.registry.SinguloItems.WORK_LOCATION_CARD.get());
-        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(place, h.getLevel(), h.absolutePos(POST), Blocks.STONE);
+        io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.record(place, h.getLevel(), h.absolutePos(post), Blocks.STONE);
         place.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("post"));
         station.items().setStackInSlot(AndroidStationBlockEntity.SLOT_ROUTE, place);
         RuinAndroid a = SinguloEntities.BLADE_ANDROID.get().create(h.getLevel());
-        a.moveTo(Vec3.atBottomCenterOf(h.absolutePos(POST.above())), 0, 0);
+        a.moveTo(Vec3.atBottomCenterOf(h.absolutePos(post.above())), 0, 0);
         h.getLevel().addFreshEntity(a);
-        a.makeGuard(java.util.UUID.randomUUID(), h.absolutePos(home), RuinAndroid.MODE_PROGRAM, 0);
+        a.makeGuard(owner, h.absolutePos(home), RuinAndroid.MODE_PROGRAM, 0);
         a.setCharge(a.maxCharge());
         try {
             var field = AndroidStationBlockEntity.class.getDeclaredField("androids");
@@ -181,6 +185,73 @@ public final class AndroidProgramCombatGameTests {
                     "真ん中まで行かない: " + a.programStatus() + " " + a.programMessage() + " log " + a.programLog() + " at " + a.position());
             Vec3 d = Vec3.atBottomCenterOf(h.absolutePos(POST)).subtract(a.position());
             h.assertTrue(a.blockPosition().equals(h.absolutePos(POST)) && d.horizontalDistance() < 0.5, "段の真上に乗らない: " + d);
+            a.discard();
+        });
+    }
+
+    /**
+     * 仲間と守る: 見張りは敵を見つけたら send で知らせるだけ（自分では戦わない）。離れた持ち場の仲間は receive で受け、
+     * 自分の見張りの範囲の外の敵を、知らせた見張りの所まで倒しに行く。持ち主の違うアンドロイドには届かない。
+     */
+    @GameTest(template = EMPTY, timeoutTicks = 500)
+    public static void programTeammatesAnswerAMessage(GameTestHelper h) {
+        java.util.UUID owner = java.util.UUID.randomUUID();
+        RuinAndroid lookout = guard(h, """
+                post = point("post")
+                auto_fight(False)
+                while True:
+                    for m in mobs(post, 4, "hostile"):
+                        say("sent", send("enemy", m, 32))
+                    wait(1)
+                """, owner, POST, POST.east(2));
+        String helper = """
+                post = point("post")
+                auto_fight(False)
+                while True:
+                    go(post.up())
+                    msg = receive("enemy")
+                    if msg and msg.data.alive:
+                        say("help", msg.topic, msg.sender != "", attack(msg.data, msg.pos, 12))
+                    wait(0.25)
+                """;
+        BlockPos far = new BlockPos(6, 1, 6);
+        RuinAndroid friend = guard(h, helper, owner, far, far.north(2));
+        RuinAndroid stranger = guard(h, helper, java.util.UUID.randomUUID(), new BlockPos(1, 1, 6), new BlockPos(1, 1, 4));
+        Husk[] husk = new Husk[1];
+        h.runAtTickTime(40, () -> husk[0] = husk(h, POST.offset(3, 0, 0)));
+        h.succeedWhen(() -> {
+            h.assertTrue(husk[0] != null && !husk[0].isAlive(), "知らせを受けた仲間が倒さない: lookout " + lookout.programLog() + " / friend "
+                    + friend.programLog() + " " + friend.programMessage());
+            h.assertTrue(lookout.programLog().contains("sent 1"), "仲間の1体だけに届くはず: " + lookout.programLog());
+            h.assertTrue(friend.programLog().contains("help enemy True True"), "受けた知らせが違う: " + friend.programLog());
+            h.assertTrue(stranger.programLog().isEmpty(), "持ち主の違うアンドロイドに届いた: " + stranger.programLog());
+            lookout.discard();
+            friend.discard();
+            stranger.discard();
+        });
+    }
+
+    /** lever(p, on): レバーを決めた向きにする。もうその向きなら触らない。レバーでないブロックは誤り。 */
+    @GameTest(template = EMPTY, timeoutTicks = 300)
+    public static void programSetsLevers(GameTestHelper h) {
+        BlockPos at = POST.south(3).below();
+        h.setBlock(at, Blocks.LEVER.defaultBlockState().setValue(net.minecraft.world.level.block.LeverBlock.FACE,
+                net.minecraft.world.level.block.state.properties.AttachFace.FLOOR));
+        RuinAndroid a = guard(h, """
+                lv = point("post").south(3).down()
+                say(lever(lv, True), redstone(lv) > 0)
+                say(lever(lv, True))
+                say(lever(lv, False), redstone(lv))
+                lever(lv, True)
+                lever(point("post"), True)
+                """);
+        h.succeedWhen(() -> {
+            h.assertTrue(a.programStatus() == AndroidProgram.P_ERROR && a.programLine() == 6 && a.programMessage().contains("not_lever"),
+                    "レバーでないブロックで止まらない: " + a.programStatus() + " " + a.programLine() + " " + a.programMessage() + " log " + a.programLog());
+            h.assertTrue(a.programLog().equals("True True" + "\u0002" + "True" + "\u0002" + "True 0")
+                            || a.programLog().replace("\u0002", "|").equals("True True|True|True 0"),
+                    "レバーの結果が違う: " + a.programLog().replace("\u0002", "|"));
+            h.assertTrue(h.getBlockState(at).getValue(net.minecraft.world.level.block.LeverBlock.POWERED), "最後に入れたレバーが入っていない");
             a.discard();
         });
     }

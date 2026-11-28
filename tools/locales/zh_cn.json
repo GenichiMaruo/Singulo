@@ -17120,8 +17120,8 @@
     "translation": "用程序驱动"
   },
   "guide.singulo.androids.program.body": {
-    "source": "Use a Program Card in hand to write what an android does in a Python-like language. Set the Android Assembly Station mode to Code, put the card in the left slot of the lower row and Work Location Cards in the upper row, and the androids of the station follow the program. Places are called by the anvil name of each Work Location Card or p1 to p8 (pos(x, y, z) also works, within 64 blocks of the station).\nYou can use variables, if / elif / else, while, for i in range(n), def and return, lists and strings. Indent with four spaces (the Tab key adds them). A # starts a comment.\nActions: go(p), take(p, item, n), put(p, item, n), use(p), mine(p) (needs a Mining Upgrade), wait(seconds) and home(). Items are written as \"coal\" or \"minecraft:iron_ingot\", tags as \"#c:ingots\".\nQueries: count(item), count_at(p, item), free_slots(), block(p), redstone(p), is_day(), time(), charge() and health(). say(...) sends a message to the owner.\nFighting: mobs(p, r) lists the mobs within r blocks of p (nearest first), and you can read .name, .type, .health, .alive, .baby, .named and .pos of a mob. Narrow the list with a third argument such as [\"hostile\", \"!creeper\"] (\"hostile\", \"animal\", \"all\", IDs like \"zombie\", tags like \"#minecraft:undead\", and ! in front to exclude). matches(m, filter) checks one mob. attack(m, p, r) fights until the mob dies or leaves r blocks around p. With auto_fight(False) it no longer seeks enemies or fights back on its own and only fights attack targets (recharging and repairs work as usual).\nExample: inside while True:, if count_at(\"furnace\", \"iron_ingot\") is more than 0, take(\"furnace\", \"iron_ingot\") and put(\"chest\"), then wait(5).\nErrors show the line and reason at the bottom of the editor and on the station (errors while running are also sent to the owner). Each tick runs a limited number of steps, so an endless loop never stops the server. The program pauses to fight or recharge and then carries on. It starts over when the world is reopened, when the card or places change, or with Restart on the station.",
-    "translation": "手持程序卡使用，就能用类似 Python 的写法编写仿生人的行动。把组装站的行动方式设为“代码”，在下排左侧的栏位放入程序卡、在上排放入作业位置卡，站点负责的仿生人就会照此行动。地点可用作业位置卡在铁砧上取的名字或 p1～p8 调用（也可用 pos(x, y, z)，限站点 64 格以内）。\n可以使用：变量、if / elif / else、while、for i in range(n)、def 与 return、列表、字符串。缩进为 4 个空格（按 Tab 键输入）。# 到行尾为注释。\n行动：go(p) 前往、take(p, 物品, 数量) 取出、put(p, 物品, 数量) 放入、use(p) 使用、mine(p) 挖掘（需要采掘升级）、wait(秒) 等待、home() 返回。物品写成 \"coal\" 或 \"minecraft:iron_ingot\"，标签写成 \"#c:ingots\"。\n查询：count(物品)、count_at(p, 物品)、free_slots()、block(p)、redstone(p)、is_day()、time()、charge()、health()。say(...) 可以向主人发送消息。\n战斗：mobs(p, r) 可取得 p 周围 r 格内的生物列表（由近到远），并可读取生物的 .name、.type、.health、.alive、.baby、.named、.pos。可用第 3 个参数筛选，如 mobs(p, r, [\"hostile\", \"!creeper\"])（\"hostile\"、\"animal\"、\"all\"、\"zombie\" 等 ID、\"#minecraft:undead\" 等标签，前面加 ! 表示排除）。matches(m, 条件) 可检查单个生物。attack(m, p, r) 会一直战斗，直到对方倒下或离开 p 周围 r 格。设为 auto_fight(False) 后，不会自行寻找敌人或被打后反击，只与 attack 的对象战斗（充电和修理照常）。\n例：在 while True: 的代码块中，若 count_at(\"furnace\", \"iron_ingot\") 大于 0，就执行 take(\"furnace\", \"iron_ingot\") 和 put(\"chest\")，然后 wait(5)。\n出错时，编写界面下方和站点上会显示行号与原因（运行中的错误也会通知主人）。每 tick 执行的步数有上限，即使是无尽循环也不会让服务器停止。战斗和充电时会暂停，结束后从中断处继续。重新打开世界、更换卡片或地点，或按下站点的“重新执行”时，会从头开始。"
+    "source": "Use a Program Card in hand to write what an android does in a Python-like language. Set the Android Assembly Station mode to Code, put the card in the left slot of the lower row and Work Location Cards in the upper row, and the androids of the station follow the program. Places are called by the anvil name of each Work Location Card or p1 to p8 (pos(x, y, z) also works, within 64 blocks of the station).\nYou can use variables, if / elif / else, while, for i in range(n), def and return, lists and strings. Indent with four spaces (the Tab key adds them). A # starts a comment.\nActions: go(p), take(p, item, n), put(p, item, n), use(p), mine(p) (needs a Mining Upgrade), wait(seconds) and home(). Items are written as \"coal\" or \"minecraft:iron_ingot\", tags as \"#c:ingots\".\nQueries: count(item), count_at(p, item), free_slots(), block(p), redstone(p), is_day(), time(), charge() and health(). say(...) sends a message to the owner.\nFighting: mobs(p, r) lists the mobs within r blocks of p (nearest first), and you can read .name, .type, .health, .alive, .baby, .named and .pos of a mob. Narrow the list with a third argument such as [\"hostile\", \"!creeper\"] (\"hostile\", \"animal\", \"all\", IDs like \"zombie\", tags like \"#minecraft:undead\", and ! in front to exclude). matches(m, filter) checks one mob. attack(m, p, r) fights until the mob dies or leaves r blocks around p. With auto_fight(False) it no longer seeks enemies or fights back on its own and only fights attack targets (recharging and repairs work as usual).\nTeamwork: send(\"enemy\", m, 32) sends a message to teammate androids running code within 32 blocks (same owner or members). The receiver takes one with msg = receive(\"enemy\") (None if there is none) and reads msg.data (the value sent), msg.pos (where the sender was) and msg.sender. lever(p, True) turns a lever on and lever(p, False) turns it off; checking mobs and pressing a button with use(p) works as an alarm.\nExample: inside while True:, if count_at(\"furnace\", \"iron_ingot\") is more than 0, take(\"furnace\", \"iron_ingot\") and put(\"chest\"), then wait(5).\nErrors show the line and reason at the bottom of the editor and on the station (errors while running are also sent to the owner). Each tick runs a limited number of steps, so an endless loop never stops the server. The program pauses to fight or recharge and then carries on. It starts over when the world is reopened, when the card or places change, or with Restart on the station.",
+    "translation": "手持程序卡使用，就能用类似 Python 的写法编写仿生人的行动。把组装站的行动方式设为“代码”，在下排左侧的栏位放入程序卡、在上排放入作业位置卡，站点负责的仿生人就会照此行动。地点可用作业位置卡在铁砧上取的名字或 p1～p8 调用（也可用 pos(x, y, z)，限站点 64 格以内）。\n可以使用：变量、if / elif / else、while、for i in range(n)、def 与 return、列表、字符串。缩进为 4 个空格（按 Tab 键输入）。# 到行尾为注释。\n行动：go(p) 前往、take(p, 物品, 数量) 取出、put(p, 物品, 数量) 放入、use(p) 使用、mine(p) 挖掘（需要采掘升级）、wait(秒) 等待、home() 返回。物品写成 \"coal\" 或 \"minecraft:iron_ingot\"，标签写成 \"#c:ingots\"。\n查询：count(物品)、count_at(p, 物品)、free_slots()、block(p)、redstone(p)、is_day()、time()、charge()、health()。say(...) 可以向主人发送消息。\n战斗：mobs(p, r) 可取得 p 周围 r 格内的生物列表（由近到远），并可读取生物的 .name、.type、.health、.alive、.baby、.named、.pos。可用第 3 个参数筛选，如 mobs(p, r, [\"hostile\", \"!creeper\"])（\"hostile\"、\"animal\"、\"all\"、\"zombie\" 等 ID、\"#minecraft:undead\" 等标签，前面加 ! 表示排除）。matches(m, 条件) 可检查单个生物。attack(m, p, r) 会一直战斗，直到对方倒下或离开 p 周围 r 格。设为 auto_fight(False) 后，不会自行寻找敌人或被打后反击，只与 attack 的对象战斗（充电和修理照常）。\n同伴协作：send(\"enemy\", m, 32) 向 32 格内的同伴机器人（同一主人或成员、以代码运行）发送消息，接收方用 msg = receive(\"enemy\") 取出一条（没有则为 None），可读取 msg.data（发送的值）、msg.pos（发送者的位置）、msg.sender。lever(p, True) 打开拉杆，lever(p, False) 关闭。检查 mobs 后用 use(p) 按下按钮，即可作为敌人来袭的警报。\n例：在 while True: 的代码块中，若 count_at(\"furnace\", \"iron_ingot\") 大于 0，就执行 take(\"furnace\", \"iron_ingot\") 和 put(\"chest\")，然后 wait(5)。\n出错时，编写界面下方和站点上会显示行号与原因（运行中的错误也会通知主人）。每 tick 执行的步数有上限，即使是无尽循环也不会让服务器停止。战斗和充电时会暂停，结束后从中断处继续。重新打开世界、更换卡片或地点，或按下站点的“重新执行”时，会从头开始。"
   },
   "gui.singulo.program.tab.functions": {
     "source": "Functions",
@@ -17318,5 +17318,45 @@
   "program.singulo.error.bad_filter": {
     "source": "Unknown filter %s (use \"hostile\", \"animal\", \"all\", a mob ID or \"#tag\", with ! in front to exclude)",
     "translation": "无法识别的筛选条件 %s（使用 \"hostile\"、\"animal\"、\"all\"、生物 ID 或 \"#标签\"，前面加 ! 表示排除）"
+  },
+  "program.singulo.fn.lever": {
+    "source": "Set a lever on (True) or off (False). Does not walk there if it already is",
+    "translation": "将拉杆设为 on（True 为开、False 为关）。已是该状态则不会走过去"
+  },
+  "program.singulo.fn.send": {
+    "source": "Send a message to teammate androids running code within r blocks (16 if omitted, up to 64; same owner or members). Returns how many got it",
+    "translation": "向 r 格（省略为 16，最多 64）内的同伴机器人（同一主人或成员、以代码运行）发送消息。返回收到的数量"
+  },
+  "program.singulo.fn.receive": {
+    "source": "Take one received message (any topic if omitted), or None. Read .topic, .data, .pos and .sender",
+    "translation": "取出一条收到的消息（省略 topic 则任意）。没有则为 None。可读取 .topic、.data、.pos、.sender"
+  },
+  "program.singulo.error.not_lever": {
+    "source": "%s is not a lever",
+    "translation": "%s 不是拉杆"
+  },
+  "program.singulo.error.bad_topic": {
+    "source": "Message topic %s must be 1 to 32 characters",
+    "translation": "消息名称 %s 须为 1～32 个字符"
+  },
+  "program.singulo.error.cannot_send": {
+    "source": "Cannot send %s (numbers, text, booleans, None, places, mobs and lists of them)",
+    "translation": "无法发送 %s（数字、文本、布尔值、None、位置、生物及其列表）"
+  },
+  "gui.singulo.program.snippet.team.title": {
+    "source": "Guard as a team",
+    "translation": "与同伴防守"
+  },
+  "gui.singulo.program.snippet.team.desc": {
+    "source": "Tells nearby teammates when it spots an enemy and fights it; on a message it goes to help defeat the enemy near the sender",
+    "translation": "发现敌人时通知附近同伴并战斗。收到消息后，前往发送者附近消灭敌人"
+  },
+  "gui.singulo.program.snippet.alarm.title": {
+    "source": "Lever when enemies come",
+    "translation": "敌人来时拉动拉杆"
+  },
+  "gui.singulo.program.snippet.alarm.desc": {
+    "source": "Turns the lever at p2 on while hostile mobs are within 10 blocks of p1, and off when they are gone",
+    "translation": "p1 周围 10 格内有敌对生物时打开 p2 的拉杆，消失后关闭"
   }
 }

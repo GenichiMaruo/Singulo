@@ -27,6 +27,7 @@ public final class Library {
         action("wait", 1, 1);
         action("home", 0, 0);
         action("attack", 1, 3);
+        action("lever", 2, 2);
         // アンドロイドと世界を調べる（すぐ終わる）
         host("say", 0, -1);
         host("print", 0, -1);
@@ -47,6 +48,8 @@ public final class Library {
         host("matches", 2, 2);
         host("distance", 2, 2);
         host("auto_fight", 1, 1);
+        host("send", 1, 3);
+        host("receive", 0, 1);
         // 値の計算
         pure("len", 1, 1);
         pure("range", 1, 3);

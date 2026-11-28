@@ -153,6 +153,11 @@ final class ProgramAssist {
                     out.add(new Candidate(a, a, Kind.ATTRIBUTE, null));
                 }
             }
+            for (String a : ProgramHelp.MESSAGE_ATTRIBUTES) {
+                if (matches(a, p)) {
+                    out.add(new Candidate(a, a, Kind.ATTRIBUTE, null));
+                }
+            }
             return trim(out, p);
         }
         Set<String> seen = new LinkedHashSet<>();

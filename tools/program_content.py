@@ -32,6 +32,7 @@ FUNCTIONS = {
     'take': ('入れ物から持ち物へ取る（物・数は省ける）。取った数', 'Take items from a container (item and count optional). Returns how many'),
     'put': ('持ち物を入れ物へ入れる（物・数は省ける）。入れた数', 'Put held items into a container (item and count optional). Returns how many'),
     'use': ('ブロックを使う（レバー・ボタン・ドアなど）', 'Use a block (lever, button, door...)'),
+    'lever': ('レバーを on（True で入・False で切）にする。もうその向きなら歩いて行かない', 'Set a lever on (True) or off (False). Does not walk there if it already is'),
     'mine': ('ブロックを1つ掘る（採掘アップグレードが要る）。掘れたら True', 'Mine one block (needs a Mining Upgrade). True if mined'),
     'wait': ('秒数だけ待つ', 'Wait this many seconds'),
     'home': ('ステーションへ戻る', 'Walk back to the station'),
@@ -43,6 +44,10 @@ FUNCTIONS = {
              'Mobs within r blocks of p (5 if omitted, up to 16), nearest first. filter narrows them ("hostile", "zombie", "#minecraft:undead", "!creeper", or a list)'),
     'matches': ('モブが絞り込み（mobs と同じ書き方）に合えば True', 'True if the mob fits the filter (written as for mobs)'),
     'distance': ('2つの場所かモブの間の距離', 'Distance between two places or mobs'),
+    'send': ('r ブロック（省くと16、64まで）以内の仲間のアンドロイド（同じ持ち主か登録者の、コードで動くもの）へ知らせを送る。届いた数',
+             'Send a message to teammate androids running code within r blocks (16 if omitted, up to 64; same owner or members). Returns how many got it'),
+    'receive': ('届いた知らせを1つ取り出す（topic を省けば何でも）。なければ None。.topic・.data・.pos・.sender を読める',
+                'Take one received message (any topic if omitted), or None. Read .topic, .data, .pos and .sender'),
     'say': ('持ち主に言葉を送る（ステーションにも出る）', 'Send a message to the owner (also shown on the station)'),
     'count': ('持ち物の数（物を省けば全部）', 'How many items it holds (all if no item given)'),
     'count_at': ('入れ物の中の数', 'How many items a container holds'),
@@ -88,6 +93,9 @@ ERRORS = {
     'mob_gone': ('そのモブはもういない（.alive で確かめられる）', 'That mob is gone (check with .alive)'),
     'bad_filter': ('絞り込み %s が分からない（"hostile"・"animal"・"all"・モブの ID・"#タグ"、頭に ! で除く）',
                    'Unknown filter %s (use "hostile", "animal", "all", a mob ID or "#tag", with ! in front to exclude)'),
+    'not_lever': ('%s はレバーではない', '%s is not a lever'),
+    'bad_topic': ('知らせの名前 %s は1〜32文字にする', 'Message topic %s must be 1 to 32 characters'),
+    'cannot_send': ('%s は知らせで送れない（数・文字・真偽・None・場所・モブ・そのリスト）', 'Cannot send %s (numbers, text, booleans, None, places, mobs and lists of them)'),
     'cannot_attack': ('%s とは戦えない（護衛のアンドロイド・飼われた動物・ボス）', 'Cannot fight %s (guard androids, tamed pets and bosses)'),
     'bad_target': ('ここには代入できない', 'Cannot assign to this'),
     'bad_value': ('%s() に渡した値が正しくない', 'Invalid value passed to %s()'),
@@ -180,6 +188,12 @@ UI = {
     'gui.singulo.program.snippet.guard.title': ('持ち場で見張る', 'Guard a post'),
     'gui.singulo.program.snippet.guard.desc': ('p1 のブロックの上で待ち、5ブロック以内に入ったモブと、倒れるか範囲を出るまで戦う。自分からはほかで戦わない（充電はいつもどおり）',
                                                'Waits on top of the block at p1 and fights any mob within 5 blocks until it dies or leaves. It fights nowhere else on its own (recharging works as usual)'),
+    'gui.singulo.program.snippet.team.title': ('仲間と守る', 'Guard as a team'),
+    'gui.singulo.program.snippet.team.desc': ('敵を見つけたら近くの仲間に知らせて戦う。知らせを受けたら、知らせたアンドロイドの所の敵を倒しに行く',
+                                              'Tells nearby teammates when it spots an enemy and fights it; on a message it goes to help defeat the enemy near the sender'),
+    'gui.singulo.program.snippet.alarm.title': ('敵が来たらレバー', 'Lever when enemies come'),
+    'gui.singulo.program.snippet.alarm.desc': ('p1 から10ブロックに敵対モブがいる間は p2 のレバーを入れ、いなくなったら切る',
+                                               'Turns the lever at p2 on while hostile mobs are within 10 blocks of p1, and off when they are gone'),
     'gui.singulo.program.snippet.signal.title': ('信号で動かす', 'React to a signal'),
     'gui.singulo.program.snippet.signal.desc': ('p1 にレッドストーン信号が来たら、p2 のブロック（ボタン・レバーなど）を使う', 'Uses the block at p2 (button, lever...) when p1 receives a redstone signal'),
     'gui.singulo.program.snippet.function.title': ('関数を作る', 'Write a function'),
@@ -215,6 +229,7 @@ GUIDE_PAGE = (
     '動き: go(p) 行く・take(p, 物, 数) 取る・put(p, 物, 数) 入れる・use(p) 使う・mine(p) 掘る（採掘アップグレード）・wait(秒) 待つ・home() 戻る。物は "coal" や "minecraft:iron_ingot"、タグは "#c:ingots"。\n'
     '調べる: count(物)・count_at(p, 物)・free_slots()・block(p)・redstone(p)・is_day()・time()・charge()・health()。say(…) で持ち主に言葉を送れます。\n'
     '戦う: mobs(p, r) で p から r ブロックのモブの一覧（近い順）が取れ、モブの .name・.type・.health・.alive・.baby・.named・.pos を読めます。mobs(p, r, ["hostile", "!creeper"]) のように3番目で絞れます（"hostile"・"animal"・"all"・"zombie" などの ID・"#minecraft:undead" などのタグ。頭に ! で除く）。matches(m, 絞り込み) で1体を確かめられます。attack(m, p, r) は、相手が倒れるか p から r ブロックの外へ出るまで戦います。auto_fight(False) にすると、自分で敵を探したり打たれて仕返ししたりせず、attack の相手とだけ戦います（充電・修理はいつもどおり）。\n'
+    '仲間と動く: send("enemy", m, 32) で32ブロック以内の仲間のアンドロイド（同じ持ち主か登録者の、コードで動くもの）へ知らせを送り、受ける側は msg = receive("enemy") で1つ取り出して msg.data（送った値）・msg.pos（送ったアンドロイドの場所）・msg.sender を読めます（なければ None）。lever(p, True) でレバーを入れ、lever(p, False) で切ります。mobs を調べて use(p) でボタンを押せば、敵が来たときの合図にもなります。\n'
     '例: while True: のブロックで、count_at("かまど", "iron_ingot") が 0 より多ければ take("かまど", "iron_ingot") と put("チェスト") をして、wait(5)。\n'
     '誤りがあると、書く画面の下とステーションに行と理由が出ます（動かしている途中の誤りは持ち主にも知らされる）。1 tick に動かす手数には上限があり、終わらないループでもサーバーは止まりません。戦い・充電のあいだは止まり、終わると続きから動きます。ワールドを開き直したときや、カード・場所を変えたときは最初から動きます（ステーションの「もう一度」でも）。',
     'Programming androids',
@@ -223,6 +238,7 @@ GUIDE_PAGE = (
     'Actions: go(p), take(p, item, n), put(p, item, n), use(p), mine(p) (needs a Mining Upgrade), wait(seconds) and home(). Items are written as "coal" or "minecraft:iron_ingot", tags as "#c:ingots".\n'
     'Queries: count(item), count_at(p, item), free_slots(), block(p), redstone(p), is_day(), time(), charge() and health(). say(...) sends a message to the owner.\n'
     'Fighting: mobs(p, r) lists the mobs within r blocks of p (nearest first), and you can read .name, .type, .health, .alive, .baby, .named and .pos of a mob. Narrow the list with a third argument such as ["hostile", "!creeper"] ("hostile", "animal", "all", IDs like "zombie", tags like "#minecraft:undead", and ! in front to exclude). matches(m, filter) checks one mob. attack(m, p, r) fights until the mob dies or leaves r blocks around p. With auto_fight(False) it no longer seeks enemies or fights back on its own and only fights attack targets (recharging and repairs work as usual).\n'
+    'Teamwork: send("enemy", m, 32) sends a message to teammate androids running code within 32 blocks (same owner or members). The receiver takes one with msg = receive("enemy") (None if there is none) and reads msg.data (the value sent), msg.pos (where the sender was) and msg.sender. lever(p, True) turns a lever on and lever(p, False) turns it off; checking mobs and pressing a button with use(p) works as an alarm.\n'
     'Example: inside while True:, if count_at("furnace", "iron_ingot") is more than 0, take("furnace", "iron_ingot") and put("chest"), then wait(5).\n'
     'Errors show the line and reason at the bottom of the editor and on the station (errors while running are also sent to the owner). Each tick runs a limited number of steps, so an endless loop never stops the server. The program pauses to fight or recharge and then carries on. It starts over when the world is reopened, when the card or places change, or with Restart on the station.',
 )

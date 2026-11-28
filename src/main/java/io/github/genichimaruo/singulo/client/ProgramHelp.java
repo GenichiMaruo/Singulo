@@ -32,6 +32,8 @@ final class ProgramHelp {
     /** モブの属性（{@code .} のあとの候補）。 */
     static final List<String> MOB_ATTRIBUTES = List.of("name", "type", "health", "max_health", "alive", "hostile", "baby", "named",
             "pos", "x", "y", "z");
+    /** 知らせ（receive() の結果）の属性。 */
+    static final List<String> MESSAGE_ATTRIBUTES = List.of("topic", "data", "sender");
     /** 絞り込みの言葉（mobs() の3番目、matches() の2番目の引数）。 */
     static final List<String> MOB_KINDS = List.of("hostile", "animal", "all");
 
@@ -45,6 +47,7 @@ final class ProgramHelp {
         fn(Category.ACTION, "take", "p", "item", "n");
         fn(Category.ACTION, "put", "p", "item", "n");
         fn(Category.ACTION, "use", "p");
+        fn(Category.ACTION, "lever", "p", "on");
         fn(Category.ACTION, "mine", "p");
         fn(Category.ACTION, "wait", "seconds");
         fn(Category.ACTION, "home");
@@ -67,6 +70,8 @@ final class ProgramHelp {
         fn(Category.QUERY, "mobs", "p", "r", "filter");
         fn(Category.QUERY, "matches", "mob", "filter");
         fn(Category.QUERY, "distance", "a", "b");
+        fn(Category.QUERY, "send", "topic", "data", "r");
+        fn(Category.QUERY, "receive", "topic");
         fn(Category.VALUE, "pos", "x", "y", "z");
         fn(Category.VALUE, "range", "start", "stop", "step");
         fn(Category.VALUE, "len", "x");
@@ -149,6 +154,29 @@ final class ProgramHelp {
                         for m in mobs(post, 5):
                             attack(m, post, 5)
                         wait(0.5)
+                    """),
+            new Snippet("team", """
+                    post = point("p1")
+                    auto_fight(False)
+                    while True:
+                        go(post.up())
+                        enemies = mobs(post, 8, "hostile")
+                        if enemies:
+                            send("enemy", enemies[0], 32)
+                            attack(enemies[0], post, 12)
+                        else:
+                            msg = receive("enemy")
+                            if msg and msg.data.alive:
+                                attack(msg.data, msg.pos, 12)
+                        wait(0.5)
+                    """),
+            new Snippet("alarm", """
+                    while True:
+                        if mobs("p1", 10, "hostile"):
+                            lever("p2", True)
+                        else:
+                            lever("p2", False)
+                        wait(1)
                     """),
             new Snippet("signal", """
                     while True:

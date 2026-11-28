@@ -83,6 +83,10 @@ final class AndroidProgram implements Vm.Host {
     /** 最後に say した言葉（画面に出す）と、最近の言葉（書く画面の「出力」に出す。新しいものが後ろ）。 */
     private String lastSaid = "";
     static final int LOG_SIZE = 8;
+    /** 知らせ: 届く距離（省くと16、64まで）・ためておける数（あふれたら古いものから捨てる）・入れ子のリストの深さ。 */
+    static final double SEND_RANGE = 16, MAX_SEND_RANGE = 64;
+    static final int INBOX_SIZE = 16, MESSAGE_DEPTH = 4;
+    private final java.util.ArrayDeque<Values.Message> inbox = new java.util.ArrayDeque<>();
     private final java.util.ArrayDeque<String> log = new java.util.ArrayDeque<>();
     private final Map<String, Predicate<ItemStack>> itemCache = new HashMap<>();
     /** 自分で敵を探して戦うか（auto_fight）。 */
@@ -122,6 +126,7 @@ final class AndroidProgram implements Vm.Host {
         log.clear();
         itemCache.clear();
         filterCache.clear();
+        inbox.clear();
         autoFight = true;
         if (source.isBlank()) {
             return;
@@ -276,6 +281,7 @@ final class AndroidProgram implements Vm.Host {
             // 動きは、始める前に引数を確かめてから、次の tick から進める
             switch (name) {
                 case "go", "use", "mine" -> target(args.get(0));
+                case "lever" -> target(args.get(0));
                 case "take", "put" -> {
                     target(args.get(0));
                     if (args.size() >= 2) {
@@ -358,6 +364,20 @@ final class AndroidProgram implements Vm.Host {
                 yield e != null && (f == null || f.test(e));
             }
             case "distance" -> where(level, args.get(0)).distanceTo(where(level, args.get(1)));
+            case "send" -> send(level, args);
+            case "receive" -> {
+                String topic = args.isEmpty() || args.get(0) == null ? null : text(args.get(0));
+                Values.Message found = null;
+                for (var it = inbox.iterator(); it.hasNext(); ) {
+                    Values.Message m = it.next();
+                    if (topic == null || m.topic().equals(topic)) {
+                        found = m;
+                        it.remove();
+                        break;
+                    }
+                }
+                yield found;
+            }
             case "auto_fight" -> {
                 autoFight = Values.truthy(args.get(0));
                 if (!autoFight && android.getTarget() != null && android.getTarget() != attackTarget) {
@@ -430,6 +450,26 @@ final class AndroidProgram implements Vm.Host {
             }
             case "mine" -> {
                 return mine(level, target(actionArgs.get(0)));
+            }
+            case "lever" -> {
+                BlockPos p = target(actionArgs.get(0));
+                if (!level.isLoaded(p)) {
+                    return Boolean.FALSE;
+                }
+                boolean on = Values.truthy(actionArgs.get(1));
+                BlockState s = level.getBlockState(p);
+                if (s.getBlock() instanceof net.minecraft.world.level.block.LeverBlock
+                        && s.getValue(net.minecraft.world.level.block.LeverBlock.POWERED) == on) {
+                    return Boolean.TRUE;                 // もうその向き: 歩いて行かない
+                }
+                Boolean arrived = approach(level, p, REACH);
+                if (arrived == null) {
+                    return Boolean.FALSE;
+                }
+                if (!arrived) {
+                    return Vm.PENDING;
+                }
+                return lever(level, p, on);
             }
             case "attack" -> {
                 return attack(level);
@@ -781,6 +821,27 @@ final class AndroidProgram implements Vm.Host {
         }
         var result = s.useWithoutItem(level, as, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(p), Direction.UP, p, false));
         return result.consumesAction();
+    }
+
+    /** レバーを決めた向きにする（もうそうなら、触らずに True）。 */
+    private Boolean lever(ServerLevel level, BlockPos p, boolean on) {
+        BlockState s = level.getBlockState(p);
+        if (!(s.getBlock() instanceof net.minecraft.world.level.block.LeverBlock lever)) {
+            throw new ProgramError("not_lever", BuiltInRegistries.BLOCK.getKey(s.getBlock()).toString());
+        }
+        if (s.getValue(net.minecraft.world.level.block.LeverBlock.POWERED) == on) {
+            return true;
+        }
+        if (!mayInteract(level, p)) {
+            android.setStall(RuinAndroid.STALL_PROTECTED);
+            return false;
+        }
+        if (!android.spend(USE_COST)) {
+            return false;
+        }
+        android.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+        lever.pull(s, level, p, actor(level));
+        return true;
     }
 
     private void stopMining() {
@@ -1164,6 +1225,74 @@ final class AndroidProgram implements Vm.Host {
         if (android.getTarget() == null && android.active()) {
             android.setTarget(t);                        // ほかの事（自分を守る戦い・充電）のあとも、同じ相手を狙い続ける
         }
+    }
+
+    // ------------------------------------------------------------------ 知らせ（アンドロイドどうし）
+
+    private static String text(Object v) {
+        if (!(v instanceof String s)) {
+            throw new ProgramError("not_text", Values.typeName(v));
+        }
+        return s;
+    }
+
+    /**
+     * send(topic, data, r): r ブロック以内の、同じ持ち主（か登録者どうし）のプログラムで動くアンドロイドへ知らせる。
+     * 届いた数を返す。data は値をそのまま写す（リストは写しを送るので、あとで変えても相手のものは変わらない）。
+     */
+    private long send(ServerLevel level, List<Object> args) {
+        String topic = text(args.get(0));
+        if (topic.isEmpty() || topic.length() > 32) {
+            throw new ProgramError("bad_topic", Values.repr(topic));
+        }
+        Object data = args.size() >= 2 ? copy(args.get(1), 0) : null;
+        double r = args.size() >= 3 ? Math.min(MAX_SEND_RANGE, number(args.get(2))) : SEND_RANGE;
+        if (!(r > 0)) {
+            throw new ProgramError("bad_value", "send");
+        }
+        String sender = android.getName().getString();
+        Values.Message m = new Values.Message(topic, data, Values.Pos.of(android.blockPosition()), sender);
+        long n = 0;
+        for (RuinAndroid other : level.getEntitiesOfClass(RuinAndroid.class, android.getBoundingBox().inflate(r),
+                o -> o != android && o.isAlive() && o.distanceTo(android) <= r)) {
+            if (other.isGuard() && other.mode() == RuinAndroid.MODE_PROGRAM && other.program != null && teammate(other)) {
+                other.program.deliver(m);
+                n++;
+            }
+        }
+        return n;
+    }
+
+    /** 同じ持ち主か、どちらかが相手の持ち主を登録しているか。 */
+    private boolean teammate(RuinAndroid other) {
+        java.util.UUID mine = android.owner(), theirs = other.owner();
+        if (mine == null || theirs == null) {
+            return false;
+        }
+        return mine.equals(theirs) || android.memberIdsForProgram().contains(theirs) || other.memberIdsForProgram().contains(mine);
+    }
+
+    void deliver(Values.Message m) {
+        inbox.addLast(m);
+        while (inbox.size() > INBOX_SIZE) {
+            inbox.removeFirst();
+        }
+    }
+
+    /** 送れる値の写し（数・文字・真偽・None・場所・モブ・それらのリスト）。 */
+    private static Object copy(Object v, int depth) {
+        if (v == null || v instanceof Boolean || v instanceof Long || v instanceof Double || v instanceof String
+                || v instanceof Values.Pos || v instanceof Values.Mob) {
+            return v;
+        }
+        if (v instanceof Values.PList l && depth < MESSAGE_DEPTH) {
+            List<Object> out = new ArrayList<>();
+            for (Object o : l.items()) {
+                out.add(copy(o, depth + 1));
+            }
+            return new Values.PList(out);
+        }
+        throw new ProgramError("cannot_send", Values.typeName(v));
     }
 
     // ------------------------------------------------------------------ 話す
