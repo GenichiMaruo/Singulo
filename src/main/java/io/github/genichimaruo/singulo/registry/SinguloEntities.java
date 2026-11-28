@@ -140,6 +140,12 @@ public final class SinguloEntities {
                     io.github.genichimaruo.singulo.android.AndroidLaser::new, MobCategory.MISC)
                     .sized(1.8F, 4.0F).clientTrackingRange(8).updateInterval(10).build(Singulo.id("android_laser").toString()));
 
+    /** 実体として作っているが見た目は現象なので、Jade・WTHIT で名前を出さないもの。 */
+    public static java.util.List<EntityType<?>> hiddenFromTooltips() {
+        return java.util.List.of(MICRO_BLACK_HOLE.get(), WARDEN_SINGULARITY.get(), INFALLING_BLOCK.get(),
+                ANDROID_CRESCENT.get(), ANDROID_LASER.get());
+    }
+
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(BLADE_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());
         event.put(WHIP_ANDROID.get(), io.github.genichimaruo.singulo.android.RuinAndroid.createAttributes().build());

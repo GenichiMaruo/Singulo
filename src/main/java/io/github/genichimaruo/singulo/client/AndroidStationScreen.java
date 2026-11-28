@@ -22,8 +22,8 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     private static final int INFO_X = 52;
     private static final int INFO_W = 162;
     private static final int MODE_Y = 62;
-    /** 動き方のボタン（迎撃・徘徊・追従・巡回）。 */
-    private static final int MODES = 4;
+    /** 動き方のボタン（迎撃・徘徊・追従・巡回・プログラム）。 */
+    private static final int MODES = 5;
     private static final int MODE_W = (INFO_W - 3 * (MODES - 1)) / MODES;
     /** 巡回の設定のボタン（周回/往復・夜だけ・立ち止まる時間）。追従の「追従する人」の段に並べる。 */
     private static final int PATROL_W = (INFO_W - 6) / 3;
@@ -38,6 +38,9 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     private static final int ESCORT_Y = 102;
     private static final int ESCORT_W = (INFO_W - 3) / 2;
     private static final int LEADER_Y = 123;
+    /** プログラム: カードの欄の右の様子と、右端の「もう一度」のボタン。 */
+    private static final int PROGRAM_TEXT_X = INFO_X + 22, RESTART_W = 40, RESTART_X = INFO_X + INFO_W - RESTART_W,
+            EDIT_W = 30, EDIT_X = RESTART_X - EDIT_W - 3;
     private static final int NAME_Y = 22;
     /** 体力と充電のバー（左に記号）。 */
     private static final int HP_Y = 37, CHARGE_Y = 49;
@@ -169,6 +172,19 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                         mouseX, mouseY);
             }
         }
+        if (menu.programming()) {
+            if (hoveredSlot != null && !hoveredSlot.hasItem() && hoveredSlot.index >= AndroidStationBlockEntity.SLOT_ROUTE
+                    && hoveredSlot.index < AndroidStationBlockEntity.SLOT_ROUTE + AndroidStationBlockEntity.ROUTE_SLOTS) {
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.program.points.hint",
+                        hoveredSlot.index - AndroidStationBlockEntity.SLOT_ROUTE + 1), 180), mouseX, mouseY);
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + RESTART_X, topPos + LEADER_Y, RESTART_W, 16)) {
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.program.restart.hint"), 180), mouseX, mouseY);
+            }
+            if (Panel.inside(mouseX, mouseY, leftPos + EDIT_X, topPos + LEADER_Y, EDIT_W, 16)) {
+                g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.program.edit.hint"), 180), mouseX, mouseY);
+            }
+        }
         if (menu.patrolling()) {
             for (int i = 0; i < 3; i++) {
                 if (Panel.inside(mouseX, mouseY, patrolX(i), topPos + LEADER_Y, PATROL_W, 16)) {
@@ -200,7 +216,7 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             g.renderTooltip(font, font.split(Component.translatable("gui.singulo.android_station.recall.hint", AndroidStationBlockEntity.RECALL_ALL_RANGE), 180),
                     mouseX, mouseY);
         }
-        if (menu.patrolling()) {
+        if (menu.patrolling() || menu.programming()) {
             return;                                  // 追従の設定（追従中に戦うか・追従する人）の段は、巡回の設定に置き換わっている
         }
         for (int i = 0; i < 2; i++) {
@@ -238,6 +254,30 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
     /** 割り切れずに余った分は最後のボタンが受け持つ（右端を情報欄の右端に揃える）。 */
     private static int modeW(int i) {
         return i == MODES - 1 ? INFO_W - i * (MODE_W + 3) : MODE_W;
+    }
+
+    /** プログラムの様子（AndroidProgram の P_ の番号）。 */
+    private static final int PROGRAM_NONE = 0, PROGRAM_RUNNING = 1, PROGRAM_WAITING = 2, PROGRAM_DONE = 3, PROGRAM_ERROR = 4, PROGRAM_PAUSED = 5;
+
+    /** プログラムの様子の文（「12行目を実行中」など。カードがなければ「カードを入れる」）。 */
+    private Component programStatus() {
+        int status = menu.value(AndroidStationBlockEntity.D_PROGRAM);
+        int line = menu.value(AndroidStationBlockEntity.D_PROGRAM_LINE);
+        if (!menu.getSlot(AndroidStationBlockEntity.SLOT_PROGRAM).hasItem()) {
+            return Component.translatable("gui.singulo.android_station.program.no_card");
+        }
+        return Component.translatable("gui.singulo.android_station.program." + Math.max(0, Math.min(PROGRAM_PAUSED, status)), line);
+    }
+
+    private boolean hasProgramCard() {
+        return io.github.genichimaruo.singulo.android.program.ProgramCardItem.isCard(menu.getSlot(AndroidStationBlockEntity.SLOT_PROGRAM).getItem());
+    }
+
+    /** 誤りの説明か、最後に say した言葉。 */
+    private Component programMessage() {
+        String raw = minecraft != null && minecraft.level != null
+                && minecraft.level.getBlockEntity(menu.pos()) instanceof AndroidStationBlockEntity station ? station.programMessage(selected()) : "";
+        return io.github.genichimaruo.singulo.android.AndroidStationBlockEntity.describeProgramMessage(raw);
     }
 
     /** 巡回の設定のボタンの文字の鍵（周回/往復・夜だけ・立ち止まる時間）。 */
@@ -392,7 +432,8 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             int id = -1;
             for (int i = 0; i < MODES; i++) {
                 if (Panel.inside(mouseX, mouseY, modeX(i), topPos + MODE_Y, modeW(i), 16)) {
-                    id = i == io.github.genichimaruo.singulo.android.RuinAndroid.MODE_PATROL ? AndroidStationBlockEntity.BUTTON_MODE_PATROL : i;
+                    id = i == io.github.genichimaruo.singulo.android.RuinAndroid.MODE_PATROL ? AndroidStationBlockEntity.BUTTON_MODE_PATROL
+                            : i == io.github.genichimaruo.singulo.android.RuinAndroid.MODE_PROGRAM ? AndroidStationBlockEntity.BUTTON_MODE_PROGRAM : i;
                 }
             }
             if (Panel.inside(mouseX, mouseY, leftPos + MINUS_X, topPos + RETREAT_Y, 16, 16)) {
@@ -403,7 +444,15 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
                 id = orphanWaiting() ? AndroidStationBlockEntity.BUTTON_LINK
                         : hasShiftDown() ? AndroidStationBlockEntity.BUTTON_RECALL_ALL : AndroidStationBlockEntity.BUTTON_RECALL;
             }
-            if (menu.patrolling()) {
+            if (menu.programming()) {
+                if (Panel.inside(mouseX, mouseY, leftPos + RESTART_X, topPos + LEADER_Y, RESTART_W, 16)) {
+                    id = AndroidStationBlockEntity.BUTTON_PROGRAM_RESTART;
+                }
+                if (Panel.inside(mouseX, mouseY, leftPos + EDIT_X, topPos + LEADER_Y, EDIT_W, 16) && hasProgramCard()) {
+                    ProgramEditorScreen.openForStation(this, menu);
+                    return true;
+                }
+            } else if (menu.patrolling()) {
                 for (int i = 0; i < 3; i++) {
                     if (Panel.inside(mouseX, mouseY, patrolX(i), topPos + LEADER_Y, PATROL_W, 16)) {
                         id = PATROL_BUTTONS[i];
@@ -496,6 +545,32 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
         Panel.plusIcon(g, x + PLUS_X + 6, y + RETREAT_Y + 6, skin.text());
         button(g, x + RECALL_X, y + RETREAT_Y, RECALL_W, 16, orphanWaiting(),
                 Panel.inside(mouseX, mouseY, x + RECALL_X, y + RETREAT_Y, RECALL_W, 16));
+        if (menu.programming()) {
+            // プログラム: 場所の欄（巡回路と同じスロット）と、その下にプログラムカードの欄・様子・もう一度のボタン
+            Slot card = menu.getSlot(AndroidStationBlockEntity.SLOT_PROGRAM);
+            ghostSlot(g, x + card.x, y + card.y, card, item("program_card"));
+            if (!card.hasItem()) {
+                area(card.x, card.y, 16, 16, List.of(Component.translatable("item.singulo.program_card")));
+            }
+            if (menu.value(AndroidStationBlockEntity.D_PROGRAM) == PROGRAM_ERROR) {
+                g.renderOutline(x + card.x - 2, y + card.y - 2, 20, 20, GuiSkin.BAD);
+            }
+            button(g, x + RESTART_X, y + LEADER_Y, RESTART_W, 16, false,
+                    Panel.inside(mouseX, mouseY, x + RESTART_X, y + LEADER_Y, RESTART_W, 16));
+            if (hasProgramCard()) {
+                button(g, x + EDIT_X, y + LEADER_Y, EDIT_W, 16, false, Panel.inside(mouseX, mouseY, x + EDIT_X, y + LEADER_Y, EDIT_W, 16));
+            } else {
+                Panel.button(g, skin, x + EDIT_X, y + LEADER_Y, EDIT_W, 16, Panel.Press.DISABLED);
+            }
+            Component message = programMessage();
+            List<Component> tip = new java.util.ArrayList<>();
+            tip.add(programStatus());
+            if (!message.getString().isEmpty()) {
+                tip.add(message);
+            }
+            area(PROGRAM_TEXT_X, LEADER_Y, EDIT_X - PROGRAM_TEXT_X - 2, 16, tip);
+            return;
+        }
         if (menu.patrolling()) {
             // 巡回: 巡回路の欄（スロット）と、その下に巡回の設定のボタン。警報中は欄の枠を赤く
             if ((menu.value(AndroidStationBlockEntity.D_PATROL) & AndroidStationBlockEntity.PATROL_ALARM) != 0) {
@@ -569,7 +644,21 @@ public class AndroidStationScreen extends FramedScreen<AndroidStationMenu> {
             }
         }
         int escort = menu.value(AndroidStationBlockEntity.D_ESCORT);
-        if (menu.patrolling()) {
+        if (menu.programming()) {
+            int status = menu.value(AndroidStationBlockEntity.D_PROGRAM);
+            int color = status == PROGRAM_ERROR ? GuiSkin.BAD : status == PROGRAM_RUNNING || status == PROGRAM_WAITING ? skin.text() : skin.dim();
+            fit(g, font, programStatus(), PROGRAM_TEXT_X, LEADER_Y + 4, EDIT_X - PROGRAM_TEXT_X - 4, color);
+            fitCentered(g, font, Component.translatable("gui.singulo.android_station.program.edit"), EDIT_X + 2, LEADER_Y + 4,
+                    EDIT_W - 4, hasProgramCard() ? skin.text() : skin.dim());
+            fitCentered(g, font, Component.translatable("gui.singulo.android_station.program.restart"), RESTART_X + 2, LEADER_Y + 4,
+                    RESTART_W - 4, skin.text());
+            for (int i = 0; i < AndroidStationBlockEntity.ROUTE_SLOTS; i++) {
+                if (!menu.getSlot(AndroidStationBlockEntity.SLOT_ROUTE + i).hasItem()) {
+                    fitCentered(g, font, Component.literal("p" + (i + 1)), AndroidStationMenu.ROUTE_X + i * 18, AndroidStationMenu.ROUTE_Y + 4,
+                            16, skin.dim());
+                }
+            }
+        } else if (menu.patrolling()) {
             int flags = menu.value(AndroidStationBlockEntity.D_PATROL);
             for (int i = 0; i < 3; i++) {
                 boolean on = i == 1 && (flags & AndroidStationBlockEntity.PATROL_NIGHT) != 0;

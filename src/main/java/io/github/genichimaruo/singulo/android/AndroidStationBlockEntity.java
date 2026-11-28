@@ -55,7 +55,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     public static final int SLOT_PRINT_UNIT = SLOT_RULES + io.github.genichimaruo.singulo.android.work.PathRule.SLOTS;
     /** 武装モジュール（0.23.0）: 印刷したアンドロイドのうち、まだ積んでいないものに積む。古い保存と番号がずれないよう、最後に置く。 */
     public static final int SLOT_WEAPON = SLOT_PRINT_UNIT + 1;
-    public static final int SLOTS = SLOT_WEAPON + 1;
+    /** プログラムカード（0.24.0）。動き方がプログラムのとき、受け持つアンドロイドがその通りに動く。古い保存と番号がずれないよう、最後に置く。 */
+    public static final int SLOT_PROGRAM = SLOT_WEAPON + 1;
+    public static final int SLOTS = SLOT_PROGRAM + 1;
     /** 巡回の各地点で立ち止まる時間の選び方（秒）。 */
     public static final int[] DWELL_SECONDS = {0, 3, 5, 10, 20};
     /** 警報のレッドストーン信号を出す時間。 */
@@ -66,7 +68,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** GUI に送る値。 */
     public static final int D_ENERGY = 0, D_CAPACITY = 1, D_MODE = 2, D_RETREAT = 3, D_STATUS = 4, D_HP = 5, D_CHARGE = 6,
             D_KIND = 7, D_DELAY = 8, D_ESCORT = 9, D_LEADER = 10,
-            D_SELECTED = 11, D_UNITS = 12, D_PATROL = 13, D_DWELL = 14, D_PRINT_FE = 15, COUNT = 16;
+            D_SELECTED = 11, D_UNITS = 12, D_PATROL = 13, D_DWELL = 14, D_PRINT_FE = 15,
+            D_PROGRAM = 16, D_PROGRAM_LINE = 17, COUNT = 18;
     /** D_PATROL のビット: 往復する、夜だけ巡回する、警報中。 */
     public static final int PATROL_BACK_AND_FORTH = 1, PATROL_NIGHT = 2, PATROL_ALARM = 4;
     /** 画面に出すモードの番号: 追従（ついていくだけ）。 */
@@ -87,6 +90,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     /** 近くのステーション（{@link #RECALL_ALL_RANGE} 以内。操作できるものだけ）のアンドロイドを、みな呼び戻す。 */
     public static final int BUTTON_RECALL_ALL = 16;
     public static final int RECALL_ALL_RANGE = 64;
+    /** プログラム: 動き方をプログラムに、受け持つアンドロイドのプログラムを最初から動かし直す。 */
+    public static final int BUTTON_MODE_PROGRAM = 18, BUTTON_PROGRAM_RESTART = 19;
 
     private final SinguloEnergyStorage energy = new SinguloEnergyStorage(CAPACITY, MAX_RECEIVE, 0, this::setChanged);
     /** 転送アップグレードで預かった持ち物（アンドロイドごと。次にその枠で印刷するアンドロイドに持たせる）。 */
@@ -112,6 +117,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                 case SLOT_UPGRADE -> isTransferUpgrade(stack);
                 case SLOT_PERMIT -> isPermit(stack);
                 case SLOT_PRODUCTION -> isProductionUpgrade(stack);
+                case SLOT_PROGRAM -> io.github.genichimaruo.singulo.android.program.ProgramCardItem.isCard(stack);
                 case SLOT_REPAIR_STOCK -> RuinAndroid.isRepairKit(stack);
                 default -> slot >= SLOT_RULES
                         ? io.github.genichimaruo.singulo.android.work.PathRule.fits((slot - SLOT_RULES) % io.github.genichimaruo.singulo.android.work.PathRule.COLS, stack)
@@ -142,6 +148,9 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
     private final int[] charges = new int[MAX_UNITS];
     /** 枠ごとの体力の信号（1〜15。いなければ 0）。 */
     private final int[] signals = new int[MAX_UNITS];
+    /** 枠ごとのプログラムの様子・今の行・画面に出す一言（{@link AndroidProgram#message}。一言はクライアントへも送る）。 */
+    private final int[] programs = new int[MAX_UNITS], programLines = new int[MAX_UNITS];
+    private final String[] programMessages = {"", ""}, programLogs = {"", ""};
     /** アンドロイドに付けた名前（枠ごと。空なら型の愛称）。印刷し直しても同じ名前にする。 */
     private final String[] names = {"", ""};
     /** 画面で見ているアンドロイドの枠。 */
@@ -178,6 +187,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         case D_PATROL -> (backAndForth ? PATROL_BACK_AND_FORTH : 0) | (nightOnly ? PATROL_NIGHT : 0) | (alarming() ? PATROL_ALARM : 0);
         case D_DWELL -> DWELL_SECONDS[dwell];
         case D_PRINT_FE -> printFe();
+        case D_PROGRAM -> programs[selected];
+        case D_PROGRAM_LINE -> programLines[selected];
         default -> 0;
     });
 
@@ -405,6 +416,66 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         return out;
     }
 
+    /**
+     * プログラムの場所: 巡回路の欄の作業位置カード（この世界のもの）。名前は、金床で付けた名前か p1〜p8（欄の番号）。
+     */
+    java.util.List<AndroidProgram.Point> points() {
+        java.util.List<AndroidProgram.Point> out = new java.util.ArrayList<>();
+        for (int i = 0; i < ROUTE_SLOTS; i++) {
+            ItemStack card = items.getStackInSlot(SLOT_ROUTE + i);
+            BlockPos p = io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.pos(card);
+            if (p != null && level != null && io.github.genichimaruo.singulo.android.work.WorkLocationCardItem.sameDimension(card, level)) {
+                Component custom = card.get(net.minecraft.core.component.DataComponents.CUSTOM_NAME);
+                out.add(new AndroidProgram.Point(custom != null ? custom.getString().strip() : "p" + (i + 1), p.immutable()));
+            }
+        }
+        return out;
+    }
+
+    /** 一言を画面の文に（クライアント）。 */
+    public static Component describeProgramMessage(String message) {
+        return AndroidProgram.describeMessage(message);
+    }
+
+    /** 枠のプログラムの一言（画面に出す。変わったらクライアントへ送る）。 */
+    public String programMessage(int unit) {
+        return programMessages[unit];
+    }
+
+    /** 枠のアンドロイドが最近 say した言葉（古い順）。 */
+    public java.util.List<String> programLog(int unit) {
+        return programLogs[unit].isEmpty() ? java.util.List.of() : java.util.List.of(programLogs[unit].split("", -1));
+    }
+
+    private void setProgramLog(int unit, String log) {
+        if (!programLogs[unit].equals(log)) {
+            programLogs[unit] = log;
+            if (level != null) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            }
+        }
+    }
+
+    /** プログラムの欄のカードに文を書く（書く画面から。ステーションの画面を開いている人だけ）。 */
+    public void saveProgram(String source) {
+        ItemStack card = items.getStackInSlot(SLOT_PROGRAM);
+        if (io.github.genichimaruo.singulo.android.program.ProgramCardItem.isCard(card)) {
+            ItemStack copy = card.copy();
+            io.github.genichimaruo.singulo.android.program.ProgramCardItem.setSource(copy, source);
+            items.setStackInSlot(SLOT_PROGRAM, copy);
+            setChanged();
+        }
+    }
+
+    private void setProgramMessage(int unit, String message) {
+        if (!programMessages[unit].equals(message)) {
+            programMessages[unit] = message;
+            if (level != null) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            }
+        }
+    }
+
     /** 警報: しばらくレッドストーン信号を出す（巡回中のアンドロイドが、敵の群れ・ボスを見つけた）。 */
     public void alarm() {
         if (level == null) {
@@ -429,6 +500,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         a.configure(mode, retreat);
         a.setPatrol(route(), backAndForth, nightOnly, DWELL_SECONDS[dwell] * 20);
         a.setPatrolRules(level == null ? java.util.List.of() : io.github.genichimaruo.singulo.android.work.PathRule.read(items, SLOT_RULES, level));
+        a.setProgram(mode == RuinAndroid.MODE_PROGRAM
+                ? io.github.genichimaruo.singulo.android.program.ProgramCardItem.source(items.getStackInSlot(SLOT_PROGRAM)) : "", points());
         if (!a.escortPending()) {
             a.setEscort(escort);
         }
@@ -644,6 +717,12 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         }
         boolean printing = false;
         for (int i = 0; i < MAX_UNITS; i++) {
+            programs[i] = 0;
+            programLines[i] = 0;
+            if (androids[i] == null) {
+                setProgramMessage(i, "");
+                setProgramLog(i, "");
+            }
             if (androids[i] != null) {
                 Entity e = level.getEntity(androids[i]);
                 if (e instanceof RuinAndroid a && a.isAlive()) {
@@ -655,6 +734,10 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
                     if (level.getGameTime() % 20 == 0) {
                         sync(a);
                     }
+                    programs[i] = a.programStatus();
+                    programLines[i] = a.programLine();
+                    setProgramMessage(i, a.programMessage());
+                    setProgramLog(i, a.programLog());
                 } else if (e == null) {
                     statuses[i] = S_AWAY;                // 読み込まれていない所にいる（追従で遠くへ行った）
                 } else {
@@ -772,6 +855,15 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         switch (id) {
             case BUTTON_MODE_GUARD, BUTTON_MODE_WANDER, BUTTON_MODE_FOLLOW -> mode = id;
             case BUTTON_MODE_PATROL -> mode = RuinAndroid.MODE_PATROL;
+            case BUTTON_MODE_PROGRAM -> mode = RuinAndroid.MODE_PROGRAM;
+            case BUTTON_PROGRAM_RESTART -> {
+                for (UUID unit : androids) {
+                    if (unit != null && level instanceof ServerLevel server && server.getEntity(unit) instanceof RuinAndroid a) {
+                        sync(a);
+                        a.restartProgram();
+                    }
+                }
+            }
             case BUTTON_ROUTE_ORDER -> backAndForth = !backAndForth;
             case BUTTON_NIGHT -> nightOnly = !nightOnly;
             case BUTTON_DWELL -> dwell = (dwell + 1) % DWELL_SECONDS.length;
@@ -927,6 +1019,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
         CompoundTag tag = super.getUpdateTag(registries);
         for (int i = 0; i < MAX_UNITS; i++) {
             tag.putString("name" + i, names[i]);
+            tag.putString("program_message" + i, programMessages[i]);
+            tag.putString("program_log" + i, programLogs[i]);
         }
         if (owner != null) {
             tag.putUUID("owner", owner);
@@ -951,6 +1045,8 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             androids[i] = savedUnit(tag, i);
             delays[i] = tag.getInt("delay" + i);
             names[i] = tag.getString("name" + i);
+            programMessages[i] = tag.getString("program_message" + i);
+            programLogs[i] = tag.getString("program_log" + i);
             signals[i] = tag.getInt("signal" + i);
             kept[i].clearContent();
             if (tag.contains("kept" + i)) {
@@ -977,7 +1073,7 @@ public class AndroidStationBlockEntity extends BlockEntity implements AbstractMa
             keptOrder[i] = tag.getInt("kept_order" + i);
             keptWork[i] = tag.contains("kept_work" + i) ? tag.getCompound("kept_work" + i).copy() : null;
         }
-        mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_PATROL);
+        mode = Mth.clamp(tag.getInt("mode"), RuinAndroid.MODE_GUARD, RuinAndroid.MODE_PROGRAM);
         retreat = tag.contains("retreat") ? Mth.clamp(tag.getInt("retreat"), 0, 90) : 30;
         escort = !tag.contains("escort") || tag.getBoolean("escort");
         leader = tag.hasUUID("leader") ? tag.getUUID("leader") : null;

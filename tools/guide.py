@@ -722,3 +722,6 @@ from food_content import CHAPTER as _FOOD_CHAPTER
 CHAPTERS.append(_FOOD_CHAPTER)
 from cover_content import CHAPTER as _COVER_CHAPTER
 CHAPTERS.append(_COVER_CHAPTER)
+# 0.24.0 アンドロイドのプログラムのページ（アンドロイドの章の最後）
+from program_content import GUIDE_PAGE as _PROGRAM_PAGE
+next(c for c in CHAPTERS if c[0] == "androids")[4].append(_PROGRAM_PAGE)

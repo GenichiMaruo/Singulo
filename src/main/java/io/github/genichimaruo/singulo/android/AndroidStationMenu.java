@@ -32,6 +32,8 @@ public class AndroidStationMenu extends AbstractContainerMenu {
             PERMIT_Y = io.github.genichimaruo.singulo.machine.GuiFrame.railSlotY(io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_UPGRADE);
     /** 巡回路の欄（動き方が巡回のとき、追従の設定の段に8つ並べる）。 */
     public static final int ROUTE_X = 61, ROUTE_Y = 104;
+    /** プログラムカードの欄（動き方がプログラムのとき、場所の欄の下の段の左に置く）。 */
+    public static final int PROGRAM_X = 53, PROGRAM_Y = 124;
     /** 経路のページ（右レールの設定の段で切り替える）: 4行（経由地点・対象範囲・進入禁止ゾーン2つ）。 */
     public static final int RULE_Y = 36, RULE_ROW = 19;
     public static final int[] RULE_COL_X = {66, 106, 146, 164};
@@ -94,7 +96,7 @@ public class AndroidStationMenu extends AbstractContainerMenu {
 
                 @Override
                 public boolean isActive() {
-                    return patrolling() && !ruleView;
+                    return (patrolling() || programming()) && !ruleView;
                 }
             });
         }
@@ -123,6 +125,17 @@ public class AndroidStationMenu extends AbstractContainerMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return RuinAndroid.isWeaponModule(stack);
+            }
+        });
+        addSlot(new SlotItemHandler(items, AndroidStationBlockEntity.SLOT_PROGRAM, PROGRAM_X, PROGRAM_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return io.github.genichimaruo.singulo.android.program.ProgramCardItem.isCard(stack);
+            }
+
+            @Override
+            public boolean isActive() {
+                return programming() && !ruleView;
             }
         });
         for (int row = 0; row < 3; row++) {
@@ -159,9 +172,21 @@ public class AndroidStationMenu extends AbstractContainerMenu {
         return data.getInt(AndroidStationBlockEntity.D_MODE) == RuinAndroid.MODE_PATROL;
     }
 
+    /** 動き方がプログラムか（場所の欄とプログラムカードの欄を出す）。 */
+    public boolean programming() {
+        return data.getInt(AndroidStationBlockEntity.D_MODE) == RuinAndroid.MODE_PROGRAM;
+    }
+
     /** ステーションの場所（クライアントで、名前を読むため）。 */
     public BlockPos pos() {
         return pos;
+    }
+
+    /** プログラムの欄のカードに文を書く（サーバー。SaveProgramPayload から）。 */
+    public void saveProgram(Player player, String source) {
+        if (player.level().getBlockEntity(pos) instanceof AndroidStationBlockEntity station && station.mayOperate(player)) {
+            station.saveProgram(source);
+        }
     }
 
     /** 名前を付け直す（サーバー。RenameAndroidPayload から）。 */

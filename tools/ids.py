@@ -872,3 +872,7 @@ MOD.update(_COVER_IDS)
 # 0.20.0 建材の階段・ハーフブロック・塀
 from building_variants import IDS as _VARIANT_IDS
 MOD.update(_VARIANT_IDS)
+
+# 0.24.0 アンドロイドのプログラム
+from program_content import IDS as _PROGRAM_IDS
+MOD.update(_PROGRAM_IDS)

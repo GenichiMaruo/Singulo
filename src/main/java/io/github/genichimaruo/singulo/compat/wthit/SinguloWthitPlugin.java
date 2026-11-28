@@ -36,6 +36,8 @@ public final class SinguloWthitPlugin {
         public void register(ICommonRegistrar registrar) {
             registrar.featureConfig(UID, true);
             registrar.blockData(Data.INSTANCE, BlockEntity.class);
+            // 小さなブラックホール・特異点・吸い込まれるブロックは現象なので、実体の名前を出さない
+            registrar.blacklist(io.github.genichimaruo.singulo.registry.SinguloEntities.hiddenFromTooltips().toArray(net.minecraft.world.entity.EntityType<?>[]::new));
         }
     }
 

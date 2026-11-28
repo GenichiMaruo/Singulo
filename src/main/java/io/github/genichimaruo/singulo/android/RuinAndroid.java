@@ -151,6 +151,8 @@ public abstract class RuinAndroid extends Monster {
     public static final int MODE_FOLLOW = 2;
     /** 巡回: ステーションで決めた巡回路を回る（{@link AndroidPatrol}）。 */
     public static final int MODE_PATROL = 3;
+    /** プログラム: ステーションのプログラムカードの通りに動く（{@link AndroidProgram}。0.24.0）。 */
+    public static final int MODE_PROGRAM = 4;
     /** 護衛が敵を探す範囲（ステーションか持ち主から）。 */
     public static final double GUARD_RANGE = 14;
     public static final int WANDER_RADIUS = 16;
@@ -2159,6 +2161,8 @@ public abstract class RuinAndroid extends Monster {
 
     /** 巡回（巡回路・記録）。 */
     final AndroidPatrol patrol = new AndroidPatrol(this);
+    /** 動き方「プログラム」（0.24.0）。 */
+    AndroidProgram program;
     /** 仲間に呼ばれて迎え撃つ相手（片付いたら、元の持ち場へ戻る）。 */
     @Nullable
     private LivingEntity assistTarget;
@@ -2296,6 +2300,52 @@ public abstract class RuinAndroid extends Monster {
         patrol.configure(route, backAndForth, nightOnly, dwellTicks);
     }
 
+    /** ステーションのプログラムと、名前の付いた場所を受け取る（変わったら最初から動かす）。 */
+    void setProgram(String source, java.util.List<AndroidProgram.Point> points) {
+        if (program != null) {
+            program.configure(source, points);
+        }
+    }
+
+    /** プログラムを最初から動かし直す（ステーションの「もう一度」）。 */
+    void restartProgram() {
+        if (program != null) {
+            program.restart();
+        }
+    }
+
+    /** プログラムの様子（{@link AndroidProgram#P_RUNNING} など）と、今の行、画面に出す一言。 */
+    int programStatus() {
+        return mode != MODE_PROGRAM || program == null ? AndroidProgram.P_NONE : program.status(!active() || getTarget() != null);
+    }
+
+    int programLine() {
+        return program == null ? 0 : program.line();
+    }
+
+    String programMessage() {
+        return mode != MODE_PROGRAM || program == null ? "" : program.message();
+    }
+
+    String programLog() {
+        return mode != MODE_PROGRAM || program == null ? "" : program.log();
+    }
+
+    /** ステーションの許可証に登録された人（プログラムが、その人の飼っている動物を攻撃しないため）。 */
+    java.util.List<java.util.UUID> memberIdsForProgram() {
+        return members;
+    }
+
+    /** 自分で敵を探す・打たれて仕返しするか（プログラムの auto_fight(False) なら、しない）。 */
+    private boolean fightsOnItsOwn() {
+        return mode != MODE_PROGRAM || program == null || program.autoFight();
+    }
+
+    /** 手がふさがっているか（作業指令台の作業中か、プログラムを動かしている）。暇なときの充電・修理・暮らしをしない。 */
+    boolean busy() {
+        return isWorking() || mode == MODE_PROGRAM && program != null && program.runnable();
+    }
+
     /** 仲間に呼ばれた: その相手を迎え撃つ（持ち場から離れていても）。 */
     public void assist(LivingEntity target) {
         assistTarget = target;
@@ -2323,13 +2373,13 @@ public abstract class RuinAndroid extends Monster {
 
     /** ステーションの設定を受け取る。 */
     public void configure(int mode, int retreatPercent) {
-        this.mode = Mth.clamp(mode, MODE_GUARD, MODE_PATROL);
+        this.mode = Mth.clamp(mode, MODE_GUARD, MODE_PROGRAM);
         this.retreatPercent = Mth.clamp(retreatPercent, 0, 90);
         BlockPos home = home();
         if (home != null) {
             if (this.mode == MODE_WANDER) {
                 restrictTo(home, WANDER_RADIUS);
-            } else if (this.mode == MODE_FOLLOW || this.mode == MODE_PATROL) {
+            } else if (this.mode == MODE_FOLLOW || this.mode == MODE_PATROL || this.mode == MODE_PROGRAM) {
                 clearRestriction();
             } else {
                 restrictTo(home, 4);
@@ -2545,7 +2595,11 @@ public abstract class RuinAndroid extends Monster {
             return false;
         }
         if (guardSide) {
-            return hostileToGuards(e) || owner instanceof RuinAndroid a && (a.intruder(e) || a.bossHunter() && isBoss(e));
+            if (owner instanceof RuinAndroid a && a.mode == MODE_PROGRAM && a.program != null && !a.program.autoFight()) {
+                return a.program.isAttackTarget(e);      // auto_fight(False): 技は attack の相手にだけ当てる（範囲の技で、ほかのモブを巻き込まない）
+            }
+            return hostileToGuards(e) || owner instanceof RuinAndroid a && (a.intruder(e) || a.bossHunter() && isBoss(e)
+                    || a.program != null && a.program.isAttackTarget(e));
         }
         return !RuinGuards.isGuard(e) && !(owner != null && owner.isAlliedTo(e));
     }
@@ -2562,6 +2616,14 @@ public abstract class RuinAndroid extends Monster {
 
     /** 護衛が狙う相手か（敵対モブと、許可証に載っていない人。護衛のアンドロイドと飼われた動物は除く）。 */
     boolean guardTargets(LivingEntity e) {
+        if (mode == MODE_PROGRAM && program != null) {
+            if (program.isAttackTarget(e)) {
+                return e.isAlive();                    // プログラムの attack の相手（敵でなくても、範囲は AndroidProgram が見る）
+            }
+            if (!program.autoFight()) {
+                return false;                          // auto_fight(False): 自分では戦わない
+            }
+        }
         if (e == assistTarget && e.isAlive() && e.distanceToSqr(this) < AndroidPatrol.CALL_RANGE * AndroidPatrol.CALL_RANGE) {
             return true;                           // 仲間に呼ばれた相手
         }
@@ -2902,6 +2964,8 @@ public abstract class RuinAndroid extends Monster {
         goalSelector.addGoal(1, new PowerGoal());
         workGoal = new AndroidWorkGoal(this);
         goalSelector.addGoal(2, workGoal);
+        program = new AndroidProgram(this);            // 親のコンストラクタから呼ばれるので、ここで作る（フィールドの初期化より先）
+        goalSelector.addGoal(2, program.new ProgramGoal());
         registerCombat();
         life = new AndroidLife(this);
         goalSelector.addGoal(3, new StashGoal());
@@ -2921,13 +2985,14 @@ public abstract class RuinAndroid extends Monster {
         targetSelector.addGoal(1, new HurtByTargetGoal(this) {
             @Override
             public boolean canUse() {
-                return super.canUse() && !(guard && (getLastHurtByMob() instanceof Player p && !intruder(p)
+                return super.canUse() && fightsOnItsOwn() && !(guard && (getLastHurtByMob() instanceof Player p && !intruder(p)
                         || getLastHurtByMob() instanceof RuinAndroid a && a.isGuard()));
             }
         });
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, p -> !guard || guardTargets(p)));
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
+                p -> !guard || fightsOnItsOwn() && guardTargets(p)));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.Mob.class, 5, true, false,
-                e -> guard && guardTargets(e)));
+                e -> guard && fightsOnItsOwn() && guardTargets(e)));
     }
 
     /** 型ごとの戦い方（優先度 2〜5）。 */
@@ -3008,19 +3073,22 @@ public abstract class RuinAndroid extends Monster {
             // 充電中（ステーションの上を除く。ステーションは体力も直す）でも、体力が減ったら自己修理キットを使う
             useRepairKit((ServerLevel) level());
         }
-        if (guard && printed() && active() && mode != MODE_FOLLOW && getTarget() == null && !isWorking() && home != null
+        if (guard && printed() && active() && mode != MODE_FOLLOW && getTarget() == null && !busy() && home != null
                 && retreatCooldown <= 0 && tickCount % 20 == 7 && getHealth() < getMaxHealth()
                 && tickCount - getLastHurtByMobTimestamp() > 100 && level().getBlockEntity(home) instanceof AndroidStationBlockEntity) {
             // 傷ついていて、手が空いている（戦っていない・作業していない）: ステーションへ戻って直す
             setState(STATE_RETREAT);
         }
-        if (guard && printed() && active() && mode != MODE_FOLLOW && getTarget() == null && !isWorking() && home != null
+        if (guard && printed() && active() && mode != MODE_FOLLOW && getTarget() == null && !busy() && home != null
                 && retreatCooldown <= 0 && tickCount % 20 == 13 && charge() < maxCharge()
                 && tickCount - getLastHurtByMobTimestamp() > 100
                 && Vec3.atBottomCenterOf(home.above()).distanceToSqr(position()) < TOP_UP_RANGE * TOP_UP_RANGE
                 && level().getBlockEntity(home) instanceof AndroidStationBlockEntity) {
             // 手が空いていて、ステーションの近くにいて、充電が減っている: 満タンにしに戻る（暇なときは満タンを目指す）
             setState(STATE_RETREAT);
+        }
+        if (program != null) {
+            program.watch();                           // プログラムの attack: 相手が倒れたか・範囲を出たか
         }
         if (guard && getTarget() != null && !guardTargets(getTarget())) {
             setTarget(null);

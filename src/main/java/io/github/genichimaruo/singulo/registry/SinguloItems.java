@@ -270,6 +270,9 @@ public final class SinguloItems {
             "chemical_sample", () -> new io.github.genichimaruo.singulo.android.work.ChemicalSampleItem(new Item.Properties()));
     public static final DeferredItem<io.github.genichimaruo.singulo.android.work.ProcedureCardItem> PROCEDURE_CARD = ITEMS.register(
             "procedure_card", () -> new io.github.genichimaruo.singulo.android.work.ProcedureCardItem(new Item.Properties()));
+    /** プログラムカード（0.24.0。アンドロイドの動きを Python に似た文で書く）。 */
+    public static final DeferredItem<io.github.genichimaruo.singulo.android.program.ProgramCardItem> PROGRAM_CARD = ITEMS.register(
+            "program_card", () -> new io.github.genichimaruo.singulo.android.program.ProgramCardItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<DeferredSpawnEggItem> SECURITY_DRONE_SPAWN_EGG = ITEMS.register("security_drone_spawn_egg",
             () -> new DeferredSpawnEggItem(SinguloEntities.SECURITY_DRONE, 0xECEEF0, 0x78D2F0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> BLADE_ANDROID_SPAWN_EGG = ITEMS.register("blade_android_spawn_egg",
@@ -389,6 +392,7 @@ public final class SinguloItems {
             Map.entry("survey_glasses", 2),
             Map.entry("recipe_card", 2),
             Map.entry("procedure_card", 2),
+            Map.entry("program_card", 2),
             Map.entry("explorer_compass", 1),
             Map.entry("creative_catalyst", 6),
             Map.entry("builder_wand", 6),
@@ -536,6 +540,7 @@ public final class SinguloItems {
         TAB_ORDER.add(SURVEY_GLASSES);
         TAB_ORDER.add(RECIPE_CARD);
         TAB_ORDER.add(PROCEDURE_CARD);
+        TAB_ORDER.add(PROGRAM_CARD);
         TAB_ORDER.addAll(ACCESSORIES);
         block(SinguloBlocks.SMES_MODULE, 4);
         block(SinguloBlocks.TOPOLOGICAL_WIRE, 4);

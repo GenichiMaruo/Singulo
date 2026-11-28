@@ -422,6 +422,7 @@ public final class GeneratedContent {
             "survey_glasses",
             "recipe_card",
             "procedure_card",
+            "program_card",
             "android_production_upgrade",
             "android_factory_print_unit",
             "android_transfer_upgrade",

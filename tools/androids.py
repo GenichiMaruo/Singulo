@@ -831,15 +831,16 @@ def item_textures(ti, save):
     save(wear(felling_icon(Image), 29), ti / 'android_felling_upgrade.png')
     save(wear(fishing_icon(Image), 31), ti / 'android_fishing_upgrade.png')
     save(wear(farming_icon(Image), 37), ti / 'android_farming_upgrade.png')
-    save(card_icon(Image, (176, 182, 194), recorded=False), ti / 'work_location_card.png')
-    save(card_icon(Image, (90, 190, 120), recorded=True), ti / 'work_location_card_recorded.png')
+    save(card_icon(Image, (90, 190, 120), 'pin', recorded=False), ti / 'work_location_card.png')
+    save(card_icon(Image, (90, 190, 120), 'pin'), ti / 'work_location_card_recorded.png')
     save(area_card_icon(Image, 0), ti / 'area_card.png')
     save(area_card_icon(Image, 1), ti / 'area_card_first.png')
     save(area_card_icon(Image, 2), ti / 'area_card_recorded.png')
     save(glasses_icon(Image), ti / 'survey_glasses.png')         # レンズを透かすので、汚しを重ねない
     save(glasses_worn_texture(Image), ti / 'survey_glasses_worn.png')
-    save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
-    save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
+    save(card_icon(Image, (120, 200, 236), 'recipe'), ti / 'recipe_card.png')
+    save(card_icon(Image, (236, 178, 92), 'procedure'), ti / 'procedure_card.png')
+    save(program_card_icon(Image), ti / 'program_card.png')
 
 
 # アニメーションつきのメモリ（隠し型だけ）: 型ごとのコマの描き方。表は下の関数の定義のあと
@@ -1330,53 +1331,70 @@ def wear(im, seed):
     return im
 
 
-def card_icon(Image, stripe, recorded=None):
-    """作業のカード: 白いカードに色の帯と、金の端子、小さな光る点（作業位置は緑、レシピは水色）。
-    作業位置カードは、未記録（recorded=False）なら帯が灰色で点が消え、記録済みなら帯が緑で、右上に位置の印（ピン）が付く。"""
+# 作業のカードの絵柄（5×5。X は絵柄の色、o は光）。カードの右半分に描く
+CARD_GLYPHS = {
+    'pin': ('.XXX.', 'XXoXX', 'XXXXX', '.XXX.', '..X..'),        # 作業位置: 位置のピン
+    'area': ('XX.XX', 'X...X', '.....', 'X...X', 'XX.XX'),       # 範囲: 四隅の角の印
+    'recipe': ('X.X.X', '.....', 'X.X.X', '.....', 'XXX.o'),     # レシピ: 作業台のマスと、できる物
+    'procedure': ('X.XXX', '.....', 'X.XXX', '.....', 'X.XX.'),  # 手順: 箇条書き
+    'program': ('X....', '.X...', 'X....', '.....', '..XXX'),    # プログラム: >_
+}
+CARD_INK = (30, 33, 44)            # 縁: インベントリの灰色（139）からも、カードの白からも離れる濃い紺
+CARD_BLANK = (176, 182, 194)       # 何も記録していないときの帯
+CARD_BLANK_GLYPH = (168, 174, 188)
+
+
+def card_icon(Image, stripe, glyph, recorded=True, lit=None):
+    """作業のカード（IC カード）: 白い地に濃い紺の縁、上・左の光と下・右の影、上に型の色の帯、左に金の IC チップ、
+    右に用途の絵柄。recorded=False なら帯と絵柄が灰色（未記録）。lit は絵柄のうち型の色にする所（x, y の判定。None なら全部）。"""
     im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     px = im.load()
-    # 外形はデータカードと同じ 14×10（x1〜14、y3〜12）。縁はカードの白を濃くした色
-    for y in range(3, 13):
-        for x in range(1, 15):
-            if (x, y) in ((1, 3), (14, 3), (1, 12), (14, 12)):
+    c = stripe if recorded else CARD_BLANK
+    x0, y0, x1, y1 = 1, 3, 14, 12                  # 外形はデータカードと同じ 14×10
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            if x in (x0, x1) and y in (y0, y1):
+                continue                           # 角を丸める
+            edge = x in (x0, x1) or y in (y0, y1)
+            px[x, y] = (CARD_INK if edge else (236, 238, 243)) + (255,)
+    for x in range(x0 + 1, x1):
+        px[x, y1 - 1] = (196, 200, 212, 255)       # 下の影
+    for y in range(y0 + 1, y1):
+        px[x0 + 1, y] = (255, 255, 255, 255)       # 左の光
+        px[x1 - 1, y] = (196, 200, 212, 255)       # 右の影
+    for x in range(x0 + 1, x1):
+        px[x, 4] = tuple(min(255, v + 30) for v in c) + (255,)
+        px[x, 5] = c + (255,)
+    for y in range(7, 11):                         # IC チップ（真ん中の筋が明るく、その中に接点の切れ目）
+        for x in range(3, 6):
+            px[x, y] = (244, 212, 128, 255) if x == 4 else (220, 176, 80, 255)
+    px[4, 8] = (170, 128, 52, 255)
+    px[4, 9] = (170, 128, 52, 255)
+    ink = tuple(int(v * 0.55) for v in c)
+    shine = tuple(min(255, v + 80) for v in c)
+    for gy, row in enumerate(CARD_GLYPHS[glyph]):
+        for gx, ch in enumerate(row):
+            if ch == '.':
                 continue
-            px[x, y] = ((150, 156, 170) if x in (1, 14) or y in (3, 12) else (238, 240, 244)) + (255,)
-    for y in range(4, 7):
-        for x in range(2, 14):
-            px[x, y] = stripe + (255,)
-    for x in (4, 6, 8):
-        px[x, 10] = (226, 186, 92, 255)
-        px[x, 11] = (200, 160, 70, 255)
-    if recorded is not False:
-        px[11, 9] = tuple(min(255, c + 70) for c in stripe) + (255,)
-        px[10, 9] = stripe + (255,)
-    else:
-        px[11, 9] = (196, 200, 210, 255)
-        px[10, 9] = (196, 200, 210, 255)
-    if recorded:
-        # 位置の印（ピン）: 帯の右上に、濃い緑の頭と白い光
-        for (x, y) in ((11, 1), (12, 1), (11, 2), (12, 2)):
-            px[x, y] = (40, 120, 70, 255)
-        px[11, 1] = (200, 255, 210, 255)
-        px[12, 3] = (40, 120, 70, 255)
+            on = recorded and (lit is None or lit(gx, gy))
+            colour = (shine if ch == 'o' else ink) if on else CARD_BLANK_GLYPH
+            px[8 + gx, 6 + gy] = colour + (255,)
     return im
+
+
+def program_card_icon(Image):
+    """プログラムカード: 紫の帯と「>_」。"""
+    return card_icon(Image, (168, 122, 232), 'program')
 
 
 def area_card_icon(Image, corners):
-    """範囲カード: 作業のカードに、範囲の角の印（かぎ形）。corners: 0 未記録（灰色の帯、印なし）、1 1つ目の角だけ（左上）、2 範囲ができた（左上と右下）。"""
-    stripe = (176, 182, 194) if corners == 0 else (120, 150, 236)
-    im = card_icon(Image, stripe, recorded=False if corners == 0 else None)
-    px = im.load()
-    mark = (60, 80, 170, 255)
-    if corners >= 1:
-        for (x, y) in ((0, 0), (1, 0), (2, 0), (0, 1), (0, 2)):
-            px[x, y] = mark
-        px[1, 1] = (200, 215, 255, 255)
-    if corners >= 2:
-        for (x, y) in ((15, 15), (14, 15), (13, 15), (15, 14), (15, 13)):
-            px[x, y] = mark
-        px[14, 14] = (200, 215, 255, 255)
-    return im
+    """範囲カード: 四隅の角の印。corners: 0 未記録（灰色）、1 1つ目の角だけ（左上の印だけ青）、2 範囲ができた（全部青）。"""
+    stripe = (120, 150, 236)
+    if corners == 0:
+        return card_icon(Image, stripe, 'area', recorded=False)
+    if corners == 1:
+        return card_icon(Image, stripe, 'area', lit=lambda x, y: x <= 1 and y <= 1)
+    return card_icon(Image, stripe, 'area')
 
 
 def glasses_icon(Image):

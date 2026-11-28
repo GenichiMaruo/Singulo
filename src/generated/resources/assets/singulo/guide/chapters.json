@@ -108,7 +108,8 @@
         "androids.work",
         "androids.process",
         "androids.farm",
-        "androids.trouble"
+        "androids.trouble",
+        "androids.program"
       ]
     },
     {
@@ -790,6 +791,13 @@
         "android_rack",
         "android_delivery",
         "item/android_work_console"
+      ]
+    },
+    "androids.program": {
+      "icon": "singulo:program_card",
+      "discoveries": [
+        "android_printed",
+        "item/program_card"
       ]
     },
     "drones.start": {

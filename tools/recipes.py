@@ -1232,6 +1232,16 @@ _shape = (('LLL', 'LQL', 'LLL'), {'L': 'コラプサー強化ガラス', 'Q': '�
 SHAPED['四芒星コラプサー強化ガラス'] = _shape
 RECIPES['四芒星コラプサー強化ガラス']['shape'] = _shape
 
+# 0.24.0 アンドロイドのプログラム（一覧の番号がずれないよう、最後に足す）
+from program_content import recipes as _program_recipes
+_program_shaped = {}
+_program_recipes(R, _program_shaped)
+for _name, _shape in _program_shaped.items():
+    _rows, _key = _shape
+    assert {mat: sum(row.count(ch) for row in _rows) for ch, mat in _key.items()} == RECIPES[_name]['inputs'], _name
+    SHAPED[_name] = _shape
+    RECIPES[_name]['shape'] = _shape
+
 # Apply saved boards after all content modules and optional recipes are registered.
 from assembly_shapes import load_edits
 load_edits(RECIPES)

@@ -97,7 +97,7 @@ final class AndroidLife extends Goal {
 
     /** 手が空いているか（暮らしを始めてよい・続けてよい）。 */
     private boolean free() {
-        if (!android.isGuard() || !android.printed() || !android.active() || android.getTarget() != null || android.isWorking()
+        if (!android.isGuard() || !android.printed() || !android.active() || android.getTarget() != null || android.busy()
                 || android.home() == null || android.mode() == RuinAndroid.MODE_FOLLOW || android.mode() == RuinAndroid.MODE_GUARD) {
             return false;
         }

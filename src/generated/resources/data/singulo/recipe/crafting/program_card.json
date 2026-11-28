@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "RPR"
+  ],
+  "key": {
+    "C": {
+      "item": "singulo:basic_circuit"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "P": {
+      "item": "singulo:procedure_card"
+    }
+  },
+  "result": {
+    "id": "singulo:program_card",
+    "count": 1
+  }
+}
