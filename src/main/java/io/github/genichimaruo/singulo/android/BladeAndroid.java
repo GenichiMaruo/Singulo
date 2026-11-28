@@ -44,6 +44,8 @@ public class BladeAndroid extends RuinAndroid {
     static final float DASH_DAMAGE = 6;
     static final float SPIN_DAMAGE = 5;
     static final float SWING_DAMAGE = 4;
+    /** 斬りが届く距離（sweep の 2.8 より少し手前まで寄る）。 */
+    static final double SWING_REACH = 2.6;
     static final double DASH_SPEED = 1.15;
 
     /** 技ごとの充電の消費（満タンは {@link #CHARGE_MAX}）。 */
@@ -230,7 +232,7 @@ public class BladeAndroid extends RuinAndroid {
                 swingCooldown--;
             }
             boolean seen = hasLineOfSight(target);
-            if (dist > 3.2 || !seen) {
+            if (dist > SWING_REACH || !seen) {   // 斬りの届く所まで寄る（3.2 で止まると、2.8 の斬りが届かないまま振り続けた）
                 if (stateTicks % 8 == 0 || getNavigation().isDone()) {
                     getNavigation().moveTo(target, dist > 9 ? 1.15 : 1.0);
                 }
