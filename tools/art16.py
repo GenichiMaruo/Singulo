@@ -2643,6 +2643,49 @@ def permit_card():
 
 # ---------------------------------------------------------------- 動くアイテムの絵（縦に並べたコマ。gen_data.py が .mcmeta を付ける）
 
+def anim_cold_atoms(t):
+    """冷却原子: 細いガラスのアンプル（外の縁と金属の栓は不透明、ガラスの壁は半透明、中の真空はほとんど透ける）。
+    格子に並んだ8つの原子が順にまたたき、冷やすレーザーの光の筋が上から下へ通る。原子は時々わずかに揺れる。"""
+    from PIL import Image
+    im = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    px = im.load()
+    f = round(t * 16) % 16
+    ink, cyan, ice, white = (24, 28, 40), (90, 200, 255), (190, 236, 255), (250, 254, 255)
+
+    def put(x, y, c, a=255):
+        px[x, y] = tuple(c[:3]) + (a,)
+
+    for y in range(3, 14):
+        for x in range(4, 12):
+            if x in (4, 11) and y in (3, 13):
+                continue
+            if x in (4, 11) or y == 13:
+                put(x, y, ink)                              # 外の縁
+            elif x in (5, 10) or y == 12:
+                put(x, y, (150, 210, 240), 150)             # ガラスの壁
+            else:
+                put(x, y, (30, 60, 100), 70)                # 中の真空
+    for y in (4, 5, 6):
+        put(5, y, (230, 248, 255), 210)                     # ガラスの光の筋
+    for x in range(4, 12):
+        put(x, 2, ink if x in (4, 11) else (150, 156, 170))
+        put(x, 1, ink if x in (4, 11) else (110, 116, 130))
+    for x in range(5, 11):
+        put(x, 0, ink)
+    row = 4 + f * 9 // 16                                   # レーザーの光の筋
+    for x in range(5, 11):
+        put(x, row, (120, 230, 255), 120)
+    for i, (x, y) in enumerate(((6, 5), (8, 5), (7, 7), (9, 7), (6, 9), (8, 9), (7, 11), (9, 11))):
+        k = 0.5 + 0.5 * math.cos((f + i * 5) % 16 / 16 * 2 * math.pi)
+        dx = 1 if (f // 4 + i) % 4 == 0 else 0
+        put(x + dx - (1 if x + dx > 9 else 0), y, mix(cyan, white, k), int(170 + 85 * k))
+        if k > 0.85:
+            put(x, y - 1, ice, 90)
+    centred = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    centred.paste(im, (0, 1))                               # 栓の上端（0）から底（13）まで: 1つ下げて上下の余白をそろえる
+    return centred
+
+
 def _glow_pt(d, x, y, c, a=255):
     d.point((round(x), round(y)), fill=rgba(c, a))
 
@@ -2763,6 +2806,7 @@ def anim_pocket(t):
 # ID: (コマを描く関数（t は 0〜1）, コマ数, 1コマの tick 数)
 ANIMATED_ITEMS = {
     'micro_black_hole_vessel': (anim_micro_black_hole, 12, 2),
+    'cold_atoms': (anim_cold_atoms, 16, 2),
     'exotic_matter': (anim_exotic_matter, 12, 3),
     'jet_condensate': (lambda t: _anim_vial(t, (120, 220, 255), True), 8, 3),
     'hawking_condensate': (lambda t: _anim_vial(t, (255, 140, 80), True), 8, 3),
