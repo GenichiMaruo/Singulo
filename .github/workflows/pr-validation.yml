@@ -187,6 +187,8 @@ jobs:
           xvfb-run -a -s "-screen 0 1280x800x24" timeout 300s bash ./gradlew --no-daemon --max-workers=2 --no-configuration-cache -I tools/review/ponder.gradle runClient -PwithSodium
           grep -q 'SINGULO_PONDER_LIGHTING_COMPLETE borrowed-level 256-pixels nested-scope exception-cleanup' build/ponder-review/logs/latest.log
           grep -q 'SINGULO_PONDER_CAPTURE_COMPLETE' build/ponder-review/logs/latest.log
+          # The optional terrain wrap must still apply next to Sodium.
+          grep -q 'AndroidWeaponTerrainMixin applied: terrain draws' build/ponder-review/logs/latest.log
           python3 tools/review/check_ponder_png.py
       - name: Verify cosmic effects and shader reload with Sodium and Distant Horizons
         env:
