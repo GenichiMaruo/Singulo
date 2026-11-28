@@ -371,6 +371,8 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_HELP) {
             Slot slot = menu.getSlot(type().assemblyUpgradeSlot());
             if (!slot.hasItem()) return Component.translatable("item.singulo.assembly_stock_upgrade");
+            // 拡張の上ではアイテムの説明が出るので、外せない理由はその説明の最後に足す（2つの吹き出しが重なっていた）
+            if (hoveredSlot == slot) return null;
             return slot.mayPickup(minecraft.player) ? null : Component.translatable("gui.singulo.assembly.upgrade_locked");
         }
         if (row == io.github.genichimaruo.singulo.machine.GuiFrame.RAIL_SETTINGS) {
@@ -386,6 +388,10 @@ public class MachineScreen extends FramedScreen<MachineMenu> {
         var lines = new java.util.ArrayList<>(super.getTooltipFromContainerItem(stack));
         int extra = hoveredSlot == null ? 0 : menu.assemblyExcess(hoveredSlot);
         if (extra > 0) lines.add(Component.literal(String.format(java.util.Locale.ROOT, "× %,d", (long) stack.getCount() + extra)));
+        if (hoveredSlot != null && type().assemblyUpgradeSlot() >= 0 && hoveredSlot == menu.getSlot(type().assemblyUpgradeSlot())
+                && !hoveredSlot.mayPickup(minecraft.player)) {
+            lines.add(Component.translatable("gui.singulo.assembly.upgrade_locked").withStyle(net.minecraft.ChatFormatting.RED));
+        }
         return lines;
     }
 
