@@ -26,5 +26,6 @@ public final class SinguloNetwork {
                 io.github.genichimaruo.singulo.android.work.WorkConsoleActionPayload::handle);
         r.playToClient(io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.TYPE, io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload.STREAM_CODEC,
                 io.github.genichimaruo.singulo.android.work.WorkConsoleViewPayload::handle);
+        r.playToServer(SaveProgramPayload.TYPE, SaveProgramPayload.STREAM_CODEC, SaveProgramPayload::handle);
     }
 }

@@ -840,6 +840,7 @@ def item_textures(ti, save):
     save(glasses_worn_texture(Image), ti / 'survey_glasses_worn.png')
     save(card_icon(Image, (120, 200, 236)), ti / 'recipe_card.png')
     save(card_icon(Image, (236, 178, 92)), ti / 'procedure_card.png')
+    save(program_card_icon(Image), ti / 'program_card.png')
 
 
 # アニメーションつきのメモリ（隠し型だけ）: 型ごとのコマの描き方。表は下の関数の定義のあと
@@ -1327,6 +1328,19 @@ def wear(im, seed):
             if opaque(sx, sy):
                 r, g, b, a = px[sx, sy]
                 px[sx, sy] = (min(255, r + d), min(255, g + d), min(255, b + d), a)
+    return im
+
+
+def program_card_icon(Image):
+    """プログラムカード: 作業のカードに紫の帯と、白い地に小さな「>_」（書いた文の行）。"""
+    im = card_icon(Image, (168, 122, 232))
+    px = im.load()
+    ink = (92, 60, 150, 255)
+    for (x, y) in ((3, 7), (4, 8), (3, 9)):          # >
+        px[x, y] = ink
+    for x in (6, 7):                                # _
+        px[x, 9] = ink
+    px[10, 8] = (200, 170, 250, 255)                # 行の光
     return im
 
 

@@ -11460,8 +11460,8 @@
     "translation": "사용처: 창세로 코어, 원초의 씨앗"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 59 more",
-    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 59개"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 60 more",
+    "translation": "사용처: 설정 카드, 탐험가의 나침반, 홀로그램 투영기, 열전 발전기, 소성로 외 60개"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 38 more",
@@ -16670,5 +16670,653 @@
   "block.singulo.mixed_panel_glass_slab": {
     "source": "Stacked Glass and Panel Slabs",
     "translation": "겹친 유리와 패널 반 블록"
+  },
+  "desc.singulo.program_card": {
+    "source": "Use it in hand to write what an android does, in a Python-like language. Put it in the program slot of an Android Assembly Station and set the mode to Code, and the androids of that station follow it. Places come from the Work Location Cards in the route slots (named with an anvil, or p1 to p8).",
+    "translation": "손에 들고 사용하면 Python과 비슷한 문법으로 안드로이드의 행동을 작성할 수 있습니다. 안드로이드 조립 스테이션의 프로그램 칸에 넣고 행동 방식을 \"코드\"로 하면, 그 스테이션의 안드로이드가 그대로 움직입니다. 장소는 순찰 경로 칸의 작업 위치 카드(모루로 붙인 이름 또는 p1~p8)입니다."
+  },
+  "gui.singulo.android_station.mode.4": {
+    "source": "Code",
+    "translation": "코드"
+  },
+  "gui.singulo.android_station.mode.4.hint": {
+    "source": "Follows the Program Card (left slot of the lower row). Places are the Work Location Cards in the upper row (anvil names, or p1 to p8). It pauses to fight or recharge and then carries on.",
+    "translation": "프로그램 카드(아래 줄 왼쪽 칸)대로 움직입니다. 장소는 위 줄의 작업 위치 카드(모루로 붙인 이름 또는 p1~p8)입니다. 싸우거나 충전하는 동안 멈추고, 끝나면 이어서 움직입니다."
+  },
+  "gui.singulo.android_station.program.0": {
+    "source": "The card is blank",
+    "translation": "카드가 비어 있습니다"
+  },
+  "gui.singulo.android_station.program.1": {
+    "source": "Running line %s",
+    "translation": "%s번째 줄 실행 중"
+  },
+  "gui.singulo.android_station.program.2": {
+    "source": "Waiting (line %s)",
+    "translation": "기다리는 중(%s번째 줄)"
+  },
+  "gui.singulo.android_station.program.3": {
+    "source": "Finished",
+    "translation": "끝났습니다"
+  },
+  "gui.singulo.android_station.program.4": {
+    "source": "Error on line %s",
+    "translation": "%s번째 줄에서 오류"
+  },
+  "gui.singulo.android_station.program.5": {
+    "source": "Paused (line %s)",
+    "translation": "일시 정지(%s번째 줄)"
+  },
+  "gui.singulo.android_station.program.no_card": {
+    "source": "Insert a Program Card",
+    "translation": "프로그램 카드를 넣으세요"
+  },
+  "gui.singulo.android_station.program.points.hint": {
+    "source": "Place p%s: insert a Work Location Card. Name it with an anvil to use that name too",
+    "translation": "장소 p%s: 작업 위치 카드를 넣으세요. 모루로 이름을 붙이면 그 이름으로도 부를 수 있습니다"
+  },
+  "gui.singulo.android_station.program.restart": {
+    "source": "Restart",
+    "translation": "다시 실행"
+  },
+  "gui.singulo.android_station.program.restart.hint": {
+    "source": "Runs the program of this station’s androids again from the start",
+    "translation": "이 스테이션의 안드로이드가 프로그램을 처음부터 다시 실행합니다"
+  },
+  "gui.singulo.program.cursor": {
+    "source": "Ln %s, Col %s",
+    "translation": "%s줄 %s열"
+  },
+  "gui.singulo.program.functions": {
+    "source": "Functions",
+    "translation": "함수"
+  },
+  "gui.singulo.program.ok": {
+    "source": "No errors",
+    "translation": "오류 없음"
+  },
+  "gui.singulo.program.title": {
+    "source": "Program Card",
+    "translation": "프로그램 카드"
+  },
+  "howto.singulo.program_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "제작: 제작대(2단계)"
+  },
+  "item.singulo.program_card": {
+    "source": "Program Card",
+    "translation": "프로그램 카드"
+  },
+  "program.singulo.error.arg_count": {
+    "source": "%s() takes %s argument(s), got %s",
+    "translation": "%s()는 인수를 %s개 받습니다(%s개 전달함)"
+  },
+  "program.singulo.error.bad_char": {
+    "source": "Unexpected character: %s",
+    "translation": "쓸 수 없는 문자: %s"
+  },
+  "program.singulo.error.bad_index": {
+    "source": "Index must be an integer, not %s",
+    "translation": "첨자는 정수여야 합니다(%s 전달함)"
+  },
+  "program.singulo.error.bad_item": {
+    "source": "Unknown item: %s",
+    "translation": "알 수 없는 아이템 이름: %s"
+  },
+  "program.singulo.error.bad_number": {
+    "source": "Malformed number: %s",
+    "translation": "숫자 표기가 올바르지 않습니다: %s"
+  },
+  "program.singulo.error.bad_operand": {
+    "source": "Cannot use %s on %s",
+    "translation": "%s는 %s에 쓸 수 없습니다"
+  },
+  "program.singulo.error.bad_operands": {
+    "source": "Cannot use %s between %s and %s",
+    "translation": "%s는 %s와 %s 사이에 쓸 수 없습니다"
+  },
+  "program.singulo.error.bad_target": {
+    "source": "Cannot assign to this",
+    "translation": "여기에는 대입할 수 없습니다"
+  },
+  "program.singulo.error.bad_value": {
+    "source": "Invalid value passed to %s()",
+    "translation": "%s()에 전달한 값이 올바르지 않습니다"
+  },
+  "program.singulo.error.builtin_name": {
+    "source": "%s is the name of a built-in function",
+    "translation": "%s는 내장 함수의 이름이라 쓸 수 없습니다"
+  },
+  "program.singulo.error.convert": {
+    "source": "Cannot convert %s to %s",
+    "translation": "%s를 %s로 바꿀 수 없습니다"
+  },
+  "program.singulo.error.dedent": {
+    "source": "Indentation does not match any outer level",
+    "translation": "들여쓰기가 바깥의 어느 줄과도 맞지 않습니다"
+  },
+  "program.singulo.error.div_zero": {
+    "source": "Division by zero",
+    "translation": "0으로 나누었습니다"
+  },
+  "program.singulo.error.duplicate_function": {
+    "source": "Function %s is already defined",
+    "translation": "함수 %s는 이미 정의되어 있습니다"
+  },
+  "program.singulo.error.duplicate_param": {
+    "source": "Duplicate parameter %s",
+    "translation": "인수 이름 %s가 겹칩니다"
+  },
+  "program.singulo.error.empty_list": {
+    "source": "Pop from an empty list",
+    "translation": "빈 리스트에서 꺼냈습니다"
+  },
+  "program.singulo.error.expected": {
+    "source": "Expected %s but found %s",
+    "translation": "%s가 있어야 할 곳에 %s가 있습니다"
+  },
+  "program.singulo.error.expected_indent": {
+    "source": "Expected an indented block",
+    "translation": "여기에는 들여쓴 블록이 필요합니다"
+  },
+  "program.singulo.error.index_range": {
+    "source": "Index %s out of range (length %s)",
+    "translation": "첨자 %s가 범위를 벗어났습니다(길이 %s)"
+  },
+  "program.singulo.error.internal": {
+    "source": "Internal error",
+    "translation": "실행할 수 없는 명령을 만났습니다"
+  },
+  "program.singulo.error.needs_mining_upgrade": {
+    "source": "Mining needs a Mining Upgrade",
+    "translation": "캐려면 채굴 업그레이드가 필요합니다"
+  },
+  "program.singulo.error.nested_def": {
+    "source": "def is only allowed at the top level",
+    "translation": "def는 가장 바깥에만 쓸 수 있습니다"
+  },
+  "program.singulo.error.no_attribute": {
+    "source": "%s has no attribute .%s",
+    "translation": "%s에는 .%s가 없습니다"
+  },
+  "program.singulo.error.no_length": {
+    "source": "%s has no length",
+    "translation": "%s에는 길이가 없습니다"
+  },
+  "program.singulo.error.no_method": {
+    "source": "%s has no method .%s()",
+    "translation": "%s에는 .%s()가 없습니다"
+  },
+  "program.singulo.error.no_point": {
+    "source": "No place called %s (Work Location Cards in the route slots)",
+    "translation": "%s라는 장소가 없습니다(순찰 경로 칸의 작업 위치 카드)"
+  },
+  "program.singulo.error.no_station": {
+    "source": "Not in the same dimension as the station",
+    "translation": "스테이션과 같은 차원에 있지 않습니다"
+  },
+  "program.singulo.error.not_assignable": {
+    "source": "Cannot change the contents of %s",
+    "translation": "%s의 내용은 바꿀 수 없습니다"
+  },
+  "program.singulo.error.not_callable": {
+    "source": "This cannot be called",
+    "translation": "이것은 함수로 부를 수 없습니다"
+  },
+  "program.singulo.error.not_in_list": {
+    "source": "%s is not in the list",
+    "translation": "%s는 리스트에 없습니다"
+  },
+  "program.singulo.error.not_integer": {
+    "source": "Expected an integer, not %s",
+    "translation": "정수가 필요합니다(%s 전달함)"
+  },
+  "program.singulo.error.not_iterable": {
+    "source": "%s is not iterable",
+    "translation": "%s는 차례로 훑을 수 없습니다"
+  },
+  "program.singulo.error.not_number": {
+    "source": "Expected a number, not %s",
+    "translation": "숫자가 필요합니다(%s 전달함)"
+  },
+  "program.singulo.error.not_position": {
+    "source": "Expected a place (pos() or a place name), not %s",
+    "translation": "장소(pos() 또는 장소 이름)가 필요합니다(%s 전달함)"
+  },
+  "program.singulo.error.not_text": {
+    "source": "Expected a string, not %s",
+    "translation": "문자열이 필요합니다(%s 전달함)"
+  },
+  "program.singulo.error.outside_function": {
+    "source": "return outside a function",
+    "translation": "return은 함수 안에서만 쓸 수 있습니다"
+  },
+  "program.singulo.error.outside_loop": {
+    "source": "%s outside a loop",
+    "translation": "%s는 반복문 안에서만 쓸 수 있습니다"
+  },
+  "program.singulo.error.overflow": {
+    "source": "Number too large",
+    "translation": "숫자가 너무 큽니다"
+  },
+  "program.singulo.error.stray": {
+    "source": "%s without a matching if",
+    "translation": "%s 앞에 대응하는 if가 없습니다"
+  },
+  "program.singulo.error.too_big": {
+    "source": "Too many items, characters or variables",
+    "translation": "리스트·문자열·변수가 너무 많습니다"
+  },
+  "program.singulo.error.too_deep": {
+    "source": "Calls nested too deeply (endless recursion?)",
+    "translation": "호출이 너무 깊습니다(끝나지 않는 재귀?)"
+  },
+  "program.singulo.error.too_far": {
+    "source": "%s is more than %s blocks from the station",
+    "translation": "%s는 스테이션에서 %s블록보다 멉니다"
+  },
+  "program.singulo.error.too_long": {
+    "source": "Program too long (up to %s characters)",
+    "translation": "프로그램이 너무 깁니다(%s자까지)"
+  },
+  "program.singulo.error.unclosed": {
+    "source": "Unclosed bracket",
+    "translation": "괄호가 닫히지 않았습니다"
+  },
+  "program.singulo.error.undefined": {
+    "source": "Name %s is not defined",
+    "translation": "%s는 아직 정하지 않은 이름입니다"
+  },
+  "program.singulo.error.unexpected_indent": {
+    "source": "Unexpected indent",
+    "translation": "여기서 들여쓰면 안 됩니다"
+  },
+  "program.singulo.error.unknown_function": {
+    "source": "Unknown function %s",
+    "translation": "함수 %s는 없습니다"
+  },
+  "program.singulo.error.unsupported": {
+    "source": "%s is not supported",
+    "translation": "%s는 쓸 수 없습니다"
+  },
+  "program.singulo.error.unterminated_string": {
+    "source": "Unterminated string",
+    "translation": "문자열이 닫히지 않았습니다"
+  },
+  "program.singulo.error_at": {
+    "source": "Line %s: %s",
+    "translation": "%s번째 줄: %s"
+  },
+  "program.singulo.fn.abs": {
+    "source": "Absolute value",
+    "translation": "절댓값"
+  },
+  "program.singulo.fn.block": {
+    "source": "Block ID at a place (\"minecraft:stone\"...)",
+    "translation": "그 장소의 블록 ID(\"minecraft:stone\" 등)"
+  },
+  "program.singulo.fn.bool": {
+    "source": "Convert to True or False",
+    "translation": "True 또는 False로 바꿉니다"
+  },
+  "program.singulo.fn.charge": {
+    "source": "Charge left (%)",
+    "translation": "남은 충전량(%)"
+  },
+  "program.singulo.fn.count": {
+    "source": "How many items it holds (all if no item given)",
+    "translation": "소지한 아이템 개수(아이템을 생략하면 전부)"
+  },
+  "program.singulo.fn.count_at": {
+    "source": "How many items a container holds",
+    "translation": "보관함 안의 아이템 개수"
+  },
+  "program.singulo.fn.float": {
+    "source": "Convert to a float",
+    "translation": "소수로 바꿉니다"
+  },
+  "program.singulo.fn.free_slots": {
+    "source": "Number of empty inventory slots",
+    "translation": "소지품의 빈 칸 수"
+  },
+  "program.singulo.fn.go": {
+    "source": "Walk to a place. True on arrival, False if unreachable",
+    "translation": "장소로 걸어갑니다. 도착하면 True, 갈 수 없으면 False"
+  },
+  "program.singulo.fn.health": {
+    "source": "Health left (%)",
+    "translation": "남은 체력(%)"
+  },
+  "program.singulo.fn.here": {
+    "source": "Where the android is now",
+    "translation": "지금 있는 장소"
+  },
+  "program.singulo.fn.home": {
+    "source": "Walk back to the station",
+    "translation": "스테이션으로 돌아갑니다"
+  },
+  "program.singulo.fn.int": {
+    "source": "Convert to an integer",
+    "translation": "정수로 바꿉니다"
+  },
+  "program.singulo.fn.is_day": {
+    "source": "True during the day",
+    "translation": "낮이면 True"
+  },
+  "program.singulo.fn.len": {
+    "source": "Length",
+    "translation": "길이"
+  },
+  "program.singulo.fn.list": {
+    "source": "Make a list",
+    "translation": "리스트를 만듭니다"
+  },
+  "program.singulo.fn.max": {
+    "source": "Largest value",
+    "translation": "가장 큰 값"
+  },
+  "program.singulo.fn.min": {
+    "source": "Smallest value",
+    "translation": "가장 작은 값"
+  },
+  "program.singulo.fn.mine": {
+    "source": "Mine one block (needs a Mining Upgrade). True if mined",
+    "translation": "블록 하나를 캡니다(채굴 업그레이드 필요). 캐면 True"
+  },
+  "program.singulo.fn.point": {
+    "source": "A place by name or number (route slot cards)",
+    "translation": "이름이나 번호로 장소를 가져옵니다(순찰 경로 칸의 카드)"
+  },
+  "program.singulo.fn.points": {
+    "source": "List of place names",
+    "translation": "장소 이름 목록"
+  },
+  "program.singulo.fn.pos": {
+    "source": "Make a place from coordinates",
+    "translation": "좌표로 장소를 만듭니다"
+  },
+  "program.singulo.fn.put": {
+    "source": "Put held items into a container (item and count optional). Returns how many",
+    "translation": "소지품을 보관함에 넣습니다(아이템·개수 생략 가능). 넣은 개수를 돌려줍니다"
+  },
+  "program.singulo.fn.randint": {
+    "source": "Random integer from a to b",
+    "translation": "a 이상 b 이하의 난수"
+  },
+  "program.singulo.fn.range": {
+    "source": "A run of numbers (for loops)",
+    "translation": "숫자의 나열(for에 사용)"
+  },
+  "program.singulo.fn.redstone": {
+    "source": "Redstone signal a place receives (0 to 15)",
+    "translation": "그 장소가 받는 레드스톤 신호(0~15)"
+  },
+  "program.singulo.fn.round": {
+    "source": "Round (to even)",
+    "translation": "반올림(짝수 쪽으로)"
+  },
+  "program.singulo.fn.say": {
+    "source": "Send a message to the owner (also shown on the station)",
+    "translation": "주인에게 메시지를 보냅니다(스테이션에도 표시)"
+  },
+  "program.singulo.fn.sorted": {
+    "source": "Sorted copy of a list",
+    "translation": "정렬한 리스트"
+  },
+  "program.singulo.fn.station": {
+    "source": "Where the station is",
+    "translation": "스테이션의 장소"
+  },
+  "program.singulo.fn.str": {
+    "source": "Convert to a string",
+    "translation": "문자열로 바꿉니다"
+  },
+  "program.singulo.fn.sum": {
+    "source": "Sum",
+    "translation": "합계"
+  },
+  "program.singulo.fn.take": {
+    "source": "Take items from a container (item and count optional). Returns how many",
+    "translation": "보관함에서 소지품으로 꺼냅니다(아이템·개수 생략 가능). 꺼낸 개수를 돌려줍니다"
+  },
+  "program.singulo.fn.time": {
+    "source": "Time of day (0 to 23999)",
+    "translation": "하루 중 시각(0~23999)"
+  },
+  "program.singulo.fn.use": {
+    "source": "Use a block (lever, button, door...)",
+    "translation": "블록을 사용합니다(레버, 버튼, 문 등)"
+  },
+  "program.singulo.fn.wait": {
+    "source": "Wait this many seconds",
+    "translation": "지정한 초만큼 기다립니다"
+  },
+  "program.singulo.say": {
+    "source": "<%s> %s",
+    "translation": "<%s> %s"
+  },
+  "program.singulo.stopped": {
+    "source": "The program of %s stopped: %s",
+    "translation": "%s의 프로그램이 멈췄습니다: %s"
+  },
+  "summary.singulo.program_card": {
+    "source": "Programs what androids do.",
+    "translation": "안드로이드의 행동을 프로그램으로 작성합니다."
+  },
+  "tooltip.singulo.program_card.empty": {
+    "source": "Blank: use it in hand to write a program",
+    "translation": "빈 카드: 손에 들고 사용하면 프로그램을 작성할 수 있습니다"
+  },
+  "tooltip.singulo.program_card.lines": {
+    "source": "%s lines",
+    "translation": "%s줄"
+  },
+  "uses.singulo.procedure_card": {
+    "source": "Used in: Program Card",
+    "translation": "사용처: 프로그램 카드"
+  },
+  "guide.singulo.androids.program.title": {
+    "source": "Programming androids",
+    "translation": "프로그램으로 움직이기"
+  },
+  "guide.singulo.androids.program.body": {
+    "source": "Use a Program Card in hand to write what an android does in a Python-like language. Set the Android Assembly Station mode to Code, put the card in the left slot of the lower row and Work Location Cards in the upper row, and the androids of the station follow the program. Places are called by the anvil name of each Work Location Card or p1 to p8 (pos(x, y, z) also works, within 64 blocks of the station).\nYou can use variables, if / elif / else, while, for i in range(n), def and return, lists and strings. Indent with four spaces (the Tab key adds them). A # starts a comment.\nActions: go(p), take(p, item, n), put(p, item, n), use(p), mine(p) (needs a Mining Upgrade), wait(seconds) and home(). Items are written as \"coal\" or \"minecraft:iron_ingot\", tags as \"#c:ingots\".\nQueries: count(item), count_at(p, item), free_slots(), block(p), redstone(p), is_day(), time(), charge() and health(). say(...) sends a message to the owner.\nFighting: mobs(p, r) lists the mobs within r blocks of p (nearest first), and you can read .name, .type, .health, .alive, .baby, .named and .pos of a mob. Narrow the list with a third argument such as [\"hostile\", \"!creeper\"] (\"hostile\", \"animal\", \"all\", IDs like \"zombie\", tags like \"#minecraft:undead\", and ! in front to exclude). matches(m, filter) checks one mob. attack(m, p, r) fights until the mob dies or leaves r blocks around p. With auto_fight(False) it no longer seeks enemies or fights back on its own and only fights attack targets (recharging and repairs work as usual).\nExample: inside while True:, if count_at(\"furnace\", \"iron_ingot\") is more than 0, take(\"furnace\", \"iron_ingot\") and put(\"chest\"), then wait(5).\nErrors show the line and reason at the bottom of the editor and on the station (errors while running are also sent to the owner). Each tick runs a limited number of steps, so an endless loop never stops the server. The program pauses to fight or recharge and then carries on. It starts over when the world is reopened, when the card or places change, or with Restart on the station.",
+    "translation": "프로그램 카드를 손에 들고 사용하면 Python과 비슷한 문법으로 안드로이드의 행동을 작성할 수 있습니다. 조립 스테이션의 행동 방식을 \"코드\"로 하고, 아래 줄 왼쪽 칸에 카드를, 위 줄에 작업 위치 카드를 넣으면 스테이션의 안드로이드가 그대로 움직입니다. 장소는 작업 위치 카드에 모루로 붙인 이름이나 p1~p8로 부릅니다(pos(x, y, z)도 가능, 스테이션에서 64블록 이내).\n쓸 수 있는 것: 변수, if / elif / else, while, for i in range(n), def와 return, 리스트, 문자열. 들여쓰기는 공백 4칸(Tab 키로 입력)입니다. #부터 줄 끝까지는 주석입니다.\n행동: go(p) 가기, take(p, 아이템, 개수) 꺼내기, put(p, 아이템, 개수) 넣기, use(p) 사용, mine(p) 캐기(채굴 업그레이드 필요), wait(초) 기다리기, home() 돌아가기. 아이템은 \"coal\"이나 \"minecraft:iron_ingot\", 태그는 \"#c:ingots\"처럼 씁니다.\n조사: count(아이템), count_at(p, 아이템), free_slots(), block(p), redstone(p), is_day(), time(), charge(), health(). say(...)로 주인에게 메시지를 보낼 수 있습니다.\n싸우기: mobs(p, r)로 p에서 r블록 안의 몹 목록(가까운 순)을 얻고, 몹의 .name, .type, .health, .alive, .baby, .named, .pos를 읽을 수 있습니다. mobs(p, r, [\"hostile\", \"!creeper\"])처럼 3번째 인수로 좁힐 수 있습니다(\"hostile\", \"animal\", \"all\", \"zombie\" 같은 ID, \"#minecraft:undead\" 같은 태그, 앞에 !를 붙이면 제외). matches(m, 조건)으로 한 마리를 확인할 수 있습니다. attack(m, p, r)은 상대가 쓰러지거나 p에서 r블록 밖으로 나갈 때까지 싸웁니다. auto_fight(False)로 하면 스스로 적을 찾거나 맞고 반격하지 않고 attack의 상대와만 싸웁니다(충전·수리는 평소대로).\n예: while True: 블록 안에서 count_at(\"furnace\", \"iron_ingot\")이 0보다 크면 take(\"furnace\", \"iron_ingot\")와 put(\"chest\")를 하고 wait(5).\n오류가 있으면 작성 화면 아래와 스테이션에 줄과 이유가 표시됩니다(실행 중 오류는 주인에게도 알립니다). 1틱에 실행하는 단계 수에는 상한이 있어 끝나지 않는 반복도 서버를 멈추지 않습니다. 싸우거나 충전하는 동안 멈추고, 끝나면 이어서 움직입니다. 월드를 다시 열거나 카드·장소를 바꾸면, 또는 스테이션의 \"다시 실행\"으로 처음부터 시작합니다."
+  },
+  "gui.singulo.program.tab.functions": {
+    "source": "Functions",
+    "translation": "함수"
+  },
+  "gui.singulo.program.tab.places": {
+    "source": "Places",
+    "translation": "장소"
+  },
+  "gui.singulo.program.tab.examples": {
+    "source": "Examples",
+    "translation": "예시"
+  },
+  "gui.singulo.program.tab.output": {
+    "source": "Output",
+    "translation": "출력"
+  },
+  "gui.singulo.program.search": {
+    "source": "Search names or descriptions",
+    "translation": "이름이나 설명으로 찾기"
+  },
+  "gui.singulo.program.category.action": {
+    "source": "Actions (take time)",
+    "translation": "행동(시간이 걸림)"
+  },
+  "gui.singulo.program.category.query": {
+    "source": "Queries",
+    "translation": "조사"
+  },
+  "gui.singulo.program.category.value": {
+    "source": "Values",
+    "translation": "값 계산"
+  },
+  "gui.singulo.program.completion": {
+    "source": "Suggest",
+    "translation": "후보"
+  },
+  "gui.singulo.program.completion.hint": {
+    "source": "Suggests the word being typed (functions, variables, place names, item IDs). Pick with the arrow keys and insert with Tab or Enter. Ctrl+Space shows it any time",
+    "translation": "입력 중인 단어의 후보(함수, 변수, 장소 이름, 아이템 ID)를 표시합니다. ↑↓로 고르고 Tab이나 Enter로 넣습니다. Ctrl+Space로 언제든 표시할 수 있습니다"
+  },
+  "gui.singulo.program.hints": {
+    "source": "Hints",
+    "translation": "힌트"
+  },
+  "gui.singulo.program.hints.hint": {
+    "source": "Shows the arguments of the function being called (the current one underlined) and what it does",
+    "translation": "부르고 있는 함수의 인수(현재 인수에 밑줄)와 설명을 표시합니다"
+  },
+  "gui.singulo.program.done": {
+    "source": "Save and close (Esc does too; Ctrl+S only saves)",
+    "translation": "저장하고 닫기(Esc도 같음. Ctrl+S는 저장만)"
+  },
+  "gui.singulo.program.discard": {
+    "source": "Close without saving",
+    "translation": "저장하지 않고 닫기"
+  },
+  "gui.singulo.program.discard.confirm": {
+    "source": "Press again to throw away the changes and close",
+    "translation": "한 번 더 누르면 변경을 버리고 닫습니다"
+  },
+  "gui.singulo.program.restart.hint": {
+    "source": "Runs the program of the androids from the start (saving first if changed)",
+    "translation": "담당 안드로이드의 프로그램을 처음부터 실행합니다(바꿨다면 먼저 저장)"
+  },
+  "gui.singulo.program.places.hand": {
+    "source": "Open the editor from Edit on the Android Assembly Station screen to list its places (Work Location Cards in the route slots). Here you can use the names p1 to p8",
+    "translation": "안드로이드 조립 스테이션 화면의 \"편집\"으로 열면 스테이션의 장소(순찰 경로 칸의 작업 위치 카드)가 나열됩니다. 여기서는 p1~p8 이름을 쓸 수 있습니다"
+  },
+  "gui.singulo.program.places.empty": {
+    "source": "p%s (empty)",
+    "translation": "p%s(비어 있음)"
+  },
+  "gui.singulo.program.places.click": {
+    "source": "Click to insert the name",
+    "translation": "클릭하면 이름을 넣습니다"
+  },
+  "gui.singulo.program.output.hand": {
+    "source": "Open the editor from Edit on the Android Assembly Station screen to see the program running and what say prints",
+    "translation": "안드로이드 조립 스테이션 화면의 \"편집\"으로 열면 실행 상황과 say의 메시지가 표시됩니다"
+  },
+  "gui.singulo.program.output.empty": {
+    "source": "Nothing printed yet (use say)",
+    "translation": "아직 메시지가 없습니다(say로 출력)"
+  },
+  "gui.singulo.program.none": {
+    "source": "Nothing found",
+    "translation": "찾을 수 없습니다"
+  },
+  "gui.singulo.program.warn.no_point": {
+    "source": "Line %s: the station has no place called %s",
+    "translation": "%s번째 줄: 스테이션에 %s라는 장소가 없습니다"
+  },
+  "gui.singulo.program.snippet.carry.title": {
+    "source": "Carry between containers",
+    "translation": "보관함 사이에서 나르기"
+  },
+  "gui.singulo.program.snippet.carry.desc": {
+    "source": "Takes whatever is in p1 and puts it in p2, checking every 5 seconds",
+    "translation": "p1에 물건이 있으면 꺼내서 p2에 넣습니다. 5초마다 확인합니다"
+  },
+  "gui.singulo.program.snippet.furnace.title": {
+    "source": "Smelt in a furnace",
+    "translation": "화로로 굽기"
+  },
+  "gui.singulo.program.snippet.furnace.desc": {
+    "source": "Feeds raw iron from p1 into the furnace at p2 and carries the ingots to p3",
+    "translation": "p1의 철 원석을 p2의 화로에 넣고, 구워진 주괴를 p3로 나릅니다"
+  },
+  "gui.singulo.program.snippet.dig.title": {
+    "source": "Dig down",
+    "translation": "아래로 캐기"
+  },
+  "gui.singulo.program.snippet.dig.desc": {
+    "source": "Mines five blocks down from p1, comes back and puts them in p2 (needs a Mining Upgrade)",
+    "translation": "p1에서 아래로 5개 캐고, 돌아와서 p2에 넣습니다(채굴 업그레이드 필요)"
+  },
+  "gui.singulo.program.snippet.day.title": {
+    "source": "Watch during the day",
+    "translation": "낮에만 지키기"
+  },
+  "gui.singulo.program.snippet.day.desc": {
+    "source": "Stands at p1 during the day and goes back to the station at night",
+    "translation": "낮에는 p1에 서 있고, 밤에는 스테이션으로 돌아갑니다"
+  },
+  "gui.singulo.program.snippet.signal.title": {
+    "source": "React to a signal",
+    "translation": "신호로 움직이기"
+  },
+  "gui.singulo.program.snippet.signal.desc": {
+    "source": "Uses the block at p2 (button, lever...) when p1 receives a redstone signal",
+    "translation": "p1이 레드스톤 신호를 받으면 p2의 블록(버튼, 레버 등)을 사용합니다"
+  },
+  "gui.singulo.program.snippet.function.title": {
+    "source": "Write a function",
+    "translation": "함수 만들기"
+  },
+  "gui.singulo.program.snippet.function.desc": {
+    "source": "Groups steps with def and returns a result with return",
+    "translation": "def로 절차를 묶고 return으로 결과를 돌려줍니다"
+  },
+  "gui.singulo.android_station.program.edit": {
+    "source": "Edit",
+    "translation": "편집"
+  },
+  "gui.singulo.android_station.program.edit.hint": {
+    "source": "Opens the editor for the card (with the place names of the station, the running line and what say prints)",
+    "translation": "카드의 프로그램을 작성하는 화면을 엽니다(스테이션 장소 이름 후보, 실행 중인 줄, say의 메시지가 표시됩니다)"
+  },
+  "program.singulo.fn.attack": {
+    "source": "Fight a mob until it dies or leaves r blocks around p (p and r optional). True if it was defeated",
+    "translation": "몹과 싸웁니다. 쓰러지거나 장소 p에서 r블록 밖으로 나갈 때까지 계속합니다(p·r 생략 가능). 쓰러뜨리면 True"
+  },
+  "program.singulo.fn.auto_fight": {
+    "source": "False stops seeking enemies and fighting back on its own; it only fights attack targets",
+    "translation": "False로 하면 스스로 적을 찾거나 맞고 반격하지 않고, attack의 상대와만 싸웁니다"
+  },
+  "program.singulo.fn.mobs": {
+    "source": "Mobs within r blocks of p (5 if omitted, up to 16), nearest first. filter narrows them (\"hostile\", \"zombie\", \"#minecraft:undead\", \"!creeper\", or a list)",
+    "translation": "장소 p에서 r블록(생략하면 5, 최대 16) 안의 몹 목록(가까운 순). filter로 좁힐 수 있습니다(\"hostile\", \"zombie\", \"#minecraft:undead\", \"!creeper\" 또는 그 리스트)"
+  },
+  "program.singulo.fn.distance": {
+    "source": "Distance between two places or mobs",
+    "translation": "두 장소나 몹 사이의 거리"
+  },
+  "program.singulo.error.bad_radius": {
+    "source": "Range %s must be from 0 to %s",
+    "translation": "범위 %s는 0부터 %s까지여야 합니다"
+  },
+  "program.singulo.error.not_mob": {
+    "source": "Expected a mob (from mobs()), not %s",
+    "translation": "몹(mobs()의 결과)이 필요합니다(%s 전달함)"
+  },
+  "program.singulo.error.mob_gone": {
+    "source": "That mob is gone (check with .alive)",
+    "translation": "그 몹은 이미 없습니다(.alive로 확인할 수 있습니다)"
+  },
+  "program.singulo.error.cannot_attack": {
+    "source": "Cannot fight %s (guard androids, tamed pets and bosses)",
+    "translation": "%s와는 싸울 수 없습니다(호위 안드로이드, 길들인 동물, 보스)"
+  },
+  "gui.singulo.program.snippet.guard.title": {
+    "source": "Guard a post",
+    "translation": "자리 지키기"
+  },
+  "gui.singulo.program.snippet.guard.desc": {
+    "source": "Waits on top of the block at p1 and fights any mob within 5 blocks until it dies or leaves. It fights nowhere else on its own (recharging works as usual)",
+    "translation": "p1 블록 위에서 기다리다가 5블록 안에 들어온 몹과, 쓰러지거나 범위를 벗어날 때까지 싸웁니다. 다른 곳에서는 스스로 싸우지 않습니다(충전은 평소대로)"
+  },
+  "program.singulo.fn.matches": {
+    "source": "True if the mob fits the filter (written as for mobs)",
+    "translation": "몹이 조건(mobs와 같은 표기)에 맞으면 True"
+  },
+  "program.singulo.error.bad_filter": {
+    "source": "Unknown filter %s (use \"hostile\", \"animal\", \"all\", a mob ID or \"#tag\", with ! in front to exclude)",
+    "translation": "알 수 없는 조건 %s(\"hostile\", \"animal\", \"all\", 몹 ID, \"#태그\"를 쓰고, 앞에 !를 붙이면 제외)"
   }
 }

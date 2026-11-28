@@ -11460,8 +11460,8 @@
     "translation": "用于：创世炉核心、原初之种"
   },
   "uses.singulo.basic_circuit": {
-    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 59 more",
-    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 59 个"
+    "source": "Used in: Settings Card, Explorer's Compass, Holo Projector, Thermoelectric Generator, Kiln and 60 more",
+    "translation": "用于：设置卡、探索罗盘、全息投影仪、热电发电机、烧制炉 等 60 个"
   },
   "uses.singulo.basic_frame": {
     "source": "Used in: Thermoelectric Generator, Kiln, Compressor, Electrolyzer, Archive Terminal and 38 more",
@@ -16670,5 +16670,653 @@
   "block.singulo.mixed_panel_glass_slab": {
     "source": "Stacked Glass and Panel Slabs",
     "translation": "玻璃与面板双层台阶"
+  },
+  "desc.singulo.program_card": {
+    "source": "Use it in hand to write what an android does, in a Python-like language. Put it in the program slot of an Android Assembly Station and set the mode to Code, and the androids of that station follow it. Places come from the Work Location Cards in the route slots (named with an anvil, or p1 to p8).",
+    "translation": "手持使用即可用类似 Python 的写法编写仿生人的行动。放入仿生人组装站的程序栏位，并将行动方式设为“代码”，该站的仿生人就会照此行动。地点来自巡逻路线栏位中的作业位置卡（用铁砧命名的名字，或 p1～p8）。"
+  },
+  "gui.singulo.android_station.mode.4": {
+    "source": "Code",
+    "translation": "代码"
+  },
+  "gui.singulo.android_station.mode.4.hint": {
+    "source": "Follows the Program Card (left slot of the lower row). Places are the Work Location Cards in the upper row (anvil names, or p1 to p8). It pauses to fight or recharge and then carries on.",
+    "translation": "按照程序卡（下排左侧的栏位）行动。地点是上排的作业位置卡（用铁砧命名的名字，或 p1～p8）。战斗和充电时会暂停，结束后从中断处继续。"
+  },
+  "gui.singulo.android_station.program.0": {
+    "source": "The card is blank",
+    "translation": "卡片是空白的"
+  },
+  "gui.singulo.android_station.program.1": {
+    "source": "Running line %s",
+    "translation": "正在执行第 %s 行"
+  },
+  "gui.singulo.android_station.program.2": {
+    "source": "Waiting (line %s)",
+    "translation": "等待中（第 %s 行）"
+  },
+  "gui.singulo.android_station.program.3": {
+    "source": "Finished",
+    "translation": "已结束"
+  },
+  "gui.singulo.android_station.program.4": {
+    "source": "Error on line %s",
+    "translation": "第 %s 行出错"
+  },
+  "gui.singulo.android_station.program.5": {
+    "source": "Paused (line %s)",
+    "translation": "已暂停（第 %s 行）"
+  },
+  "gui.singulo.android_station.program.no_card": {
+    "source": "Insert a Program Card",
+    "translation": "放入程序卡"
+  },
+  "gui.singulo.android_station.program.points.hint": {
+    "source": "Place p%s: insert a Work Location Card. Name it with an anvil to use that name too",
+    "translation": "地点 p%s：放入作业位置卡。用铁砧命名后，也能用那个名字调用"
+  },
+  "gui.singulo.android_station.program.restart": {
+    "source": "Restart",
+    "translation": "重新执行"
+  },
+  "gui.singulo.android_station.program.restart.hint": {
+    "source": "Runs the program of this station’s androids again from the start",
+    "translation": "让此站的仿生人从头重新执行程序"
+  },
+  "gui.singulo.program.cursor": {
+    "source": "Ln %s, Col %s",
+    "translation": "第 %s 行，第 %s 列"
+  },
+  "gui.singulo.program.functions": {
+    "source": "Functions",
+    "translation": "函数"
+  },
+  "gui.singulo.program.ok": {
+    "source": "No errors",
+    "translation": "没有错误"
+  },
+  "gui.singulo.program.title": {
+    "source": "Program Card",
+    "translation": "程序卡"
+  },
+  "howto.singulo.program_card": {
+    "source": "Made in: Crafting Table (stage 2)",
+    "translation": "制作：工作台（阶段2）"
+  },
+  "item.singulo.program_card": {
+    "source": "Program Card",
+    "translation": "程序卡"
+  },
+  "program.singulo.error.arg_count": {
+    "source": "%s() takes %s argument(s), got %s",
+    "translation": "%s() 接受 %s 个参数（传入了 %s 个）"
+  },
+  "program.singulo.error.bad_char": {
+    "source": "Unexpected character: %s",
+    "translation": "无法使用的字符：%s"
+  },
+  "program.singulo.error.bad_index": {
+    "source": "Index must be an integer, not %s",
+    "translation": "索引必须是整数（传入了 %s）"
+  },
+  "program.singulo.error.bad_item": {
+    "source": "Unknown item: %s",
+    "translation": "不认识的物品名：%s"
+  },
+  "program.singulo.error.bad_number": {
+    "source": "Malformed number: %s",
+    "translation": "数字写法不正确：%s"
+  },
+  "program.singulo.error.bad_operand": {
+    "source": "Cannot use %s on %s",
+    "translation": "%s 不能用于 %s"
+  },
+  "program.singulo.error.bad_operands": {
+    "source": "Cannot use %s between %s and %s",
+    "translation": "%s 不能用于 %s 和 %s 之间"
+  },
+  "program.singulo.error.bad_target": {
+    "source": "Cannot assign to this",
+    "translation": "这里不能赋值"
+  },
+  "program.singulo.error.bad_value": {
+    "source": "Invalid value passed to %s()",
+    "translation": "传给 %s() 的值不正确"
+  },
+  "program.singulo.error.builtin_name": {
+    "source": "%s is the name of a built-in function",
+    "translation": "%s 是内置函数的名字，不能使用"
+  },
+  "program.singulo.error.convert": {
+    "source": "Cannot convert %s to %s",
+    "translation": "无法把 %s 转换为 %s"
+  },
+  "program.singulo.error.dedent": {
+    "source": "Indentation does not match any outer level",
+    "translation": "缩进与外层任何一行都对不齐"
+  },
+  "program.singulo.error.div_zero": {
+    "source": "Division by zero",
+    "translation": "除以 0"
+  },
+  "program.singulo.error.duplicate_function": {
+    "source": "Function %s is already defined",
+    "translation": "函数 %s 已经定义过了"
+  },
+  "program.singulo.error.duplicate_param": {
+    "source": "Duplicate parameter %s",
+    "translation": "参数名 %s 重复"
+  },
+  "program.singulo.error.empty_list": {
+    "source": "Pop from an empty list",
+    "translation": "从空列表中取出"
+  },
+  "program.singulo.error.expected": {
+    "source": "Expected %s but found %s",
+    "translation": "应为 %s 的地方出现了 %s"
+  },
+  "program.singulo.error.expected_indent": {
+    "source": "Expected an indented block",
+    "translation": "这里需要缩进的代码块"
+  },
+  "program.singulo.error.index_range": {
+    "source": "Index %s out of range (length %s)",
+    "translation": "索引 %s 超出范围（长度 %s）"
+  },
+  "program.singulo.error.internal": {
+    "source": "Internal error",
+    "translation": "遇到无法执行的指令"
+  },
+  "program.singulo.error.needs_mining_upgrade": {
+    "source": "Mining needs a Mining Upgrade",
+    "translation": "挖掘需要采掘升级"
+  },
+  "program.singulo.error.nested_def": {
+    "source": "def is only allowed at the top level",
+    "translation": "def 只能写在最外层"
+  },
+  "program.singulo.error.no_attribute": {
+    "source": "%s has no attribute .%s",
+    "translation": "%s 没有 .%s"
+  },
+  "program.singulo.error.no_length": {
+    "source": "%s has no length",
+    "translation": "%s 没有长度"
+  },
+  "program.singulo.error.no_method": {
+    "source": "%s has no method .%s()",
+    "translation": "%s 没有 .%s()"
+  },
+  "program.singulo.error.no_point": {
+    "source": "No place called %s (Work Location Cards in the route slots)",
+    "translation": "没有名为 %s 的地点（巡逻路线栏位的作业位置卡）"
+  },
+  "program.singulo.error.no_station": {
+    "source": "Not in the same dimension as the station",
+    "translation": "不在站点所在的维度"
+  },
+  "program.singulo.error.not_assignable": {
+    "source": "Cannot change the contents of %s",
+    "translation": "不能更改 %s 的内容"
+  },
+  "program.singulo.error.not_callable": {
+    "source": "This cannot be called",
+    "translation": "这不能作为函数调用"
+  },
+  "program.singulo.error.not_in_list": {
+    "source": "%s is not in the list",
+    "translation": "%s 不在列表中"
+  },
+  "program.singulo.error.not_integer": {
+    "source": "Expected an integer, not %s",
+    "translation": "需要整数（传入了 %s）"
+  },
+  "program.singulo.error.not_iterable": {
+    "source": "%s is not iterable",
+    "translation": "%s 无法逐一遍历"
+  },
+  "program.singulo.error.not_number": {
+    "source": "Expected a number, not %s",
+    "translation": "需要数字（传入了 %s）"
+  },
+  "program.singulo.error.not_position": {
+    "source": "Expected a place (pos() or a place name), not %s",
+    "translation": "需要地点（pos() 或地点名）（传入了 %s）"
+  },
+  "program.singulo.error.not_text": {
+    "source": "Expected a string, not %s",
+    "translation": "需要字符串（传入了 %s）"
+  },
+  "program.singulo.error.outside_function": {
+    "source": "return outside a function",
+    "translation": "return 只能写在函数内"
+  },
+  "program.singulo.error.outside_loop": {
+    "source": "%s outside a loop",
+    "translation": "%s 只能写在循环内"
+  },
+  "program.singulo.error.overflow": {
+    "source": "Number too large",
+    "translation": "数字太大"
+  },
+  "program.singulo.error.stray": {
+    "source": "%s without a matching if",
+    "translation": "%s 之前没有对应的 if"
+  },
+  "program.singulo.error.too_big": {
+    "source": "Too many items, characters or variables",
+    "translation": "列表、字符串或变量太多"
+  },
+  "program.singulo.error.too_deep": {
+    "source": "Calls nested too deeply (endless recursion?)",
+    "translation": "调用嵌套太深（是否为无尽递归？）"
+  },
+  "program.singulo.error.too_far": {
+    "source": "%s is more than %s blocks from the station",
+    "translation": "%s 距离站点超过 %s 格"
+  },
+  "program.singulo.error.too_long": {
+    "source": "Program too long (up to %s characters)",
+    "translation": "程序太长（最多 %s 个字符）"
+  },
+  "program.singulo.error.unclosed": {
+    "source": "Unclosed bracket",
+    "translation": "括号没有闭合"
+  },
+  "program.singulo.error.undefined": {
+    "source": "Name %s is not defined",
+    "translation": "%s 是尚未定义的名字"
+  },
+  "program.singulo.error.unexpected_indent": {
+    "source": "Unexpected indent",
+    "translation": "这里不应缩进"
+  },
+  "program.singulo.error.unknown_function": {
+    "source": "Unknown function %s",
+    "translation": "没有函数 %s"
+  },
+  "program.singulo.error.unsupported": {
+    "source": "%s is not supported",
+    "translation": "不能使用 %s"
+  },
+  "program.singulo.error.unterminated_string": {
+    "source": "Unterminated string",
+    "translation": "字符串没有闭合"
+  },
+  "program.singulo.error_at": {
+    "source": "Line %s: %s",
+    "translation": "第 %s 行：%s"
+  },
+  "program.singulo.fn.abs": {
+    "source": "Absolute value",
+    "translation": "绝对值"
+  },
+  "program.singulo.fn.block": {
+    "source": "Block ID at a place (\"minecraft:stone\"...)",
+    "translation": "该地点方块的 ID（如 \"minecraft:stone\"）"
+  },
+  "program.singulo.fn.bool": {
+    "source": "Convert to True or False",
+    "translation": "转换为 True 或 False"
+  },
+  "program.singulo.fn.charge": {
+    "source": "Charge left (%)",
+    "translation": "剩余电量（%）"
+  },
+  "program.singulo.fn.count": {
+    "source": "How many items it holds (all if no item given)",
+    "translation": "身上的物品数量（省略物品则为全部）"
+  },
+  "program.singulo.fn.count_at": {
+    "source": "How many items a container holds",
+    "translation": "容器内的物品数量"
+  },
+  "program.singulo.fn.float": {
+    "source": "Convert to a float",
+    "translation": "转换为小数"
+  },
+  "program.singulo.fn.free_slots": {
+    "source": "Number of empty inventory slots",
+    "translation": "身上空栏位的数量"
+  },
+  "program.singulo.fn.go": {
+    "source": "Walk to a place. True on arrival, False if unreachable",
+    "translation": "走到某个地点。到达返回 True，无法到达返回 False"
+  },
+  "program.singulo.fn.health": {
+    "source": "Health left (%)",
+    "translation": "剩余生命（%）"
+  },
+  "program.singulo.fn.here": {
+    "source": "Where the android is now",
+    "translation": "现在的位置"
+  },
+  "program.singulo.fn.home": {
+    "source": "Walk back to the station",
+    "translation": "回到站点"
+  },
+  "program.singulo.fn.int": {
+    "source": "Convert to an integer",
+    "translation": "转换为整数"
+  },
+  "program.singulo.fn.is_day": {
+    "source": "True during the day",
+    "translation": "白天时为 True"
+  },
+  "program.singulo.fn.len": {
+    "source": "Length",
+    "translation": "长度"
+  },
+  "program.singulo.fn.list": {
+    "source": "Make a list",
+    "translation": "建立列表"
+  },
+  "program.singulo.fn.max": {
+    "source": "Largest value",
+    "translation": "最大的值"
+  },
+  "program.singulo.fn.min": {
+    "source": "Smallest value",
+    "translation": "最小的值"
+  },
+  "program.singulo.fn.mine": {
+    "source": "Mine one block (needs a Mining Upgrade). True if mined",
+    "translation": "挖掘一个方块（需要采掘升级）。挖到返回 True"
+  },
+  "program.singulo.fn.point": {
+    "source": "A place by name or number (route slot cards)",
+    "translation": "按名字或编号取得地点（巡逻路线栏位的卡）"
+  },
+  "program.singulo.fn.points": {
+    "source": "List of place names",
+    "translation": "地点名字的列表"
+  },
+  "program.singulo.fn.pos": {
+    "source": "Make a place from coordinates",
+    "translation": "用坐标建立地点"
+  },
+  "program.singulo.fn.put": {
+    "source": "Put held items into a container (item and count optional). Returns how many",
+    "translation": "把身上的物品放进容器（物品和数量可省略）。返回放入的数量"
+  },
+  "program.singulo.fn.randint": {
+    "source": "Random integer from a to b",
+    "translation": "a 到 b 之间的随机整数"
+  },
+  "program.singulo.fn.range": {
+    "source": "A run of numbers (for loops)",
+    "translation": "数字序列（用于 for）"
+  },
+  "program.singulo.fn.redstone": {
+    "source": "Redstone signal a place receives (0 to 15)",
+    "translation": "该地点接收的红石信号（0～15）"
+  },
+  "program.singulo.fn.round": {
+    "source": "Round (to even)",
+    "translation": "四舍五入（取偶数）"
+  },
+  "program.singulo.fn.say": {
+    "source": "Send a message to the owner (also shown on the station)",
+    "translation": "向主人发送消息（也会显示在站点上）"
+  },
+  "program.singulo.fn.sorted": {
+    "source": "Sorted copy of a list",
+    "translation": "排序后的列表"
+  },
+  "program.singulo.fn.station": {
+    "source": "Where the station is",
+    "translation": "站点的位置"
+  },
+  "program.singulo.fn.str": {
+    "source": "Convert to a string",
+    "translation": "转换为字符串"
+  },
+  "program.singulo.fn.sum": {
+    "source": "Sum",
+    "translation": "合计"
+  },
+  "program.singulo.fn.take": {
+    "source": "Take items from a container (item and count optional). Returns how many",
+    "translation": "从容器取物品到身上（物品和数量可省略）。返回取出的数量"
+  },
+  "program.singulo.fn.time": {
+    "source": "Time of day (0 to 23999)",
+    "translation": "一天中的时刻（0～23999）"
+  },
+  "program.singulo.fn.use": {
+    "source": "Use a block (lever, button, door...)",
+    "translation": "使用方块（拉杆、按钮、门等）"
+  },
+  "program.singulo.fn.wait": {
+    "source": "Wait this many seconds",
+    "translation": "等待指定的秒数"
+  },
+  "program.singulo.say": {
+    "source": "<%s> %s",
+    "translation": "<%s> %s"
+  },
+  "program.singulo.stopped": {
+    "source": "The program of %s stopped: %s",
+    "translation": "%s 的程序已停止：%s"
+  },
+  "summary.singulo.program_card": {
+    "source": "Programs what androids do.",
+    "translation": "用程序编写仿生人的行动。"
+  },
+  "tooltip.singulo.program_card.empty": {
+    "source": "Blank: use it in hand to write a program",
+    "translation": "空白：手持使用即可编写程序"
+  },
+  "tooltip.singulo.program_card.lines": {
+    "source": "%s lines",
+    "translation": "%s 行"
+  },
+  "uses.singulo.procedure_card": {
+    "source": "Used in: Program Card",
+    "translation": "用于：程序卡"
+  },
+  "guide.singulo.androids.program.title": {
+    "source": "Programming androids",
+    "translation": "用程序驱动"
+  },
+  "guide.singulo.androids.program.body": {
+    "source": "Use a Program Card in hand to write what an android does in a Python-like language. Set the Android Assembly Station mode to Code, put the card in the left slot of the lower row and Work Location Cards in the upper row, and the androids of the station follow the program. Places are called by the anvil name of each Work Location Card or p1 to p8 (pos(x, y, z) also works, within 64 blocks of the station).\nYou can use variables, if / elif / else, while, for i in range(n), def and return, lists and strings. Indent with four spaces (the Tab key adds them). A # starts a comment.\nActions: go(p), take(p, item, n), put(p, item, n), use(p), mine(p) (needs a Mining Upgrade), wait(seconds) and home(). Items are written as \"coal\" or \"minecraft:iron_ingot\", tags as \"#c:ingots\".\nQueries: count(item), count_at(p, item), free_slots(), block(p), redstone(p), is_day(), time(), charge() and health(). say(...) sends a message to the owner.\nFighting: mobs(p, r) lists the mobs within r blocks of p (nearest first), and you can read .name, .type, .health, .alive, .baby, .named and .pos of a mob. Narrow the list with a third argument such as [\"hostile\", \"!creeper\"] (\"hostile\", \"animal\", \"all\", IDs like \"zombie\", tags like \"#minecraft:undead\", and ! in front to exclude). matches(m, filter) checks one mob. attack(m, p, r) fights until the mob dies or leaves r blocks around p. With auto_fight(False) it no longer seeks enemies or fights back on its own and only fights attack targets (recharging and repairs work as usual).\nExample: inside while True:, if count_at(\"furnace\", \"iron_ingot\") is more than 0, take(\"furnace\", \"iron_ingot\") and put(\"chest\"), then wait(5).\nErrors show the line and reason at the bottom of the editor and on the station (errors while running are also sent to the owner). Each tick runs a limited number of steps, so an endless loop never stops the server. The program pauses to fight or recharge and then carries on. It starts over when the world is reopened, when the card or places change, or with Restart on the station.",
+    "translation": "手持程序卡使用，就能用类似 Python 的写法编写仿生人的行动。把组装站的行动方式设为“代码”，在下排左侧的栏位放入程序卡、在上排放入作业位置卡，站点负责的仿生人就会照此行动。地点可用作业位置卡在铁砧上取的名字或 p1～p8 调用（也可用 pos(x, y, z)，限站点 64 格以内）。\n可以使用：变量、if / elif / else、while、for i in range(n)、def 与 return、列表、字符串。缩进为 4 个空格（按 Tab 键输入）。# 到行尾为注释。\n行动：go(p) 前往、take(p, 物品, 数量) 取出、put(p, 物品, 数量) 放入、use(p) 使用、mine(p) 挖掘（需要采掘升级）、wait(秒) 等待、home() 返回。物品写成 \"coal\" 或 \"minecraft:iron_ingot\"，标签写成 \"#c:ingots\"。\n查询：count(物品)、count_at(p, 物品)、free_slots()、block(p)、redstone(p)、is_day()、time()、charge()、health()。say(...) 可以向主人发送消息。\n战斗：mobs(p, r) 可取得 p 周围 r 格内的生物列表（由近到远），并可读取生物的 .name、.type、.health、.alive、.baby、.named、.pos。可用第 3 个参数筛选，如 mobs(p, r, [\"hostile\", \"!creeper\"])（\"hostile\"、\"animal\"、\"all\"、\"zombie\" 等 ID、\"#minecraft:undead\" 等标签，前面加 ! 表示排除）。matches(m, 条件) 可检查单个生物。attack(m, p, r) 会一直战斗，直到对方倒下或离开 p 周围 r 格。设为 auto_fight(False) 后，不会自行寻找敌人或被打后反击，只与 attack 的对象战斗（充电和修理照常）。\n例：在 while True: 的代码块中，若 count_at(\"furnace\", \"iron_ingot\") 大于 0，就执行 take(\"furnace\", \"iron_ingot\") 和 put(\"chest\")，然后 wait(5)。\n出错时，编写界面下方和站点上会显示行号与原因（运行中的错误也会通知主人）。每 tick 执行的步数有上限，即使是无尽循环也不会让服务器停止。战斗和充电时会暂停，结束后从中断处继续。重新打开世界、更换卡片或地点，或按下站点的“重新执行”时，会从头开始。"
+  },
+  "gui.singulo.program.tab.functions": {
+    "source": "Functions",
+    "translation": "函数"
+  },
+  "gui.singulo.program.tab.places": {
+    "source": "Places",
+    "translation": "地点"
+  },
+  "gui.singulo.program.tab.examples": {
+    "source": "Examples",
+    "translation": "示例"
+  },
+  "gui.singulo.program.tab.output": {
+    "source": "Output",
+    "translation": "输出"
+  },
+  "gui.singulo.program.search": {
+    "source": "Search names or descriptions",
+    "translation": "按名字或说明搜索"
+  },
+  "gui.singulo.program.category.action": {
+    "source": "Actions (take time)",
+    "translation": "行动（需要时间）"
+  },
+  "gui.singulo.program.category.query": {
+    "source": "Queries",
+    "translation": "查询"
+  },
+  "gui.singulo.program.category.value": {
+    "source": "Values",
+    "translation": "值的计算"
+  },
+  "gui.singulo.program.completion": {
+    "source": "Suggest",
+    "translation": "候选"
+  },
+  "gui.singulo.program.completion.hint": {
+    "source": "Suggests the word being typed (functions, variables, place names, item IDs). Pick with the arrow keys and insert with Tab or Enter. Ctrl+Space shows it any time",
+    "translation": "显示正在输入的词的候选（函数、变量、地点名、物品 ID）。用 ↑↓ 选择，按 Tab 或 Enter 插入。按 Ctrl+Space 可随时显示"
+  },
+  "gui.singulo.program.hints": {
+    "source": "Hints",
+    "translation": "提示"
+  },
+  "gui.singulo.program.hints.hint": {
+    "source": "Shows the arguments of the function being called (the current one underlined) and what it does",
+    "translation": "显示正在调用的函数的参数（当前参数带下划线）和说明"
+  },
+  "gui.singulo.program.done": {
+    "source": "Save and close (Esc does too; Ctrl+S only saves)",
+    "translation": "保存并关闭（也可按 Esc；Ctrl+S 只保存）"
+  },
+  "gui.singulo.program.discard": {
+    "source": "Close without saving",
+    "translation": "不保存直接关闭"
+  },
+  "gui.singulo.program.discard.confirm": {
+    "source": "Press again to throw away the changes and close",
+    "translation": "再按一次即放弃更改并关闭"
+  },
+  "gui.singulo.program.restart.hint": {
+    "source": "Runs the program of the androids from the start (saving first if changed)",
+    "translation": "让负责的仿生人从头执行程序（有更改时先保存）"
+  },
+  "gui.singulo.program.places.hand": {
+    "source": "Open the editor from Edit on the Android Assembly Station screen to list its places (Work Location Cards in the route slots). Here you can use the names p1 to p8",
+    "translation": "从仿生人组装站界面的“编辑”打开时，会列出该站的地点（巡逻路线栏位的作业位置卡）。这里可以使用 p1～p8 的名字"
+  },
+  "gui.singulo.program.places.empty": {
+    "source": "p%s (empty)",
+    "translation": "p%s（空）"
+  },
+  "gui.singulo.program.places.click": {
+    "source": "Click to insert the name",
+    "translation": "点击即可插入名字"
+  },
+  "gui.singulo.program.output.hand": {
+    "source": "Open the editor from Edit on the Android Assembly Station screen to see the program running and what say prints",
+    "translation": "从仿生人组装站界面的“编辑”打开时，会显示运行情况和 say 的消息"
+  },
+  "gui.singulo.program.output.empty": {
+    "source": "Nothing printed yet (use say)",
+    "translation": "还没有消息（可用 say 输出）"
+  },
+  "gui.singulo.program.none": {
+    "source": "Nothing found",
+    "translation": "没有找到"
+  },
+  "gui.singulo.program.warn.no_point": {
+    "source": "Line %s: the station has no place called %s",
+    "translation": "第 %s 行：站点没有名为 %s 的地点"
+  },
+  "gui.singulo.program.snippet.carry.title": {
+    "source": "Carry between containers",
+    "translation": "在容器之间搬运"
+  },
+  "gui.singulo.program.snippet.carry.desc": {
+    "source": "Takes whatever is in p1 and puts it in p2, checking every 5 seconds",
+    "translation": "p1 里有物品就取出放进 p2，每 5 秒检查一次"
+  },
+  "gui.singulo.program.snippet.furnace.title": {
+    "source": "Smelt in a furnace",
+    "translation": "用熔炉烧制"
+  },
+  "gui.singulo.program.snippet.furnace.desc": {
+    "source": "Feeds raw iron from p1 into the furnace at p2 and carries the ingots to p3",
+    "translation": "把 p1 的粗铁放进 p2 的熔炉，再把烧好的锭搬到 p3"
+  },
+  "gui.singulo.program.snippet.dig.title": {
+    "source": "Dig down",
+    "translation": "向下挖"
+  },
+  "gui.singulo.program.snippet.dig.desc": {
+    "source": "Mines five blocks down from p1, comes back and puts them in p2 (needs a Mining Upgrade)",
+    "translation": "从 p1 向下挖 5 格，回来后放进 p2（需要采掘升级）"
+  },
+  "gui.singulo.program.snippet.day.title": {
+    "source": "Watch during the day",
+    "translation": "只在白天看守"
+  },
+  "gui.singulo.program.snippet.day.desc": {
+    "source": "Stands at p1 during the day and goes back to the station at night",
+    "translation": "白天站在 p1，夜里回到站点"
+  },
+  "gui.singulo.program.snippet.signal.title": {
+    "source": "React to a signal",
+    "translation": "用信号驱动"
+  },
+  "gui.singulo.program.snippet.signal.desc": {
+    "source": "Uses the block at p2 (button, lever...) when p1 receives a redstone signal",
+    "translation": "p1 收到红石信号时，使用 p2 的方块（按钮、拉杆等）"
+  },
+  "gui.singulo.program.snippet.function.title": {
+    "source": "Write a function",
+    "translation": "编写函数"
+  },
+  "gui.singulo.program.snippet.function.desc": {
+    "source": "Groups steps with def and returns a result with return",
+    "translation": "用 def 汇总步骤，用 return 返回结果"
+  },
+  "gui.singulo.android_station.program.edit": {
+    "source": "Edit",
+    "translation": "编辑"
+  },
+  "gui.singulo.android_station.program.edit.hint": {
+    "source": "Opens the editor for the card (with the place names of the station, the running line and what say prints)",
+    "translation": "打开编写此卡程序的界面（会显示站点地点名的候选、正在执行的行和 say 的消息）"
+  },
+  "program.singulo.fn.attack": {
+    "source": "Fight a mob until it dies or leaves r blocks around p (p and r optional). True if it was defeated",
+    "translation": "与生物战斗，直到它倒下或离开 p 周围 r 格（p、r 可省略）。击倒则返回 True"
+  },
+  "program.singulo.fn.auto_fight": {
+    "source": "False stops seeking enemies and fighting back on its own; it only fights attack targets",
+    "translation": "设为 False 时，不再自行寻找敌人或被打后反击，只与 attack 的对象战斗"
+  },
+  "program.singulo.fn.mobs": {
+    "source": "Mobs within r blocks of p (5 if omitted, up to 16), nearest first. filter narrows them (\"hostile\", \"zombie\", \"#minecraft:undead\", \"!creeper\", or a list)",
+    "translation": "地点 p 周围 r 格（省略为 5，最多 16）内的生物列表（由近到远）。可用 filter 筛选（\"hostile\"、\"zombie\"、\"#minecraft:undead\"、\"!creeper\" 或其列表）"
+  },
+  "program.singulo.fn.distance": {
+    "source": "Distance between two places or mobs",
+    "translation": "两个地点或生物之间的距离"
+  },
+  "program.singulo.error.bad_radius": {
+    "source": "Range %s must be from 0 to %s",
+    "translation": "范围 %s 必须在 0 到 %s 之间"
+  },
+  "program.singulo.error.not_mob": {
+    "source": "Expected a mob (from mobs()), not %s",
+    "translation": "需要生物（mobs() 的结果）（传入了 %s）"
+  },
+  "program.singulo.error.mob_gone": {
+    "source": "That mob is gone (check with .alive)",
+    "translation": "那个生物已经不在了（可用 .alive 确认）"
+  },
+  "program.singulo.error.cannot_attack": {
+    "source": "Cannot fight %s (guard androids, tamed pets and bosses)",
+    "translation": "不能与 %s 战斗（护卫仿生人、驯服的动物、首领）"
+  },
+  "gui.singulo.program.snippet.guard.title": {
+    "source": "Guard a post",
+    "translation": "守卫岗位"
+  },
+  "gui.singulo.program.snippet.guard.desc": {
+    "source": "Waits on top of the block at p1 and fights any mob within 5 blocks until it dies or leaves. It fights nowhere else on its own (recharging works as usual)",
+    "translation": "在 p1 的方块上等待，与进入 5 格内的生物战斗，直到它倒下或离开范围。不会自行在别处战斗（充电照常）"
+  },
+  "program.singulo.fn.matches": {
+    "source": "True if the mob fits the filter (written as for mobs)",
+    "translation": "生物符合筛选条件（写法同 mobs）则为 True"
+  },
+  "program.singulo.error.bad_filter": {
+    "source": "Unknown filter %s (use \"hostile\", \"animal\", \"all\", a mob ID or \"#tag\", with ! in front to exclude)",
+    "translation": "无法识别的筛选条件 %s（使用 \"hostile\"、\"animal\"、\"all\"、生物 ID 或 \"#标签\"，前面加 ! 表示排除）"
   }
 }

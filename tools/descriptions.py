@@ -1169,3 +1169,8 @@ SUMMARY['携帯型アンドロイド印刷機（Mk2）'] = ('型の違う3体を
 SUMMARY['コラプサー強化パネル'] = ('ウィザーにも爆発にも壊されない、最も硬いパネル。', 'The toughest panel: proof against the Wither and explosions.')
 SUMMARY['発光コラプサー強化パネル'] = ('明るく光る、ウィザーにも爆発にも壊されないパネル。', 'A glowing panel proof against the Wither and explosions.')
 SUMMARY['コラプサー強化ガラス'] = ('ウィザーにも爆発にも壊されない、透けるガラス。', 'See-through glass proof against the Wither and explosions.')
+
+# 0.24.0 アンドロイドのプログラム
+from program_content import DESC as _PROGRAM_DESC, SUMMARY as _PROGRAM_SUMMARY
+DESC.update(_PROGRAM_DESC)
+SUMMARY.update(_PROGRAM_SUMMARY)

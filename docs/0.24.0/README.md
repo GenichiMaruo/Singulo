@@ -28,3 +28,7 @@
 - `android_laser`: アンドロイドが床から立てる光の柱。
 
 一覧は `SinguloEntities.hiddenFromTooltips()` にまとめ、Jade は `hideTarget`、WTHIT は `blacklist` に登録する（`compat/jade/SinguloJadePlugin`、`compat/wthit/SinguloWthitPlugin`）。
+
+## アンドロイドのプログラム
+
+プログラムカードに Python に似た書き方でアンドロイドの動きを書き、組立ステーションの動き方「コード」で動かす。言語・関数・守り・負荷の決まりは [programming.md](programming.md)。

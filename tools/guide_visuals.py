@@ -57,6 +57,7 @@ TOPIC_ICONS = {
     'androids.process': 'android_mining_upgrade',
     'androids.farm': 'android_farming_upgrade',
     'androids.trouble': 'android_supply_port',
+    'androids.program': 'program_card',
 
     'drones.start': 'drone_station',
     'drones.send': 'packing_crate',
@@ -228,6 +229,7 @@ PAGE_DISCOVERIES = {
     'androids.process': ANDROID_WORK, 'androids.farm': ANDROID_WORK, 'androids.trouble': ANDROID_WORK,
     'androids.care': ['android_printed', 'android_charger', 'android_work'],
     'androids.patrol': ['android_printed', 'android_routes', 'android_work'],
+    'androids.program': ['android_printed', 'item/program_card'],
 }
 
 

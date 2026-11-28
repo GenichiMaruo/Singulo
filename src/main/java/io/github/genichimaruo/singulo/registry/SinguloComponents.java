@@ -108,5 +108,10 @@ public final class SinguloComponents {
             REGISTER.registerComponentType("food_paste", b -> b.persistent(io.github.genichimaruo.singulo.food.FoodPaste.Content.CODEC)
                     .networkSynchronized(io.github.genichimaruo.singulo.food.FoodPaste.Content.STREAM_CODEC));
 
+    /** プログラムカードに書いたプログラムの文（0.24.0）。 */
+    public static final Supplier<DataComponentType<String>> PROGRAM = REGISTER.registerComponentType("program",
+            b -> b.persistent(Codec.string(0, io.github.genichimaruo.singulo.android.program.Program.MAX_SOURCE))
+                    .networkSynchronized(ByteBufCodecs.stringUtf8(io.github.genichimaruo.singulo.android.program.Program.MAX_SOURCE)));
+
     private SinguloComponents() {}
 }

@@ -228,7 +228,8 @@ final class AndroidWorkGoal extends Goal {
     @Override
     public boolean canUse() {
         // 襲われて戦っている間は止める（作業の進みは残る。片付けたら、止めた所から続ける）
-        return android.isGuard() && android.workConsole() != null && android.active() && android.printed() && android.getTarget() == null;
+        return android.isGuard() && android.workConsole() != null && android.mode() != RuinAndroid.MODE_PROGRAM && android.active() && android.printed()
+                && android.getTarget() == null;
     }
 
     @Override

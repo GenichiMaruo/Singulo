@@ -21,6 +21,8 @@ public final class ClientConfig {
     public static final ModConfigSpec.BooleanValue WORK_ORDER_SORT_REVERSED;
     public static final ModConfigSpec.BooleanValue WORK_ORDER_JEI_SYNC;
     public static final ModConfigSpec.IntValue WORK_ORDER_ROWS;
+    public static final ModConfigSpec.BooleanValue PROGRAM_COMPLETION;
+    public static final ModConfigSpec.BooleanValue PROGRAM_HINTS;
     public static final ModConfigSpec.IntValue SELECTOR_ROWS;
     public static final ModConfigSpec.BooleanValue ARSENAL_NOTICE;
     public static final ModConfigSpec SPEC;
@@ -40,6 +42,8 @@ public final class ClientConfig {
         ModConfigSpec.BooleanValue WORK_ORDER_SORT_REVERSED_;
         ModConfigSpec.BooleanValue WORK_ORDER_JEI_SYNC_;
         ModConfigSpec.IntValue WORK_ORDER_ROWS_;
+        ModConfigSpec.BooleanValue PROGRAM_COMPLETION_;
+        ModConfigSpec.BooleanValue PROGRAM_HINTS_;
         ModConfigSpec.IntValue SELECTOR_ROWS_;
         ModConfigSpec.BooleanValue ARSENAL_NOTICE_;
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -74,6 +78,10 @@ public final class ClientConfig {
         WORK_ORDER_JEI_SYNC_ = b.define("workOrderJeiSync", false);
         b.comment("アンドロイド作業指令台の注文タブの物の一覧の行数。6行以上にすると、注文タブではプレイヤーのインベントリを隠してその場所も使う（画面の下の段のボタンでも変えられる）", "範囲: 3〜10（整数）");
         WORK_ORDER_ROWS_ = b.defineInRange("workOrderRows", 5, 3, 10);
+        b.comment("プログラムカードを書く画面で、打っている語の候補（関数・変数・場所の名前・物の ID）を出す（画面の「候補」のボタンでも変えられる）", "範囲: true / false");
+        PROGRAM_COMPLETION_ = b.define("programCompletion", true);
+        b.comment("プログラムカードを書く画面で、呼んでいる関数の引数と説明を出す（画面の「ヒント」のボタンでも変えられる）", "範囲: true / false");
+        PROGRAM_HINTS_ = b.define("programHints", true);
         b.comment("装置の「作るもの」を選ぶ板の行数。板はインベントリの見出しの上から上へ伸び、画面に収まる行数までになる（板の右上のボタンでも変えられる）", "範囲: 2〜8（整数）");
         SELECTOR_ROWS_ = b.defineInRange("selectorRows", 3, 2, 8);
         b.pop();
@@ -95,6 +103,8 @@ public final class ClientConfig {
         WORK_ORDER_SORT_REVERSED = WORK_ORDER_SORT_REVERSED_;
         WORK_ORDER_JEI_SYNC = WORK_ORDER_JEI_SYNC_;
         WORK_ORDER_ROWS = WORK_ORDER_ROWS_;
+        PROGRAM_COMPLETION = PROGRAM_COMPLETION_;
+        PROGRAM_HINTS = PROGRAM_HINTS_;
         SELECTOR_ROWS = SELECTOR_ROWS_;
         ARSENAL_NOTICE = ARSENAL_NOTICE_;
         SPEC = b.build();

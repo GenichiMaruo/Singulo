@@ -1814,6 +1814,8 @@ def lang_files():
     UI_LANG.update(_DECOR_UI)
     from factory_content import UI as _FACTORY_UI
     UI_LANG.update(_FACTORY_UI)
+    from program_content import UI as _PROGRAM_UI
+    UI_LANG.update(_PROGRAM_UI)
     ja, en = {}, {}
     for name, (iid, en_name, kind) in MOD.items():
         if kind == 'structure':
@@ -4221,7 +4223,7 @@ TAB_GROUPS = [
         'android_memory_axe', 'android_memory_bit', 'android_memory_gunner', 'android_memory_katana', 'android_memory_spark',
         'android_work_console', 'android_supply_port', 'android_delivery_port', 'android_recipe_rack',
         'android_workbench', 'advanced_android_workbench', 'quantum_android_workbench',
-        'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card',
+        'work_location_card', 'area_card', 'survey_glasses', 'recipe_card', 'procedure_card', 'program_card',
     ]),
     ('アンドロイドのアップグレード', [
         'android_production_upgrade', 'android_factory_print_unit', 'android_transfer_upgrade',
